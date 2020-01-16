@@ -1,0 +1,145 @@
+<div *ngIf="reviewingDto">
+    <div class="container">
+        <h1 class="text-center"> Review article</h1>
+        
+        <div class="row">
+            <div class="col-lg-6">
+                <h3>Basic</h3>
+                <table class="table table-bordered">
+                    <tr>
+                        <th>Title</th>
+                        <td>{{reviewingDto.article.articleTitle}}</td>
+                    </tr>
+                    <tr>
+                        <th>Abstract</th>
+                        <textarea class="form-control" name="" id=""  rows="10">{{reviewingDto.article.articleAbstract}}</textarea>
+                    </tr>
+                    <tr>
+                        <th>Science area</th>
+                        <td>Code {{reviewingDto.article.scienceArea.scienceAreaCode}} , Name: {{reviewingDto.article.scienceArea.scienceAreaName}}</td>
+                    </tr>
+                    <tr>
+                        <th>Author</th>
+                        <td>{{reviewingDto.article.author.firstName}} {{reviewingDto.article.author.lastName}}</td>
+                    </tr>
+                    <tr>
+                        <th>Key terms</th>
+                        <td><span *ngFor="let term of reviewingDto.article.keyTerms" class="badge badge-primary ml-3">{{term.termName}}</span></td>
+                    </tr>
+                    <tr>
+                        <th>
+                            File preview
+                        </th>
+                        <td>
+                            <!-- <a href="{{article.file.value.toString()}}" download ></a> -->
+                            <!-- <a [href]="article.file.toString()" download="proba.pdf" >Text</a>
+                            <a href="#" (click)="preview()" >Text</a> -->
+                            <a [href]="fileUrl" download>DownloadFile</a>
+                            <!-- <iframe [src]="fileUrl" frameborder="0"></iframe>
+                            <object data=""></object> -->
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div class="col-lg-6">
+                <h3>About magazine</h3>
+                <table class="table table-bordered">
+                        <tr>
+                            <th>Id</th>
+                            <td>{{reviewingDto.magazine.magazineId}}</td>
+                        </tr>
+                        <tr>
+                            <th>Name</th>
+                            <td>{{reviewingDto.magazine.name}}</td>
+                        </tr>
+                        <tr>
+                            <th>Issn</th>
+                            <td>{{reviewingDto.magazine.issn}}</td>
+                        </tr>
+                        <tr>
+                            <th>Science areas</th>
+                            <td><table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Code</th>
+                                        <th>Name</th>
+                                    </tr>
+                                </thead>
+                                <tr *ngFor="let sc of reviewingDto.magazine.scienceAreas">
+                                    <td>{{sc.scienceAreaCode}}</td>
+                                    <td>{{sc.scienceAreaName}}</td>
+                                </tr>
+                            </table></td>
+                        </tr>
+                </table>
+                <div *ngIf="reviewingDto.article.coAuthors.length > 0">
+                    <h3>Co authors</h3>
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>First name</th>
+                                <th>Last name</th>
+                            </tr>
+                        </thead>
+                        <tr *ngFor="let coathor of reviewingDto.article.coAuthors">
+                            <td>{{coathor.firstName}}</td>
+                            <td>{{coathor.lastName}}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+           
+        </div>
+        <div>
+            <h2 class="text-center">Your decision</h2>
+            <form #f="ngForm" (ngSubmit)="f.form.valid && reviewPost()" novalidate>
+                <div class="form-group row" >
+                    <div class="col-lg-3"><label for="comment">Comment:</label></div>
+                    <div class="col-lg-9">
+                        <textarea rows="3" class="form-control" name="comment" [(ngModel)]="reviewingDto.opinion.comment" #abstract="ngModel"
+                        >
+        
+                        </textarea>
+                    </div>
+                </div>
+                <div class="form-group row" >
+                    <div class="col-lg-3"><label for="commentEditor">Comment[Only for editors!]:</label></div>
+                    <div class="col-lg-9">
+                        <textarea rows="3" class="form-control" name="commentEditor" [(ngModel)]="reviewingDto.opinion.commentOnlyForEditor" #commentEditor="ngModel"
+                        >
+        
+                        </textarea>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-lg-3">
+                        <div class="col-lg-4"><label for="commentEditor">Decision:</label></div>
+                    </div>
+                    <div class="col-lg-5">
+                        <select class="form-control" name="reviewerDecision" [(ngModel)]="reviewingDto.opinion.opinion" #reviewerDecision="ngModel"
+                            [ngClass]="{ 'is-invalid': f.submitted && reviewerDecision.invalid }" required >
+                            <option *ngFor="let val of possibleOpinionsValues" value={{val}}>
+                                {{val}}
+                            </option>
+                        </select>
+                    </div>
+                    <div  *ngIf="f.submitted && reviewerDecision.invalid" class="col-lg-3 text-danger">
+                        <div *ngIf="reviewerDecision.errors.required">Opinion</div>
+                    </div>
+                </div>
+            
+            <div class="row">  
+                <div class="col-lg-4"></div>
+                <div class="col-lg-4">                
+                    <input type="submit" class="btn btn-success form-control" value="Submit review">     
+                </div>
+
+            </div>
+            </form>
+
+        </div>
+        
+    </div>
+    
+</div>
+

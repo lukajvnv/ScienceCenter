@@ -1,0 +1,25 @@
+
+
+<div class="jumbotron">
+    <div class="container">
+        <h1 class="text-center">View All User task</h1>
+        <table class="table table-bordered">
+            <thead>
+                <th>Name</th>
+                <th>Task id</th>
+                <th>Assignee</th>
+                <th>Detail</th>
+                <th>Delete</th>
+            </thead>
+            <tbody>
+                <tr *ngFor="let task of tasks" > 
+                    <td>{{task.name}}</td>
+                    <td>{{task.taskDefinitionId}}</td>
+                    <td>{{task.assignee}}</td>
+                    <td><button (click)="view(task)">Complete</button></td>
+                    <td><button (click)="removeTask(task)">Remove</button></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

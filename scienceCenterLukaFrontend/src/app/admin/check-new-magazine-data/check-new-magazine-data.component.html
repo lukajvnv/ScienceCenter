@@ -1,0 +1,125 @@
+<div class="jumbotron">
+    <div class="container" *ngIf="checkingMagazine">
+        <h3 class="text-center">View magazine</h3>
+        <div class="row">
+            <h3>Basic info</h3>
+            <table class="table table-bordered">
+                <tr>
+                    <th>Magazine id:</th>
+                    <td>{{checkingMagazine.magazine.magazineId}}</td>
+                </tr>
+                <tr>
+                    <th>ISSN:</th>
+                    <td>{{checkingMagazine.magazine.issn}}</td>
+                </tr>
+                <tr>
+                    <th>Name:</th>
+                    <td>{{checkingMagazine.magazine.name}}</td>
+                </tr>
+                <tr>
+                    <th>Way of payment:</th>
+                    <td>{{checkingMagazine.magazine.wayOfPayment}}</td>
+                </tr>
+                <tr>
+                    <th>Chief editor</th>
+                    <td>{{checkingMagazine.magazine.chiefEditor.firstName}} {{checkingMagazine.magazine.chiefEditor.lastName}} , {{checkingMagazine.magazine.chiefEditor.city}}</td>
+                </tr>
+                <tr>
+                    <th>Membership price</th>
+                    <td>{{checkingMagazine.magazine.membershipPrice}}</td>
+                </tr>
+                <tr>
+                    <th>
+                        Science areas:
+                    </th>
+                    <td>
+                        <b><table>
+                            <thead>
+                                <th>
+                                    Science area code
+                                </th>
+                                <th>
+                                    Science area name
+                                </th>
+                            </thead>
+                            <tr *ngFor="let scArea of checkingMagazine.magazine.scienceAreas">
+                                <td>{{scArea.scienceAreaCode}}</td>
+                                <td>{{scArea.scienceAreaName}}</td>
+                            </tr>
+                        </table></b>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="row">
+            <div class="col">
+                <h2>Selected editors</h2>
+                <table class="table table-bordered">
+                    <thead>
+                        <th>First name</th>
+                        <th>Last name</th>
+                        <th>City</th>
+                        <th>Science area</th>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let rev of checkingMagazine.magazine.editors">
+                            <td>{{rev.editorReviewer.firstName}}</td>
+                            <td>{{rev.editorReviewer.lastName}}</td>
+                            <td>{{rev.editorReviewer.city}}</td>
+                            <td>{{rev.scienceArea.scienceAreaCode}}-{{rev.scienceArea.scienceAreaName}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="col">
+                <h2>Selected reviewers</h2>
+                <table class="table table-bordered">
+                    <thead>
+                        <th>First name</th>
+                        <th>Last name</th>
+                        <th>City</th>
+                        <th>Science area</th>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let rev of checkingMagazine.magazine.reviewers">
+                            <td>{{rev.editorReviewer.firstName}}</td>
+                            <td>{{rev.editorReviewer.lastName}}</td>
+                            <td>{{rev.editorReviewer.city}}</td>
+                            <td>{{rev.scienceArea.scienceAreaCode}}-{{rev.scienceArea.scienceAreaName}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+        </div>
+
+        <form #f="ngForm" (ngSubmit)="f.form.valid && submit(f.value, f)" novalidate>
+            <div class="form-group row" >
+                <div class="col-lg-4"><label for="textDecision">Magazine valid:</label></div>
+                <div class="col-lg-3"><input type="checkbox" class="form-control" name="textDecision" [(ngModel)]="checkingMagazine.valid" #textDecision="ngModel"
+                />
+                </div>
+                
+
+            </div>
+            <div class="form-group row" *ngIf="!isTextOk">
+                <div class="col-lg-4"><label for="comment">Comment:</label></div>
+                <div class="col-lg-5">
+                    <textarea rows="5" class="form-control" name="comment" [(ngModel)]="checkingMagazine.comment" #abstract="ngModel"
+                    >
+    
+                    </textarea>
+                </div>
+            </div>
+        <div class="row">  
+            <div class="col-lg-4">
+
+            </div>
+            <div class="col-lg-4">
+                <input type="submit" class="btn btn-success form-control" value="Save decision">     
+            </div>
+        </div>
+        </form>
+
+    </div>
+</div>

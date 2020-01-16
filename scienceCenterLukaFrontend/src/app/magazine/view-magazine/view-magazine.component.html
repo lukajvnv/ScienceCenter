@@ -1,0 +1,48 @@
+<div class="container">
+    <div class="row">
+        <div class="col-lg-4 themed-grid-col  mt-3" style="border:2px solid red;  ">
+            <div class="container">
+                <div class="list-group">
+                    <!-- <a (click)="filterByAirline(undefined);" [class.active]="selectedAirline === undefined" class="list-group-item list-group-item-action" >Post text</a> -->
+                   
+                    <a (click)="newText()"  class="list-group-item list-group-item-info" >Post text</a>
+                    <a (click)="viewEditions()"  class="list-group-item list-group-item-action" >View editions</a>
+                    <a (click)="subscribe()"  class="list-group-item list-group-item-info" >Subscribe</a>
+      
+                  </div>
+            </div>
+      </div>
+      <div *ngIf="magazine" class="col-lg-8">
+        <table class="table table-bordered mt-3">
+            <thead>
+          
+            </thead>
+            <tbody>
+              <tr>
+                <th>Magazine id</th>
+                <td>{{magazine.magazineId}}</td>
+              </tr>
+              <tr class="info">
+                <th>Magazine name</th>
+                <td>{{magazine.name}}</td>
+              </tr>
+              <tr class="info">
+                <th>Magazine issn</th>
+                <td>{{magazine.issn}}</td>
+              </tr>
+              <tr>
+                <th>Magazine science areas</th>
+                <b><table>
+                    <tr *ngFor="let scArea of magazine.scienceAreas">
+                        <td>{{scArea.scienceAreaCode}}</td>
+                        <td>{{scArea.scienceAreaName}}</td>
+                    </tr>
+                </table></b>
+              </tr>
+              
+                                                       
+            </tbody>
+          </table>  
+      </div>
+    </div>
+</div>

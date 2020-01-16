@@ -1,0 +1,47 @@
+server:
+  port: 8085
+
+spring.datasource: # Please adjust username, password, hostname, port and database name
+  type: org.postgresql.jdbc2.optional.SimpleDataSource
+  username: postgres
+  password: postgres
+  url: jdbc:postgresql://localhost:5432/science_centerL?useSSL=false
+  
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQL95Dialect
+        temp: 
+          use_jdbc_metadata_defaults: false
+        jdbc:
+          lob: 
+            non_contextual_creation: true
+  mail: 
+    default-encoding: UTF-8
+    host: smtp.gmail.com
+    username: isa.airflights.project@gmail.com
+    password: isa.airflights.project12
+    port: 587
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls: 
+            enable: true
+            required: true
+          ssl:
+            trust: smtp.gmail.com
+    protocol: smtp
+    test-connection: false
+
+mail:
+  smtp:
+    debug: true
+
+camunda.bpm.admin-user: 
+  id: demo
+  password: demo
+  

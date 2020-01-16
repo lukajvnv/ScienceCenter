@@ -1,0 +1,73 @@
+<div class="jumbotron" *ngIf="displayDto">
+    <div class="container">
+        <div class="row">
+            <h3>New user request</h3>
+            <table class="table table-bordered">
+                <tr>
+                    <th>First name:</th>
+                    <td>{{displayDto.userDto.firstName}}</td>
+                </tr>
+                <tr>
+                    <th>Last name:</th>
+                    <td>{{displayDto.userDto.lastName}}</td>
+                </tr>
+                <tr>
+                    <th>Vocation:</th>
+                    <td>{{displayDto.userDto.vocation}}</td>
+                </tr>
+                <tr>
+                    <th>Email:</th>
+                    <td>{{displayDto.userDto.email}}</td>
+                </tr>
+                <tr>
+                    <th>City</th>
+                    <td>{{displayDto.userDto.city}}</td>
+                </tr>
+                <tr>
+                    <th>Coutry</th>
+                    <td>{{displayDto.userDto.country}}</td>
+                </tr>
+                <tr >
+                    <th>
+                        Science areas:
+                    </th>
+                    <td>
+                        <b><table>
+                            <thead>
+                                <th>
+                                    Science area code
+                                </th>
+                                <th>
+                                    Science area name
+                                </th>
+                            </thead>
+                            <tr *ngFor="let scArea of displayDto.scienceAreaDto">
+                                <td>{{scArea.scienceAreaCode}}</td>
+                                <td>{{scArea.scienceAreaName}}</td>
+                            </tr>
+                        </table></b>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <h3 class="text-center">Reviewer confirmation
+        </h3>
+        
+            
+            <form #f="ngForm" (ngSubmit)="f.form.valid && submit(f.value, f)" novalidate>
+                <div class="form-group row" >
+                    <div class="col-lg-3"><label for="basicDecision">Accept as reviewer:</label></div>
+                    <div class="col-lg-3"><input type="checkbox" class="form-control" name="basicDecision" [(ngModel)]="acceptAsReviewer" #basicDecision="ngModel"
+                         />
+                    </div>
+                    <div  class="col-lg-3">
+                        <input type="submit" class="btn btn-success form-control" value="Save decision">
+                    </div>
+    
+                </div>
+            </form>
+        
+                
+    </div>
+</div>

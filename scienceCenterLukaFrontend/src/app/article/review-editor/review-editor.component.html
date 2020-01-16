@@ -1,0 +1,178 @@
+<div *ngIf="reviewingEditorDto">
+    <div class="container">
+        <h1 class="text-center"> Review article</h1>
+        <div class="row">
+            <div class="col-lg-3 list-group">
+                <h3>Reviewers' opinions</h3>
+                <a *ngFor="let opinion of reviewingEditorDto.opinions" (click)="displayEditorReview = false; opinionToDisplay = opinion;"  class="list-group-item list-group-item-action" >{{opinion.personOpinionId}}' opinion, iteration {{opinion.iteration}}</a>
+                <a (click)="displayEditorReview = true; opinionToDisplay = undefined;"  class="list-group-item list-group-item-action" >Write your opinion</a>
+            </div>
+            <div class="col-lg-9">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <h3>Basic</h3>
+                        <table class="table table-bordered">
+                            <tr>
+                                <th>Title</th>
+                                <td>{{reviewingEditorDto.article.articleTitle}}</td>
+                            </tr>
+                            <tr>
+                                <th>Abstract</th>
+                                <textarea class="form-control" name="" id=""  rows="5">{{reviewingEditorDto.article.articleAbstract}}</textarea>
+                            </tr>
+                            <tr>
+                                <th>Science area</th>
+                                <td>Code {{reviewingEditorDto.article.scienceArea.scienceAreaCode}} , Name: {{reviewingEditorDto.article.scienceArea.scienceAreaName}}</td>
+                            </tr>
+                            <tr>
+                                <th>Author</th>
+                                <td>{{reviewingEditorDto.article.author.firstName}} {{reviewingEditorDto.article.author.lastName}}</td>
+                            </tr>
+                            <tr>
+                                <th>Key terms</th>
+                                <td><span *ngFor="let term of reviewingEditorDto.article.keyTerms" class="badge badge-primary ml-3">{{term.termName}}</span></td>
+                            </tr>
+                            <tr>
+                                <th>
+                                    File preview
+                                </th>
+                                <td>
+                                    <!-- <a href="{{article.file.value.toString()}}" download ></a> -->
+                                    <!-- <a [href]="article.file.toString()" download="proba.pdf" >Text</a>
+                                    <a href="#" (click)="preview()" >Text</a> -->
+                                    <a [href]="fileUrl" download>DownloadFile</a>
+                                    <!-- <iframe [src]="fileUrl" frameborder="0"></iframe>
+                                    <object data=""></object> -->
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-lg-6">
+                        <h3>About magazine</h3>
+                        <table class="table table-bordered">
+                                <tr>
+                                    <th>Id</th>
+                                    <td>{{reviewingEditorDto.magazine.magazineId}}</td>
+                                </tr>
+                                <tr>
+                                    <th>Name</th>
+                                    <td>{{reviewingEditorDto.magazine.name}}</td>
+                                </tr>
+                                <tr>
+                                    <th>Issn</th>
+                                    <td>{{reviewingEditorDto.magazine.issn}}</td>
+                                </tr>
+                                <tr>
+                                    <th>Science areas</th>
+                                    <td><table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Code</th>
+                                                <th>Name</th>
+                                            </tr>
+                                        </thead>
+                                        <tr *ngFor="let sc of reviewingEditorDto.magazine.scienceAreas">
+                                            <td>{{sc.scienceAreaCode}}</td>
+                                            <td>{{sc.scienceAreaName}}</td>
+                                        </tr>
+                                    </table></td>
+                                </tr>
+                        </table>
+                        <div *ngIf="reviewingEditorDto.article.coAuthors.length > 0">
+                            <h3>Co authors</h3>
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>First name</th>
+                                        <th>Last name</th>
+                                    </tr>
+                                </thead>
+                                <tr *ngFor="let coathor of reviewingEditorDto.article.coAuthors">
+                                    <td>{{coathor.firstName}}</td>
+                                    <td>{{coathor.lastName}}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                   
+                </div>
+                
+            </div>
+        </div>
+        
+        <div *ngIf="displayEditorReview">
+            <h2 class="text-center">Your decision</h2>
+            <form #f="ngForm" (ngSubmit)="f.form.valid && reviewPost()" novalidate>
+                <div class="form-group row" >
+                    <div class="col-lg-3"><label for="comment">Comment:</label></div>
+                    <div class="col-lg-9">
+                        <textarea rows="3" class="form-control" name="comment" [(ngModel)]="reviewingEditorDto.editorOpinion.comment" #abstract="ngModel"
+                        >
+        
+                        </textarea>
+                    </div>
+                </div>
+              
+                <div class="form-group row">
+                    <div class="col-lg-3">
+                        <div class="col-lg-4"><label for="commentEditor">Decision:</label></div>
+                    </div>
+                    <div class="col-lg-5">
+                        <select class="form-control" name="reviewerDecision" [(ngModel)]="reviewingEditorDto.editorOpinion.opinion" #reviewerDecision="ngModel"
+                            [ngClass]="{ 'is-invalid': f.submitted && reviewerDecision.invalid }" required >
+                            <option *ngFor="let val of possibleOpinionsValues" value={{val}}>
+                                {{val}}
+                            </option>
+                        </select>
+                    </div>
+                    <div  *ngIf="f.submitted && reviewerDecision.invalid" class="col-lg-3 text-danger">
+                        <div *ngIf="reviewerDecision.errors.required">Opinion</div>
+                    </div>
+                </div>
+            
+            <div class="row">  
+                <div class="col-lg-4"></div>
+                <div class="col-lg-4">                
+                    <input type="submit" class="btn btn-success form-control" value="Submit review">     
+                </div>
+
+            </div>
+            </form>
+
+        </div>
+        
+        <div *ngIf="!displayEditorReview">
+            <table class="table table-bordered">
+                <tr>
+                    <th>Reviewer id:</th>
+                    <td>{{opinionToDisplay?.personOpinionId}}</td>
+                </tr>
+                <tr>
+                    <th>Decision:</th>
+                    <td>{{opinionToDisplay?.opinion}}</td>
+                </tr>
+                <tr>
+                    <th>Comment:</th>
+                    <td>
+                        <textarea rows="3" class="form-control" name="comment" 
+                        >{{opinionToDisplay?.comment}}
+                        </textarea>
+                    </td>
+                </tr>
+                <tr>
+                    <th>Comment[for editor]:</th>
+                    <td>
+                        <textarea rows="3" class="form-control" name="commentEditor" 
+                        >{{opinionToDisplay?.commentOnlyForEditor}}
+                        </textarea>
+                    </td>
+
+                </tr>
+                
+            </table>
+        </div>
+
+    </div>
+    
+</div>
+

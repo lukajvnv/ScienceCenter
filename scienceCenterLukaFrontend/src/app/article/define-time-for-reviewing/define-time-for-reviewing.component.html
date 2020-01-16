@@ -1,0 +1,38 @@
+<div class="jumbotron">
+    <div class="container">
+        <form  (ngSubmit)="postResult()" class="mt-3">
+            <h2>Define time deadline for reaving</h2>
+            <div class="form-group row" >
+                <div class="col-lg-2">
+                    <label for="days">Days:</label>
+                </div>
+                <div class="col-lg-1">
+                    <input type="number" class="form-control" name="days" [(ngModel)]="days" 
+                     />
+                </div>
+                <div class="col-lg-2">
+                    <label for="hours">Hours:</label>
+                </div>
+                <div class="col-lg-1">
+                    <input type="number" class="form-control" name="hours" [(ngModel)]="hours" 
+                     />
+                </div>
+                <div class="col-lg-2">
+                    <label for="minutes">Minutes:</label>
+                </div>
+                <div class="col-lg-1">
+                    <input type="number" class="form-control" name="minutes" [(ngModel)]="minutes" 
+                     />
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-6">
+    
+                </div>
+                <div class="col-lg-3">
+                    <input type="submit" class="btn btn-lg btn-success" value="Submit">
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

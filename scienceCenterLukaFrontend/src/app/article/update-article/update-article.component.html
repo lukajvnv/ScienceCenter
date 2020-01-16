@@ -1,0 +1,234 @@
+<div class="jumbotron">
+    <div class="container" *ngIf="articleFormDto">  
+        <div class="form-group row">
+        <div class="col-lg-4"><label for="comment">Comment from editor:</label></div>
+            <div class="col-lg-5">
+                <!-- <input type="text" class="form-control" name="abstract" [(ngModel)]="articleData.articleAbstract" #abstract="ngModel"
+                [ngClass]="{ 'is-invalid': f.submitted && abstract.invalid }" required /> -->
+                <textarea rows="3" class="form-control" name="comment" >{{update.comment}}
+                </textarea>
+            </div>
+        </div>
+      <h1 class="text-center">Update article</h1>
+      <!-- <p class="text-center">New article</p> -->
+      <form #f="ngForm" (ngSubmit)="f.form.valid && onSubmit(f.value, f)" novalidate>
+        <div class="form-group row" >
+            <div class="col-lg-4"><label for="title">Title:</label>
+            </div>
+            <div class="col-lg-5"><input type="text" class="form-control" name="title" [(ngModel)]="articleData.articleTitle" #title="ngModel"
+                [ngClass]="{ 'is-invalid': f.submitted && title.invalid }" required />
+            </div>
+            <div  *ngIf="f.submitted && title.invalid" class="col-lg-3 text-danger">
+                <div *ngIf="title.errors.required">Title is required</div>
+            </div>
+        </div>
+
+        <div class="form-group row" >
+            <div class="col-lg-4"><label for="abstract">Abstract:</label></div>
+            <div class="col-lg-5">
+                <textarea rows="3" class="form-control" name="abstract" [(ngModel)]="articleData.articleAbstract" #abstract="ngModel"
+                [ngClass]="{ 'is-invalid': f.submitted && abstract.invalid }" required>
+
+                </textarea>
+            </div>
+            <div  *ngIf="f.submitted && abstract.invalid" class="col-lg-3 text-danger">
+                <div *ngIf="abstract.errors.required">Abstract is required</div>
+            </div>
+        </div>
+
+        <div class="form-group row" >
+            <div class="col-lg-4"><label for="abstract">Article price:</label></div>
+            <div class="col-lg-5">
+                <input type="number" class="form-control" name="articlePrice" [(ngModel)]="articleData.articlePrice" #articlePrice="ngModel"
+                [ngClass]="{ 'is-invalid': f.submitted && articlePrice.invalid }" required />
+
+               
+            </div>
+            <div  *ngIf="f.submitted && articlePrice.invalid" class="col-lg-3 text-danger">
+                <div *ngIf="articlePrice.errors.required">Price is required</div>
+            </div>
+        </div>
+
+        <div class="form-group row" >
+            <div class="col-lg-4"><label for="science_area">Science area:</label></div>
+            <div class="col-lg-5">
+                <select class="form-control" name="science_area" [(ngModel)]="articleData.articleScienceArea" #science_area="ngModel"
+                [ngClass]="{ 'is-invalid': f.submitted && science_area.invalid }" required size="{{articleFormDto.articleScienceAreas.length}}">
+                    <option *ngFor="let val of articleFormDto.articleScienceAreas" value={{val.scienceAreaId}}>
+                        {{val.scienceAreaCode}} - {{val.scienceAreaName}}
+                    </option>
+                </select>
+            </div>
+            
+            <div  *ngIf="f.submitted && science_area.invalid" class="col-lg-3 text-danger">
+                <div *ngIf="science_area.errors.required">Science area is required</div>
+            </div>
+        </div>
+
+        <div class="form-group row" >
+            <div class="col-lg-4"><label for="articleText">Upload text:</label></div>
+            <div class="col-lg-5">
+                <input type="file" class="form-control-file"  name="articleText" [(ngModel)]="articleData.fileName"  #articleText="ngModel"
+                [ngClass]="{ 'is-invalid': f.submitted && articleText.invalid }" required 
+                (change)="onFileUpload($event)"
+                /></div>
+            <div  *ngIf="f.submitted && articleText.invalid" class="col-lg-3 text-danger">
+                <div *ngIf="articleText.errors.required">File is required</div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-6">
+  
+            </div>
+            <div class="col-lg-3">
+              <input type="submit" class="btn btn-success form-control" value="Add article">
+            </div>
+        </div>
+
+       </form>
+
+        <div class="row">
+            <div class="col">
+                <h2 class="text-center">Terms</h2>
+                <div class="form-group row" >
+                    <div class="col-lg-4"><label for="customTerm">Custom term:</label></div>
+                    <div class="col-lg-5"><input type="text" class="form-control" name="customTerm" [(ngModel)]="customTerm.termName" #customTerm="ngModel"
+                        /></div>
+                    <div   class="col-lg-3">
+                        <button class="btn btn-success" (click)="addCustom(customTerm)">Add</button>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <h3 class="text-center">Selected terms</h3>
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Remove</th>
+                                </tr>
+                            </thead>
+                            <tr *ngFor="let t of articleData.articleTerm">
+                                <td>{{t.termName}}</td>
+                                <td><button class="btn btn-danger" (click)="delete(t)">Remove</button></td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col">
+                        <h3 class="text-center">Terms to select</h3>
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Add</th>
+                                </tr>
+                            </thead>
+                            <tr *ngFor="let term of articleFormDto.articleTerms">
+                                <td>{{term.termName}}</td>
+                                <td><button class="btn btn-info" (click)="add(term)">Add</button></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <h2 class="text-center">Coauthors</h2>
+                <div class="row">
+                    <div class="col-lg-5">
+                        <button class="btn btn-info" (click)="activeForm = 'custom'">Add custom</button>
+                    </div>
+                    <div class="col-lg-2"></div>
+                    <div class="col-lg-5" >
+                        <button class="btn btn-info" (click)="activeForm = 'existing'">Add existing</button>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <h3 class="text-center">Selected coauthors</h3>
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Remove</th>
+                                </tr>
+                            </thead>
+                            <tr *ngFor="let c of articleData.articleCoAuthors">
+                                <td>{{c.firstName}} {{c.lastName}}</td>
+                                <td><button class="btn btn-danger" (click)="deleteCoauthor(c)">Remove</button></td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-lg-6" *ngIf="activeForm === 'existing'">
+                        <h3 class="text-center">Coauthor to select</h3>
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Add</th>
+                                </tr>
+                            </thead>
+                            <tr *ngFor="let coauthor of articleFormDto.coAuthors">
+                                <td>{{coauthor.firstName}} {{coauthor.lastName}}</td>
+                                <td><button class="btn btn-info" (click)="addExisting(coauthor)">Add</button></td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-lg-6" *ngIf="activeForm === 'custom'">
+                        <h3 class="text-center">Add coauthor</h3>
+                        <form #f="ngForm" (ngSubmit)="f.form.valid && addCustomCouathor(f.value, f)" novalidate>
+                            <div class="form-group">
+                              <label for="customFirstName">First name:</label>
+                              <input type="text" class="form-control" name="customFirstName" [(ngModel)]="customUser.firstName" #customFirstName="ngModel"
+                              [ngClass]="{ 'is-invalid': f.submitted && customFirstName.invalid }" required>
+                              <div  *ngIf="f.submitted && customFirstName.invalid" class="text-danger">
+                                <div *ngIf="customFirstName.errors.required">First name is required</div>
+                              </div>
+                            </div>
+                            <div class="form-group">
+                              <label for="customLastName">Last name:</label>
+                              <input type="text" class="form-control" name="customLastName" [(ngModel)]="customUser.lastName" #customLastName="ngModel"
+                              [ngClass]="{ 'is-invalid': f.submitted && customLastName.invalid }" required >
+                              <div  *ngIf="f.submitted && customLastName.invalid" class="text-danger">
+                                <div *ngIf="customLastName.errors.required">Last name is required</div>
+                              </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="customEmail">Email address:</label>
+                                <input type="email" class="form-control" name="customEmail" [(ngModel)]="customUser.email" #customEmail="ngModel"
+                                [ngClass]="{ 'is-invalid': f.submitted && customEmail.invalid }" required >
+                                <div  *ngIf="f.submitted && customEmail.invalid" class="text-danger">
+                                    <div *ngIf="customEmail.errors.required">Email is required</div>
+                                    <!-- <div *ngIf="customEmail.errors.typeMismatch">Email pattern required</div> -->
+                                </div>
+                              </div>
+                            <div class="form-group">
+                               <label for="customCity">City:</label>
+                                <input type="text" class="form-control" name="customCity" [(ngModel)]="customUser.city" #customCity="ngModel"
+                                [ngClass]="{ 'is-invalid': f.submitted && customCity.invalid }" required >
+                                <div  *ngIf="f.submitted && customCity.invalid" class="text-danger">
+                                    <div *ngIf="customCity.errors.required">City is required</div>
+                                  </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="customCountry">Country:</label>
+                                <input type="text" class="form-control" name="customCountry" [(ngModel)]="customUser.country" #customCountry="ngModel"
+                                [ngClass]="{ 'is-invalid': f.submitted && customCountry.invalid }" required >
+                                <div  *ngIf="f.submitted && customCountry.invalid" class="text-danger">
+                                    <div *ngIf="customCountry.errors.required">Country is required</div>
+                                  </div>
+                            </div>
+                            <input type="submit" class="btn btn-success form-control" value="Add author">
+                          </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+
+        
+      <!-- </form> -->
+
+    </div>
+  </div>
+

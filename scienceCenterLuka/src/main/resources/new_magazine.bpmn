@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_15ie66d" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="3.4.1">
+  <bpmn:process id="new_magazine" name="New magazine" isExecutable="true" camunda:candidateStarterGroups="editor">
+    <bpmn:extensionElements>
+      <camunda:executionListener class="com.project.service.camunda.task.NewMagazineInitialization" event="start" />
+    </bpmn:extensionElements>
+    <bpmn:startEvent id="StartEvent_1" camunda:initiator="user">
+      <bpmn:outgoing>SequenceFlow_073elzy</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_073elzy" sourceRef="StartEvent_1" targetRef="ExclusiveGateway_17893bf" />
+    <bpmn:userTask id="new_magazine_form" name="New Magazine form" camunda:assignee="${user}" camunda:candidateGroups="editor">
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="name" label="Name*:" type="string">
+            <camunda:validation>
+              <camunda:constraint name="required" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="issn_number" label="ISSN number*:" type="string">
+            <camunda:validation>
+              <camunda:constraint name="required" />
+              <camunda:constraint name="minlength" config="8" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="payment_option" label="Way of payment*:" type="enum" defaultValue="OPEN_ACCESS">
+            <camunda:value id="OPEN_ACCESS" name="OPEN_ACCESS" />
+            <camunda:value id="PAID_ACCESS" name="PAID_ACCESS" />
+          </camunda:formField>
+          <camunda:formField id="membership_price" label="Membership price:" type="string" />
+          <camunda:formField id="science_area" label="Science area:" type="enum" />
+        </camunda:formData>
+        <camunda:taskListener class="com.project.service.camunda.task.NewMagazineFormScienceAreaDatasource" event="create" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_1k1kgq2</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0qukm1q</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="add_editor_and_reviewer" name="Add editors and reviewers" camunda:assignee="${user}">
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="magazine_science_area" label="First editor(ID)" type="enum" />
+          <camunda:formField id="magazine_editors" label="Second editor(ID)" type="enum" />
+          <camunda:formField id="magazine_reviewers" label="First reviewer*(ID)" type="enum" />
+        </camunda:formData>
+        <camunda:taskListener class="com.project.service.camunda.task.AddEditorsReviewersDataSource" event="create" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_1ws5y00</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1rmuq4d</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="SequenceFlow_1rmuq4d" sourceRef="add_editor_and_reviewer" targetRef="process_edit_rev_adding" />
+    <bpmn:exclusiveGateway id="is_valid" name="Is valid?">
+      <bpmn:incoming>SequenceFlow_1bqiryk</bpmn:incoming>
+      <bpmn:outgoing>valid</bpmn:outgoing>
+      <bpmn:outgoing>invalid</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="valid" name="Valid" sourceRef="is_valid" targetRef="activate_magazine">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${view_is_valid == true}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:endEvent id="EndEvent_18fnd0y">
+      <bpmn:incoming>SequenceFlow_0h8jgsx</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_0h8jgsx" sourceRef="activate_magazine" targetRef="EndEvent_18fnd0y" />
+    <bpmn:exclusiveGateway id="ExclusiveGateway_17893bf">
+      <bpmn:incoming>SequenceFlow_073elzy</bpmn:incoming>
+      <bpmn:incoming>invalid</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1k1kgq2</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="SequenceFlow_1k1kgq2" sourceRef="ExclusiveGateway_17893bf" targetRef="new_magazine_form" />
+    <bpmn:sequenceFlow id="invalid" name="Invalid" sourceRef="is_valid" targetRef="ExclusiveGateway_17893bf">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${view_is_valid == false}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:userTask id="check_data" name="Checking data[by admin]" camunda:assignee="demo">
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="view_comment" label="Comment:" type="string" />
+          <camunda:formField id="view_is_valid" label="Valid?:" type="boolean" />
+        </camunda:formData>
+        <camunda:taskListener class="com.project.service.camunda.task.CheckingMagazineDataInitialization" event="create" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_1g8kcm9</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1unj239</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="SequenceFlow_1bqiryk" sourceRef="proccess_checking_data" targetRef="is_valid" />
+    <bpmn:sequenceFlow id="SequenceFlow_1unj239" sourceRef="check_data" targetRef="proccess_checking_data" />
+    <bpmn:sequenceFlow id="SequenceFlow_1g8kcm9" sourceRef="process_edit_rev_adding" targetRef="check_data" />
+    <bpmn:serviceTask id="process_edit_rev_adding" name="Process editors and reviwers adding" camunda:class="com.project.service.camunda.service.ProcessEditorsReviewersAdding">
+      <bpmn:incoming>SequenceFlow_1rmuq4d</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1g8kcm9</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="proccess_checking_data" name="Process checking data" camunda:expression="${user}">
+      <bpmn:incoming>SequenceFlow_1unj239</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1bqiryk</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="process_form_data" name="Process form data" camunda:class="com.project.service.camunda.service.ProcessNewMagazineData">
+      <bpmn:incoming>SequenceFlow_0qukm1q</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1ws5y00</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="SequenceFlow_0qukm1q" sourceRef="new_magazine_form" targetRef="process_form_data" />
+    <bpmn:sequenceFlow id="SequenceFlow_1ws5y00" sourceRef="process_form_data" targetRef="add_editor_and_reviewer" />
+    <bpmn:serviceTask id="activate_magazine" name="Activate_magazine" camunda:class="com.project.service.camunda.service.ActivateMagazine">
+      <bpmn:incoming>valid</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0h8jgsx</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:subProcess id="SubProcess_0p3ti8i" triggeredByEvent="true">
+      <bpmn:startEvent id="StartEvent_02ap3uh">
+        <bpmn:outgoing>SequenceFlow_15cfirk</bpmn:outgoing>
+        <bpmn:errorEventDefinition id="ErrorEventDefinition_0qu0kwe" errorRef="Error_0kl73o0" />
+      </bpmn:startEvent>
+      <bpmn:endEvent id="EndEvent_1vo67d7">
+        <bpmn:incoming>SequenceFlow_0cuf6y4</bpmn:incoming>
+      </bpmn:endEvent>
+      <bpmn:serviceTask id="ServiceTask_13tenrn" name="Error handler" camunda:class="com.project.service.camunda.service.ErrorHandler">
+        <bpmn:incoming>SequenceFlow_15cfirk</bpmn:incoming>
+        <bpmn:outgoing>SequenceFlow_0cuf6y4</bpmn:outgoing>
+      </bpmn:serviceTask>
+      <bpmn:sequenceFlow id="SequenceFlow_15cfirk" sourceRef="StartEvent_02ap3uh" targetRef="ServiceTask_13tenrn" />
+      <bpmn:sequenceFlow id="SequenceFlow_0cuf6y4" sourceRef="ServiceTask_13tenrn" targetRef="EndEvent_1vo67d7" />
+    </bpmn:subProcess>
+  </bpmn:process>
+  <bpmn:error id="Error_0kl73o0" name="UnexpectedError" errorCode="UnexpectedError" camunda:errorMessage="UnexpectedError" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="new_magazine">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="132" y="109" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_073elzy_di" bpmnElement="SequenceFlow_073elzy">
+        <di:waypoint x="168" y="127" />
+        <di:waypoint x="195" y="127" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="UserTask_1lgb2q0_di" bpmnElement="new_magazine_form">
+        <dc:Bounds x="340" y="87" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="UserTask_08lkxqh_di" bpmnElement="add_editor_and_reviewer">
+        <dc:Bounds x="800" y="87" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1rmuq4d_di" bpmnElement="SequenceFlow_1rmuq4d">
+        <di:waypoint x="900" y="127" />
+        <di:waypoint x="1020" y="127" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ExclusiveGateway_07vsvv9_di" bpmnElement="is_valid" isMarkerVisible="true">
+        <dc:Bounds x="1465" y="102" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1469" y="78" width="41" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_041mo2u_di" bpmnElement="valid">
+        <di:waypoint x="1515" y="127" />
+        <di:waypoint x="1570" y="127" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1531" y="109" width="23" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="EndEvent_18fnd0y_di" bpmnElement="EndEvent_18fnd0y">
+        <dc:Bounds x="1832" y="109" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0h8jgsx_di" bpmnElement="SequenceFlow_0h8jgsx">
+        <di:waypoint x="1670" y="127" />
+        <di:waypoint x="1832" y="127" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ExclusiveGateway_17893bf_di" bpmnElement="ExclusiveGateway_17893bf" isMarkerVisible="true">
+        <dc:Bounds x="195" y="102" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1k1kgq2_di" bpmnElement="SequenceFlow_1k1kgq2">
+        <di:waypoint x="245" y="127" />
+        <di:waypoint x="340" y="127" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0uqji1e_di" bpmnElement="invalid">
+        <di:waypoint x="1490" y="152" />
+        <di:waypoint x="1490" y="330" />
+        <di:waypoint x="220" y="330" />
+        <di:waypoint x="220" y="152" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1454" y="273" width="32" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="UserTask_1v5tbdo_di" bpmnElement="check_data">
+        <dc:Bounds x="1190" y="85" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1bqiryk_di" bpmnElement="SequenceFlow_1bqiryk">
+        <di:waypoint x="1440" y="127" />
+        <di:waypoint x="1465" y="127" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1unj239_di" bpmnElement="SequenceFlow_1unj239">
+        <di:waypoint x="1290" y="125" />
+        <di:waypoint x="1315" y="125" />
+        <di:waypoint x="1315" y="127" />
+        <di:waypoint x="1340" y="127" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1g8kcm9_di" bpmnElement="SequenceFlow_1g8kcm9">
+        <di:waypoint x="1120" y="127" />
+        <di:waypoint x="1155" y="127" />
+        <di:waypoint x="1155" y="125" />
+        <di:waypoint x="1190" y="125" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_0tp6aqr_di" bpmnElement="process_edit_rev_adding">
+        <dc:Bounds x="1020" y="87" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_0ajjiof_di" bpmnElement="proccess_checking_data">
+        <dc:Bounds x="1340" y="87" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_04aw8ju_di" bpmnElement="process_form_data">
+        <dc:Bounds x="560" y="87" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0qukm1q_di" bpmnElement="SequenceFlow_0qukm1q">
+        <di:waypoint x="440" y="127" />
+        <di:waypoint x="560" y="127" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1ws5y00_di" bpmnElement="SequenceFlow_1ws5y00">
+        <di:waypoint x="660" y="127" />
+        <di:waypoint x="800" y="127" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_1agunds_di" bpmnElement="activate_magazine">
+        <dc:Bounds x="1570" y="87" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SubProcess_0p3ti8i_di" bpmnElement="SubProcess_0p3ti8i" isExpanded="true">
+        <dc:Bounds x="320" y="380" width="350" height="200" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="StartEvent_02ap3uh_di" bpmnElement="StartEvent_02ap3uh">
+        <dc:Bounds x="342" y="452" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_1vo67d7_di" bpmnElement="EndEvent_1vo67d7">
+        <dc:Bounds x="582" y="452" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_13tenrn_di" bpmnElement="ServiceTask_13tenrn">
+        <dc:Bounds x="440" y="430" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_15cfirk_di" bpmnElement="SequenceFlow_15cfirk">
+        <di:waypoint x="378" y="470" />
+        <di:waypoint x="440" y="470" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0cuf6y4_di" bpmnElement="SequenceFlow_0cuf6y4">
+        <di:waypoint x="540" y="470" />
+        <di:waypoint x="582" y="470" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

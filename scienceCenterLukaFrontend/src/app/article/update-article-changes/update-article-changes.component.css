@@ -1,0 +1,10 @@
+li.active{
+    background-color: blue;
+    opacity: 70%;
+  }
+  
+  ul.nav {
+    cursor: pointer;
+  }
+
+  a.list-group-item.list-group-item-action { cursor: pointer;  }

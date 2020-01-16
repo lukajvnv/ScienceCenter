@@ -1,0 +1,56 @@
+
+<div class="container">
+    <h2 class="text-center">View magazines</h2>
+    <div  >
+        <div *ngFor="let magazine of magazines">
+          <div class="row oneFlight">
+            <div class="col-lg-10">
+              <div class="row">
+                <div class="col-lg-2">
+                  <p><b>Magazine id</b></p>       
+                </div>
+                <div class="col-lg-4">
+                  <p><b>Magazine name</b></p>
+                </div>
+                <div class="col-lg-2">
+                  <p><b>Magazine issn</b></p>
+                </div>
+                <div class="col-lg-4">
+                  <p><b>Magazine scince areas</b></p>
+                </div>
+              </div>
+              <div class="row">
+                  <div class="col-lg-2">
+                      <p><b>{{magazine.magazineId}}</b></p>
+                    </div>
+                <div class="col-lg-4">
+                  <p><b>{{magazine.name}}</b></p>
+                </div>
+                <div class="col-lg-2">
+                  <p><b>{{magazine.issn}}</b></p>
+                </div>
+                <div class="col-lg-4"  style="font-size: 17px">
+                  <!-- <p><b>{{magazine.scienceAreas}}</b></p> -->
+                  <b><table>
+                      <tr *ngFor="let scArea of magazine.scienceAreas">
+                          <td>{{scArea.scienceAreaCode}}</td>
+                          <td>{{scArea.scienceAreaName}}</td>
+                      </tr>
+                  </table></b>
+                </div>
+    
+              </div>
+            </div>
+            <div class="col-lg-2 priceDiv">
+              <!-- <div class="w-100">fdfd</div> -->
+              <div style="text-align: center">
+                <button type="submit" class="btn btn-primary btn-block detail" (click)="detail(magazine.magazineId)">
+                  Detail
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+    </div>
+</div>
+

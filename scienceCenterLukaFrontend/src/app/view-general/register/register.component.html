@@ -1,0 +1,51 @@
+<!-- <form #f="ngForm" (ngSubmit)="onSubmit(f.value, f)" ngNativeValidate>
+
+    <div *ngFor="let field of formFields" >
+        <label for={{field.id}}>{{field.label}}</label>
+  
+        <input type="text" name={{field.id}} ngModel  *ngIf="field.type.name=='string'" >
+        <input type="checkbox" name={{field.id}} ngModel  *ngIf="field.type.name=='boolean'">
+        <input type="number" name={{field.id}} ngModel  *ngIf="field.type.name=='long'">
+        <select name="{{field.id}}" *ngIf="field.type.name=='enum'" ngModel multiple>
+          <option *ngFor="let val of enumValues" value={{val}}>
+            {{field.type.values[val]}}
+          </option>
+        </select>
+    </div>
+    
+    <input type="submit">
+  </form> -->
+  <div class="jumbotron">
+    <h2 class="text-center">Register</h2>
+    <div class="container">
+      <form #f="ngForm" (ngSubmit)="onSubmit(f.value, f)" novalidate>
+
+        <div class="form-group row" *ngFor="let field of formFields" >
+            <label for={{field.id}} class="col-lg-4">{{field.label}}</label>
+      
+            <input class="col-lg-3 form-control" type="text" name={{field.id}}  ngModel *ngIf="field.type.name=='string'"
+             required>
+            <input class="col-lg-3" type="checkbox" name={{field.id}} ngModel   *ngIf="field.type.name=='boolean'" >
+            <input class="col-lg-3 form-control" type="number" name={{field.id}}  ngModel  *ngIf="field.type.name=='long'" required> 
+             <select class="col-lg-3 form-control" name="{{field.id}}" *ngIf="field.type.name=='enum'" ngModel multiple required size="{{enumValues.length}}">
+              <option *ngFor="let val of enumValues" value={{val}}>
+                {{field.type.values[val]}}
+              </option>
+            </select>
+            
+        </div>
+        <div class="row">
+          <div class="col-lg-3">
+
+          </div>
+          <div class="col-lg-3">
+            <input type="submit" class="btn btn-success form-control" value="Sign Up">
+          </div>
+        </div>
+      </form>
+
+    </div>
+  </div>
+  
+
+

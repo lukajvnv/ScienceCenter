@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_1oijm3c" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="3.4.1">
+  <bpmn:process id="user_registration" name="User account registration" isExecutable="true" camunda:candidateStarterGroups="guest">
+    <bpmn:startEvent id="StartEvent_1" camunda:initiator="user">
+      <bpmn:outgoing>SequenceFlow_0hloyp3</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_0hloyp3" sourceRef="StartEvent_1" targetRef="sign_up_form" />
+    <bpmn:userTask id="sign_up_form" name="Sign up form" camunda:assignee="${user}" camunda:candidateGroups="guest">
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="first_name" label="First name*:" type="string">
+            <camunda:validation>
+              <camunda:constraint name="required" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="last_name" label="Last Name*:" type="string">
+            <camunda:validation>
+              <camunda:constraint name="required" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="city" label="City*:" type="string">
+            <camunda:validation>
+              <camunda:constraint name="required" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="country" label="Country*:" type="string">
+            <camunda:validation>
+              <camunda:constraint name="required" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="title" label="Title:" type="string" />
+          <camunda:formField id="email" label="Email*:" type="string">
+            <camunda:validation>
+              <camunda:constraint name="required" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="username" label="Username*:" type="string">
+            <camunda:validation>
+              <camunda:constraint name="required" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="password" label="Password*:" type="string">
+            <camunda:validation>
+              <camunda:constraint name="required" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="is_reviewer" label="Reviewer:" type="boolean" />
+          <camunda:formField id="science_area" label="Science areas:" type="enum" />
+        </camunda:formData>
+        <camunda:taskListener class="com.project.service.camunda.task.SignUpFormScienceAreaDatasource" event="create" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_0hloyp3</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0mln6if</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="SequenceFlow_0mln6if" sourceRef="sign_up_form" targetRef="sign_up_verification" />
+    <bpmn:serviceTask id="sign_up_verification" name="Sign up verification" camunda:class="com.project.service.camunda.service.RegisterNewUser">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:outputParameter name="is_verification_ok">valid</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_0mln6if</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_088j4mn</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:userTask id="user_account_activation" name="User account activation" camunda:assignee="${user}">
+      <bpmn:incoming>SequenceFlow_1k5tz1k</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0zxqfiz</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="SequenceFlow_0zxqfiz" sourceRef="user_account_activation" targetRef="process_activation" />
+    <bpmn:exclusiveGateway id="is_reviewer_gateway" name="Is Reviewer?">
+      <bpmn:incoming>SequenceFlow_0cdkraf</bpmn:incoming>
+      <bpmn:outgoing>author_not_reviewer</bpmn:outgoing>
+      <bpmn:outgoing>reviewer</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="author_not_reviewer" name="Author" sourceRef="is_reviewer_gateway" targetRef="EndEvent_1ob1ukh">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${is_reviewer==false}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="reviewer" name="Reviewer" sourceRef="is_reviewer_gateway" targetRef="reviewer_confirmation">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${is_reviewer==true}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SequenceFlow_0uzh9gy" sourceRef="reviewer_confirmation" targetRef="process_reviewer_confirmation" />
+    <bpmn:endEvent id="IntermediateThrowEvent_074znst">
+      <bpmn:incoming>SequenceFlow_1qd09rc</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:userTask id="reviewer_confirmation" name="Reviewer_confirmation" camunda:assignee="demo">
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="accept_review_request" label="Accept" type="boolean" />
+        </camunda:formData>
+        <camunda:taskListener class="com.project.service.camunda.task.ReviewerConfirmationDataInitialization" event="create" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>reviewer</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0uzh9gy</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:endEvent id="EndEvent_1ob1ukh">
+      <bpmn:incoming>author_not_reviewer</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_1k5tz1k" sourceRef="activation_link_sending" targetRef="user_account_activation" />
+    <bpmn:serviceTask id="activation_link_sending" name="Activation_link_sending" camunda:class="com.project.service.camunda.service.SendActivationCode">
+      <bpmn:incoming>SequenceFlow_1g4154d</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1k5tz1k</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="SequenceFlow_0cdkraf" sourceRef="process_activation" targetRef="is_reviewer_gateway" />
+    <bpmn:serviceTask id="process_activation" name="Process account activation" camunda:class="com.project.service.camunda.service.ProcessAccountActivation">
+      <bpmn:incoming>SequenceFlow_0zxqfiz</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0cdkraf</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="SequenceFlow_1qd09rc" sourceRef="process_reviewer_confirmation" targetRef="IntermediateThrowEvent_074znst" />
+    <bpmn:serviceTask id="process_reviewer_confirmation" name="Process reviewer confirmation" camunda:class="com.project.service.camunda.service.ProcessReviewerConfirmation">
+      <bpmn:incoming>SequenceFlow_0uzh9gy</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1qd09rc</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="is_verified" name="Verified?">
+      <bpmn:incoming>SequenceFlow_088j4mn</bpmn:incoming>
+      <bpmn:outgoing>no_verified</bpmn:outgoing>
+      <bpmn:outgoing>verified</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="no_verified" name="No" sourceRef="is_verified" targetRef="EndEvent_0ceyzca">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${verified == false}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="verified" name="Yes" sourceRef="is_verified" targetRef="generate_activation_link">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${verified == true}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SequenceFlow_088j4mn" sourceRef="sign_up_verification" targetRef="is_verified" />
+    <bpmn:sequenceFlow id="SequenceFlow_1g4154d" sourceRef="generate_activation_link" targetRef="activation_link_sending" />
+    <bpmn:serviceTask id="generate_activation_link" name="Generate activation link" camunda:class="com.project.service.camunda.service.GenerateHash">
+      <bpmn:incoming>verified</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1g4154d</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="EndEvent_0ceyzca" name="Ver error">
+      <bpmn:incoming>no_verified</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:subProcess id="SubProcess_0xr9488" triggeredByEvent="true">
+      <bpmn:startEvent id="StartEvent_0yynvjx">
+        <bpmn:outgoing>SequenceFlow_1197pe5</bpmn:outgoing>
+        <bpmn:errorEventDefinition errorRef="Error_1ur6jsb" />
+      </bpmn:startEvent>
+      <bpmn:endEvent id="EndEvent_137uvnu">
+        <bpmn:incoming>SequenceFlow_1mmdf5m</bpmn:incoming>
+      </bpmn:endEvent>
+      <bpmn:serviceTask id="ServiceTask_1syre8r" name="Error handler" camunda:class="com.project.service.camunda.service.ErrorHandler">
+        <bpmn:incoming>SequenceFlow_1197pe5</bpmn:incoming>
+        <bpmn:outgoing>SequenceFlow_1mmdf5m</bpmn:outgoing>
+      </bpmn:serviceTask>
+      <bpmn:sequenceFlow id="SequenceFlow_1197pe5" sourceRef="StartEvent_0yynvjx" targetRef="ServiceTask_1syre8r" />
+      <bpmn:sequenceFlow id="SequenceFlow_1mmdf5m" sourceRef="ServiceTask_1syre8r" targetRef="EndEvent_137uvnu" />
+    </bpmn:subProcess>
+  </bpmn:process>
+  <bpmn:message id="Message_1b0bd5v" />
+  <bpmn:signal id="Signal_1rl4rnb" name="Signal_1m4n22r" />
+  <bpmn:error id="Error_1ur6jsb" name="UnexpectedError" errorCode="UnexpectedError" camunda:errorMessage="UnexpectedError" />
+  <bpmn:error id="Error_1wpodri" name="Exception" errorCode="java.lang.Exception" camunda:errorMessage="Unknown error" />
+  <bpmn:error id="Error_0ppsq9z" name="NullPointerException" errorCode="java.lang.NullPointerException" camunda:errorMessage="fd" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="user_registration">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="152" y="179" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0hloyp3_di" bpmnElement="SequenceFlow_0hloyp3">
+        <di:waypoint x="188" y="197" />
+        <di:waypoint x="300" y="197" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="UserTask_1ep49yw_di" bpmnElement="sign_up_form">
+        <dc:Bounds x="300" y="157" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0mln6if_di" bpmnElement="SequenceFlow_0mln6if">
+        <di:waypoint x="400" y="197" />
+        <di:waypoint x="480" y="197" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_0en6z4d_di" bpmnElement="sign_up_verification">
+        <dc:Bounds x="480" y="157" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="UserTask_1hvlm6u_di" bpmnElement="user_account_activation">
+        <dc:Bounds x="960" y="157" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0zxqfiz_di" bpmnElement="SequenceFlow_0zxqfiz">
+        <di:waypoint x="1060" y="197" />
+        <di:waypoint x="1080" y="197" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ExclusiveGateway_0055jbg_di" bpmnElement="is_reviewer_gateway" isMarkerVisible="true">
+        <dc:Bounds x="1195" y="172" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1191" y="142" width="64" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1lhtxu0_di" bpmnElement="author_not_reviewer">
+        <di:waypoint x="1245" y="197" />
+        <di:waypoint x="1412" y="197" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1265" y="179" width="33" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_07jwthx_di" bpmnElement="reviewer">
+        <di:waypoint x="1220" y="222" />
+        <di:waypoint x="1220" y="276" />
+        <di:waypoint x="1190" y="276" />
+        <di:waypoint x="1190" y="330" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1199" y="239" width="48" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0uzh9gy_di" bpmnElement="SequenceFlow_0uzh9gy">
+        <di:waypoint x="1260" y="370" />
+        <di:waypoint x="1290" y="370" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="EndEvent_12epcmp_di" bpmnElement="IntermediateThrowEvent_074znst">
+        <dc:Bounds x="1442" y="352" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="UserTask_1y6vzm3_di" bpmnElement="reviewer_confirmation">
+        <dc:Bounds x="1160" y="330" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_1atbrb5_di" bpmnElement="EndEvent_1ob1ukh">
+        <dc:Bounds x="1412" y="179" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1k5tz1k_di" bpmnElement="SequenceFlow_1k5tz1k">
+        <di:waypoint x="930" y="197" />
+        <di:waypoint x="960" y="197" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_1gi533m_di" bpmnElement="activation_link_sending">
+        <dc:Bounds x="830" y="157" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0cdkraf_di" bpmnElement="SequenceFlow_0cdkraf">
+        <di:waypoint x="1180" y="197" />
+        <di:waypoint x="1195" y="197" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_0n9lj98_di" bpmnElement="process_activation">
+        <dc:Bounds x="1080" y="157" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1qd09rc_di" bpmnElement="SequenceFlow_1qd09rc">
+        <di:waypoint x="1390" y="370" />
+        <di:waypoint x="1442" y="370" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_0logmvn_di" bpmnElement="process_reviewer_confirmation">
+        <dc:Bounds x="1290" y="330" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExclusiveGateway_0bkce81_di" bpmnElement="is_verified" isMarkerVisible="true">
+        <dc:Bounds x="625" y="172" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="630" y="229" width="42" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1asmp46_di" bpmnElement="no_verified">
+        <di:waypoint x="650" y="172" />
+        <di:waypoint x="650" y="100" />
+        <di:waypoint x="1322" y="100" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="669" y="103" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_13w9dhm_di" bpmnElement="verified">
+        <di:waypoint x="675" y="197" />
+        <di:waypoint x="710" y="197" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="668" y="179" width="18" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_088j4mn_di" bpmnElement="SequenceFlow_088j4mn">
+        <di:waypoint x="580" y="197" />
+        <di:waypoint x="625" y="197" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1g4154d_di" bpmnElement="SequenceFlow_1g4154d">
+        <di:waypoint x="810" y="197" />
+        <di:waypoint x="830" y="197" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_14wee87_di" bpmnElement="generate_activation_link">
+        <dc:Bounds x="710" y="157" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_1yaes4d_di" bpmnElement="EndEvent_0ceyzca">
+        <dc:Bounds x="1322" y="82" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1318" y="125" width="44" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SubProcess_1mafkkt_di" bpmnElement="SubProcess_0xr9488" isExpanded="true">
+        <dc:Bounds x="310" y="350" width="350" height="200" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="StartEvent_03udnkx_di" bpmnElement="StartEvent_0yynvjx">
+        <dc:Bounds x="332" y="422" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_137uvnu_di" bpmnElement="EndEvent_137uvnu">
+        <dc:Bounds x="572" y="422" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_1syre8r_di" bpmnElement="ServiceTask_1syre8r">
+        <dc:Bounds x="430" y="400" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1197pe5_di" bpmnElement="SequenceFlow_1197pe5">
+        <di:waypoint x="368" y="440" />
+        <di:waypoint x="430" y="440" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1mmdf5m_di" bpmnElement="SequenceFlow_1mmdf5m">
+        <di:waypoint x="530" y="440" />
+        <di:waypoint x="572" y="440" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
