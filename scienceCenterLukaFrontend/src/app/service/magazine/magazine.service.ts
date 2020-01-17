@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { StorageService } from '../auth-storage/storage.service';
 
 @Injectable({
   providedIn: 'root'
@@ -10,10 +11,16 @@ export class MagazineService {
   private MAGAZINEAPI = "http://localhost:8085/magazine/";
 
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private tokenStorageService: StorageService) { }
+
+  private genHeader(): HttpHeaders {
+    return new HttpHeaders().set('Authorization', this.tokenStorageService.getToken());
+  }
 
   startNewMagazine(): Observable<any>{
-    return this.http.get(this.MAGAZINEAPI + 'start'); 
+    const header: HttpHeaders = this.genHeader();
+    
+    return this.http.get(this.MAGAZINEAPI + 'start', {headers: this.genHeader()}); 
   }
 
   correctNewMagazine(taskId: string){
@@ -21,27 +28,27 @@ export class MagazineService {
   }
 
   retrieveEditorsReviewers(taskId) : Observable<any>{
-    return this.http.get(this.MAGAZINEAPI + "/retrieveEditorsReviewers/".concat(taskId));
+    return this.http.get(this.MAGAZINEAPI + "retrieveEditorsReviewers/".concat(taskId));
   }
 
   postMagazineBasicData(obj, taskId) : Observable<any>{
-    return this.http.post(this.MAGAZINEAPI + "/submitBasicInfo/".concat(taskId), obj);
+    return this.http.post(this.MAGAZINEAPI + "submitBasicInfo/".concat(taskId), obj);
   }
 
   correctMagazineBasicData(obj, taskId) : Observable<any>{
-    return this.http.put(this.MAGAZINEAPI + "/correctBasicInfo/".concat(taskId), obj);
+    return this.http.put(this.MAGAZINEAPI + "correctBasicInfo/".concat(taskId), obj);
   }
 
   postMagazineEditorsReviewersData(obj, taskId) : Observable<any>{
-    return this.http.post(this.MAGAZINEAPI + "/submitComplexInfo/".concat(taskId), obj);
+    return this.http.post(this.MAGAZINEAPI + "submitComplexInfo/".concat(taskId), obj);
   }
 
   checkingMagazineDataStart(taskId) : Observable<any>{
-    return this.http.get(this.MAGAZINEAPI + "/checkingMagazineData/".concat(taskId));
+    return this.http.get(this.MAGAZINEAPI + "checkingMagazineData/".concat(taskId));
   }
 
   checkingMagazineDataPost(response, taskId) : Observable<any>{
-    return this.http.post(this.MAGAZINEAPI + "/checkingMagazineData/".concat(taskId), response);
+    return this.http.post(this.MAGAZINEAPI + "checkingMagazineData/".concat(taskId), response);
   }
 
   getAllMagazines(): Observable<any>{
@@ -49,6 +56,6 @@ export class MagazineService {
   }
 
   getMagazine(magazineId: string): Observable<any>{
-    return this.http.get(this.MAGAZINEAPI + '/' + magazineId); 
+    return this.http.get(this.MAGAZINEAPI  + magazineId); 
   }
 }

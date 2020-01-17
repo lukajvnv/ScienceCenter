@@ -26,7 +26,7 @@ export class ReviewAdditionalComponent implements OnInit {
   // private opinion: OpinionAboutArticle;
 
   constructor(private activatedRoute: ActivatedRoute, private reviewService: ReviewService, private router: Router,
-    private toastr: ToastrService, private sanitizer: DomSanitizer) { }
+    private toastr: ToastrService, private sanitizer: DomSanitizer, private toasterService: ToastrService) { }
 
   ngOnInit() {
    
@@ -61,6 +61,9 @@ export class ReviewAdditionalComponent implements OnInit {
 
     x.subscribe( res => {
       console.log('resi');
+
+      this.toasterService.success('Analyzing article is finished.');
+      this.router.navigate(['home']);
     }, err => {
 
     })

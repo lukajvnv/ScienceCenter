@@ -4,6 +4,7 @@ import { UserService } from 'src/app/service/user/user.service';
 import { FormSignUpSubmission } from 'src/app/model/form-sign-up-submission';
 import { ToastrService } from 'ngx-toastr';
 import { ErrorObject } from 'src/app/model/error-object';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-register',
@@ -21,7 +22,7 @@ export class RegisterComponent implements OnInit {
   private enumValues = [];
   private tasks = [];
 
-  constructor(private userService: UserService, private toastrService: ToastrService) { }
+  constructor(private userService: UserService, private toastrService: ToastrService, private router: Router) { }
 
   ngOnInit() {
     let x = this.userService.startRegister();
@@ -77,7 +78,8 @@ export class RegisterComponent implements OnInit {
       res => {
         console.log(res);
         
-        this.toastrService.success("You registered successfully!")
+        this.toastrService.success("Look at your email for activation link!");
+        this.router.navigate(['home']);
       },
       (err : any) => {
         console.log("Error occured");

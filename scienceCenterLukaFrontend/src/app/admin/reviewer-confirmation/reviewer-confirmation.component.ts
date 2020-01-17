@@ -49,7 +49,9 @@ export class ReviewerConfirmationComponent implements OnInit {
 
     x.subscribe(
       res => {
-        console.log("Rijesi");        
+        console.log("Rijesi"); 
+        this.toastrService.success("Operation completed");
+        this.router.navigate(['home']);       
 
       },
       err => {

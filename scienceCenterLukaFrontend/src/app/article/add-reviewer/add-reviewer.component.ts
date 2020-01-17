@@ -77,6 +77,9 @@ export class AddReviewerComponent implements OnInit {
 
     x.subscribe(res => {
       console.log('resi');
+
+      this.toastr.success('Operations of adding reviewer is completed.');
+      this.router.navigate(['home']);
     }, err => {
 
     });

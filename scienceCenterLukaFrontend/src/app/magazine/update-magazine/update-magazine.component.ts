@@ -6,7 +6,7 @@ import { ToastrService } from 'ngx-toastr';
 import { MagazineService } from 'src/app/service/magazine/magazine.service';
 import { NewMagazineFormReviewerEditorRow } from 'src/app/model/new-magazine-form-reviewer-editor-row';
 import { ScienceArea } from 'src/app/model/science-area';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-update-magazine',
@@ -33,7 +33,7 @@ export class UpdateMagazineComponent implements OnInit {
   private formDataEditorsReviewers: NewMagazineFormReviewerEditor = new NewMagazineFormReviewerEditor();
 
 
-  constructor(private magazineService: MagazineService, private toastrService: ToastrService, private activatedRoute: ActivatedRoute) { }
+  constructor(private magazineService: MagazineService, private toastrService: ToastrService, private activatedRoute: ActivatedRoute, private router: Router) { }
 
   ngOnInit() {
     this.activatedRoute.paramMap.subscribe(data => {
@@ -118,7 +118,8 @@ export class UpdateMagazineComponent implements OnInit {
 
     x.subscribe(
       res => {
-        alert('Resi');
+        this.toastrService.success('New magazine is sent to the admin for verification!');
+        this.router.navigate(['home']);
 
       },
       err => {

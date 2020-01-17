@@ -6,11 +6,17 @@ import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.project.config.security.service.UserDetailsServiceImpl;
+import com.project.model.user.UserSignedUp;
+
 @Service
 public class NewMagazineInitialization implements ExecutionListener {
 	
 	@Autowired
 	IdentityService identityService;
+	
+	@Autowired
+	private UserDetailsServiceImpl userDetailService;
 
 	@Override
 	public void notify(DelegateExecution execution) throws Exception {
@@ -27,8 +33,15 @@ public class NewMagazineInitialization implements ExecutionListener {
 //			System.out.println("Greska");
 //		}
 		
+		UserSignedUp loggedUser = userDetailService.getLoggedUser();
+		if(loggedUser == null ) {
+			
+			return;
+		}
+		execution.setVariable("user", loggedUser.getUserUsername());
+		
 		//Privremeno
-		execution.setVariable("user", "editorDemo");
+		// execution.setVariable("user", "editorDemo");
 
 	}
 

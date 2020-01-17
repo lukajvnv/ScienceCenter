@@ -64,6 +64,8 @@ export class ReviewComponent implements OnInit {
 
     x.subscribe( res => {
       console.log('resi');
+      this.toastr.success('Operations of reviewing is completed.');
+      this.router.navigate(['home']);
     }, err => {
 
     })

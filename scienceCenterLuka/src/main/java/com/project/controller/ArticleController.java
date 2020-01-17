@@ -15,6 +15,7 @@ import org.camunda.bpm.engine.task.Task;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -36,6 +37,7 @@ import com.project.service.ArticleService;
 
 @RestController
 @RequestMapping("/article")
+@CrossOrigin
 public class ArticleController {
 
 	
@@ -107,7 +109,7 @@ public class ArticleController {
 			String proccessInstanceId = task.getProcessInstanceId();
 			
 			ArticleDto requestDto = (ArticleDto) runtimeService.getVariable(proccessInstanceId, "articleRequestDto");
-			runtimeService.removeVariable(proccessInstanceId, "articleRequestDto");
+			// runtimeService.removeVariable(proccessInstanceId, "articleRequestDto");
 			
 	        return new ResponseEntity<ArticleDto>(requestDto, HttpStatus.OK);
 	    }
@@ -138,6 +140,9 @@ public class ArticleController {
 				// e.printStackTrace();
 				
 				System.out.println("bacaj ga nekompatabilnost");
+	    		//return ResponseEntity.status(error.getStatus()).body(new Response(HttpStatus.));
+	    		return new ResponseEntity<>(HttpStatus.OK);
+
 			}
 
 			

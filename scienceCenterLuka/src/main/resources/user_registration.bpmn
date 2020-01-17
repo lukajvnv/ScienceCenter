@@ -145,6 +145,10 @@
       <bpmn:sequenceFlow id="SequenceFlow_1197pe5" sourceRef="StartEvent_0yynvjx" targetRef="ServiceTask_1syre8r" />
       <bpmn:sequenceFlow id="SequenceFlow_1mmdf5m" sourceRef="ServiceTask_1syre8r" targetRef="EndEvent_137uvnu" />
     </bpmn:subProcess>
+    <bpmn:textAnnotation id="TextAnnotation_1l6bcjv">
+      <bpmn:text>If bpm error occurs or be thrown from tasks</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Association_0rbli8r" sourceRef="SubProcess_0xr9488" targetRef="TextAnnotation_1l6bcjv" />
   </bpmn:process>
   <bpmn:message id="Message_1b0bd5v" />
   <bpmn:signal id="Signal_1rl4rnb" name="Signal_1m4n22r" />
@@ -290,6 +294,13 @@
       <bpmndi:BPMNEdge id="SequenceFlow_1mmdf5m_di" bpmnElement="SequenceFlow_1mmdf5m">
         <di:waypoint x="530" y="440" />
         <di:waypoint x="572" y="440" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="TextAnnotation_1l6bcjv_di" bpmnElement="TextAnnotation_1l6bcjv">
+        <dc:Bounds x="660" y="270" width="100" height="68" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Association_0rbli8r_di" bpmnElement="Association_0rbli8r">
+        <di:waypoint x="639" y="350" />
+        <di:waypoint x="660" y="336" />
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

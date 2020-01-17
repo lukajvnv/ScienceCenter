@@ -68,7 +68,8 @@ export class DefineTimeForReviewingComponent implements OnInit {
     let x = this.reviewService.defineTimeForReview(this.taskId, template);
 
     x.subscribe(res => {
-
+      this.toastr.success('Operations of define time for reviewing is completed.');
+      this.router.navigate(['home']);
     }, err => {
 
     });

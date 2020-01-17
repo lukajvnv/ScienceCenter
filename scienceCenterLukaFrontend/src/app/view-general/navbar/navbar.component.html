@@ -7,21 +7,18 @@
     </nav>
     <div class="collapse navbar-collapse" id="navbarsExampleDefault">
         <ul class="navbar-nav mr-auto">
-          <li class="nav-item active">
+          <li class="nav-item active" *ngIf="role === 'EDITOR'">
             <a class="nav-link" routerLink = "/new-magazine">New magazine <span class="sr-only">(current)</span></a>
           </li>
           <li class="nav-item active">
-            <a class="nav-link" routerLink = "/tasks">Task (editor) <span class="sr-only">(current)</span></a>
-          </li>
-          <li class="nav-item active">
-            <a class="nav-link" routerLink = "/messages">Task (reviewer) <span class="sr-only">(current)</span></a>
+            <a class="nav-link" routerLink = "/tasks" *ngIf="isUserLogged">Task  <span class="sr-only">(current)</span></a>
           </li>
           <li class="nav-item active">
             <a class="nav-link"  routerLink = "/view-magazines">View magazines <span class="sr-only">(current)</span></a>
           </li>
-          <li class="nav-item active">
+          <!-- <li class="nav-item active" *ngIf="isUserLogged">
             <a class="nav-link"  routerLink = "/newObject">New article <span class="sr-only">(current)</span></a>
-          </li>
+          </li> -->
         </ul>
 
         <ul class="nav navbar-right nav-pills">
@@ -34,8 +31,9 @@
                 Sign Up</button>
             </li>
             <li class="nav-item active">
-                <button *ngIf="!isUserLogged" routerLink="/login" class="btn btn-secondary my-2 mx-2" type="submit"><i class="fa fa-angle-down"></i>Sign in</button>
-            </li>
+                <button *ngIf="!isUserLogged" routerLink="/sign-in" class="btn btn-secondary my-2 mx-2" type="submit"><i class="fa fa-angle-down"></i>Sign in</button>
+                <!-- <button *ngIf="!isUserLogged" routerLink="/sign-in" class="btn btn-secondary my-2 mx-2" type="submit"><i class="fa fa-angle-down"></i>Sign in</button> -->
+              </li>
             <li class="nav-item active">
                 <!-- <a class="nav-link" routerLink = "/logout">Odjava </a> -->
                 <button  (click)="signOut()" class="btn btn-secondary my-2 mx-2" type="submit"><i class="fa fa-angle-up"></i>Sign out</button>

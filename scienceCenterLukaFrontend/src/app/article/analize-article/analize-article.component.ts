@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, UrlHandlingStrategy } from '@angular/router';
+import { ActivatedRoute, UrlHandlingStrategy, Router } from '@angular/router';
 import { ArticleService } from 'src/app/service/article/article.service';
 import { Article } from 'src/app/model/article';
 import { URL } from 'url';
 import { DomSanitizer } from '@angular/platform-browser';
 import { EncodeDecode } from 'src/app/util/base64';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-analize-article',
@@ -16,8 +17,8 @@ export class AnalizeArticleComponent implements OnInit {
   private taskIdTopic: string;
   private taskIdText: string;
   private displayArticle;
-  private isOk: boolean;
-  private isTextOk: boolean;
+  private isOk: boolean = false;
+  private isTextOk: boolean = false;
   private comment: string = '';
   private article: Article;
 
@@ -25,7 +26,8 @@ export class AnalizeArticleComponent implements OnInit {
 
   private proba: string | ArrayBuffer;
 
-  constructor(private activatedRoute: ActivatedRoute, private articleService: ArticleService, private sanitizer: DomSanitizer) { }
+  constructor(private activatedRoute: ActivatedRoute, private articleService: ArticleService, private sanitizer: DomSanitizer, private toastrService: ToastrService,
+    private router: Router) { }
 
   ngOnInit() {
     // this.activeForm == 'custom';
@@ -51,6 +53,12 @@ export class AnalizeArticleComponent implements OnInit {
     let x = this.articleService.analizeBasicResult(this.taskIdTopic, this.isOk);
 
     x.subscribe(res => {
+
+      if(!this.isOk){
+        this.toastrService.success('Analyzing article is finished.');
+        this.router.navigate(['home']);
+      }
+
       this.article = res;
       console.log(this.article.file.toString());
       this.taskIdText = res.taskId;
@@ -91,6 +99,9 @@ export class AnalizeArticleComponent implements OnInit {
 
     x.subscribe(res => {
       this.article = res;
+
+      this.toastrService.success('Analyzing article is finished.');
+      this.router.navigate(['home']);
 
     }, err => {
 

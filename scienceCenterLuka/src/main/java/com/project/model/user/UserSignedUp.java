@@ -89,5 +89,8 @@ public class UserSignedUp  {
 //	@Column(name = "username_fk", unique = true, nullable = false, length = 64)
 	@Column(name = "username_fk")
 	private String userUsername;
+	
+	@Column
+	private String password;
 
 }

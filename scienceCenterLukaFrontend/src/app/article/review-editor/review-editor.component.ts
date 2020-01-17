@@ -62,6 +62,8 @@ export class ReviewEditorComponent implements OnInit {
 
     x.subscribe( res => {
       console.log('resi');
+      this.toastr.success('Operations of editor reviewing is completed.');
+      this.router.navigate(['home']);
     }, err => {
 
     })

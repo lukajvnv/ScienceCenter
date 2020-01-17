@@ -15,9 +15,11 @@ import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.identity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.project.dto.NewUserResponseDto;
+import com.project.config.security.service.UserDetailsServiceImpl;
 import com.project.dto.FormSubmissionDto;
 import com.project.exception.SignUpVerificationException;
 import com.project.model.Magazine;
@@ -37,7 +39,11 @@ public class RegisterNewUser implements JavaDelegate {
 	
 	@Autowired
 	private UnityOfWork unityOfWork;
-
+	
+	@Autowired
+	private PasswordEncoder passwordEncoder;
+	
+	
 	@Override
 	public void execute(DelegateExecution execution) throws Exception, SignUpVerificationException {
 		// TODO Auto-generated method stub
@@ -69,6 +75,7 @@ public class RegisterNewUser implements JavaDelegate {
 			
 			UserSignedUp newSignUpUser = UserSignedUp.builder()
 					.userUsername(map.get("username"))
+					.password(passwordEncoder.encode(map.get("password")))
 					.role(Role.COMMON_USER)
 					.wantToReviewe(Boolean.parseBoolean(map.get("is_reviewer")))
 					.userScienceAreas(new HashSet<ScienceArea>(selectedScienceAreas))

@@ -18,7 +18,6 @@ import { NotFoundComponent } from './view-general/not-found/not-found.component'
 import { NavbarComponent } from './view-general/navbar/navbar.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { TestService } from './service/test.service';
-import { AuthService } from './service/auth-storage/auth.service';
 import { UserService } from './service/user/user.service';
 import { MagazineService } from './service/magazine/magazine.service';
 import { StorageService } from './service/auth-storage/storage.service';
@@ -43,6 +42,10 @@ import { UpdateArticleChangesComponent } from './article/update-article-changes/
 import { CheckNewMagazineDataComponent } from './admin/check-new-magazine-data/check-new-magazine-data.component';
 import { ReviewerConfirmationComponent } from './admin/reviewer-confirmation/reviewer-confirmation.component';
 import { NewEditorComponent } from './admin/new-editor/new-editor.component';
+import { Notauthorized } from './path-guards/nonauthorized.guard';
+import { AdminGuard } from './path-guards/admin.guard';
+import { EditorGuard } from './path-guards/editor.guard';
+import { Authorized } from './path-guards/authorized.guard';
 
 
 const routes = [
@@ -53,7 +56,10 @@ const routes = [
       path: 'home', component: HomeComponent,
     },
     {
-      path: 'register', component: RegisterComponent,
+      path: 'register', component: RegisterComponent, canActivate: [Notauthorized]
+    },
+    {
+      path: 'sign-in', component: SignInComponent, canActivate: [Notauthorized]
     },
     {
       path: 'new-magazine', component: NewMagazineComponent,
@@ -98,7 +104,7 @@ const routes = [
       path: 'editor-review/:taskId', component: ReviewEditorComponent,
     },
     {
-      path: 'tasks', component: ViewTasksComponent,
+      path: 'tasks', component: ViewTasksComponent, canActivate: [Authorized]
     },
     {
       path: 'reviewer-confirmation/:taskId', component: ReviewerConfirmationComponent,
@@ -158,7 +164,8 @@ const routes = [
     }),
     RouterModule.forRoot(routes, {enableTracing: true}) // <-- debugging purposes only
   ],
-  providers: [ToastrService, TestService, AuthService, UserService, MagazineService, StorageService, TaskService],
+  providers: [ToastrService, TestService, UserService, MagazineService, StorageService, TaskService,
+    Notauthorized, AdminGuard, EditorGuard, Authorized],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

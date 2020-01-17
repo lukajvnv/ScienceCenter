@@ -59,8 +59,10 @@ public class SendActivationCode implements JavaDelegate {
 		helper.setTo(code.getEmail());
 		helper.setSubject("Acount activation:");
 		helper.setFrom(env.getProperty("spring.mail.username"));
-		mailSender.send(mimeMessage);
+		//privremeno zakom.
+		// mailSender.send(mimeMessage);
 		System.out.println("saljem mejl");	
+		System.out.println("processId: " + id);
 	}
 	
 //	@Async

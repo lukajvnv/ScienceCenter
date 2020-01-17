@@ -5,10 +5,10 @@
                 <div class="list-group">
                     <!-- <a (click)="filterByAirline(undefined);" [class.active]="selectedAirline === undefined" class="list-group-item list-group-item-action" >Post text</a> -->
                    
-                    <a (click)="newText()"  class="list-group-item list-group-item-info" >Post text</a>
                     <a (click)="viewEditions()"  class="list-group-item list-group-item-action" >View editions</a>
-                    <a (click)="subscribe()"  class="list-group-item list-group-item-info" >Subscribe</a>
-      
+                    <a (click)="subscribe()"  class="list-group-item list-group-item-info" *ngIf="isLogged">Subscribe</a>
+                    <a (click)="newText()"  class="list-group-item list-group-item-info" *ngIf="isLogged">Post text</a>
+
                   </div>
             </div>
       </div>

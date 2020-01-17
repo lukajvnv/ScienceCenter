@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import com.project.model.Article;
@@ -29,6 +30,9 @@ public class DataLoader implements ApplicationRunner {
 
 	@Autowired
 	private UnityOfWork unityOfWork;
+	
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 	
 //	@Autowired
 //	private DoiGeneratorRepository doiGeneratorRepository;
@@ -102,6 +106,7 @@ public class DataLoader implements ApplicationRunner {
 				.email("lukajvnv@gmail.com")
 				.vocation("dipling")
 				.role(Role.COMMON_USER)
+				.password(passwordEncoder.encode("lukaAuthor"))
 				.userUsername("lukaAuthor").build();
 		
 		UserSignedUp user01 = UserSignedUp.builder()
@@ -113,6 +118,7 @@ public class DataLoader implements ApplicationRunner {
 				.email("lukajvnv@gmail.com")
 				.vocation("dipling")
 				.role(Role.COMMON_USER)
+				.password(passwordEncoder.encode("nikolaAuthor"))
 				.userUsername("nikolaAuthor").build();
 		
 		// editori
@@ -127,6 +133,7 @@ public class DataLoader implements ApplicationRunner {
 				.vocation("dipling")
 				.role(Role.EDITOR)
 				.wantToReviewe(true)
+				.password(passwordEncoder.encode("editorDemo"))
 				.userUsername("editorDemo").build();
 		
 		UserSignedUp user2 = UserSignedUp.builder()
@@ -139,6 +146,7 @@ public class DataLoader implements ApplicationRunner {
 				.vocation("dipling")
 				.role(Role.EDITOR)
 				.wantToReviewe(true)
+				.password(passwordEncoder.encode("editorDemo1"))
 				.userUsername("editorDemo1").build();
 		
 		UserSignedUp user3 = UserSignedUp.builder()
@@ -151,6 +159,7 @@ public class DataLoader implements ApplicationRunner {
 				.vocation("dipling")
 				.role(Role.EDITOR)
 				.wantToReviewe(true)
+				.password(passwordEncoder.encode("editorDemo2"))
 				.userUsername("editorDemo2").build();
 		
 		UserSignedUp user4 = UserSignedUp.builder()
@@ -163,6 +172,7 @@ public class DataLoader implements ApplicationRunner {
 				.vocation("dipling")
 				.role(Role.EDITOR)
 				.wantToReviewe(true)
+				.password(passwordEncoder.encode("editorDemo3"))
 				.userUsername("editorDemo3").build();
 		
 		UserSignedUp user5 = UserSignedUp.builder()
@@ -175,6 +185,7 @@ public class DataLoader implements ApplicationRunner {
 				.vocation("dipling")
 				.role(Role.EDITOR)
 				.wantToReviewe(true)
+				.password(passwordEncoder.encode("editorDemo4"))
 				.userUsername("editorDemo4").build();
 		
 		UserSignedUp user6 = UserSignedUp.builder()
@@ -187,6 +198,7 @@ public class DataLoader implements ApplicationRunner {
 				.vocation("dipling")
 				.role(Role.EDITOR)
 				.wantToReviewe(true)
+				.password(passwordEncoder.encode("editorDemo5"))
 				.userUsername("editorDemo5").build();
 		
 		//recezenti
@@ -204,6 +216,7 @@ public class DataLoader implements ApplicationRunner {
 				.vocation("dipling")
 				.role(Role.REVIEWER)
 				.wantToReviewe(true)
+				.password(passwordEncoder.encode("reviewerDemo"))
 				.userScienceAreas(scAreasSet)
 				.userUsername("reviewerDemo").build();
 		
@@ -217,6 +230,7 @@ public class DataLoader implements ApplicationRunner {
 				.vocation("dipling")
 				.role(Role.REVIEWER)
 				.wantToReviewe(true)
+				.password(passwordEncoder.encode("reviewerDemo1"))
 				.userScienceAreas(scAreasSet)
 				.userUsername("reviewerDemo1").build();
 		
@@ -230,6 +244,7 @@ public class DataLoader implements ApplicationRunner {
 				.vocation("dipling")
 				.role(Role.REVIEWER)
 				.wantToReviewe(true)
+				.password(passwordEncoder.encode("reviewerDemo2"))
 				.userScienceAreas(scAreasSet)
 				.userUsername("reviewerDemo2").build();
 		
@@ -244,6 +259,7 @@ public class DataLoader implements ApplicationRunner {
 				.role(Role.REVIEWER)
 				.wantToReviewe(true)
 				.userScienceAreas(scAreasSet)
+				.password(passwordEncoder.encode("reviewerDemo3"))
 				.userUsername("reviewerDemo3").build();
 		
 		UserSignedUp user11 = UserSignedUp.builder()
@@ -257,6 +273,7 @@ public class DataLoader implements ApplicationRunner {
 				.role(Role.REVIEWER)
 				.wantToReviewe(true)
 				.userScienceAreas(scAreasSet)
+				.password(passwordEncoder.encode("reviewerDemo4"))
 				.userUsername("reviewerDemo4").build();
 		
 		UserSignedUp user12 = UserSignedUp.builder()
@@ -270,8 +287,23 @@ public class DataLoader implements ApplicationRunner {
 				.role(Role.REVIEWER)
 				.wantToReviewe(true)
 				.userScienceAreas(scAreasSet)
+				.password(passwordEncoder.encode("reviewerDemo5"))
 				.userUsername("reviewerDemo5").build();
 		
+		// ADMIN
+		UserSignedUp admin = UserSignedUp.builder()
+				.firstName("Admin")
+				.lastName("Adminovic glavni")
+				.activatedAccount(true)
+				.city("Novi Sad")
+				.country("Serbia")
+				.email("lukajvnv@gmail.com")
+				.vocation("dipling")
+				.role(Role.ADMIN)
+				.wantToReviewe(true)
+				//.userScienceAreas(scAreasSet)
+				.password(passwordEncoder.encode("demo"))
+				.userUsername("demo").build();
 		
 		unityOfWork.getUserSignedUpRepository().save(user0);
 		unityOfWork.getUserSignedUpRepository().save(user01);
@@ -286,7 +318,9 @@ public class DataLoader implements ApplicationRunner {
 		unityOfWork.getUserSignedUpRepository().save(user9);
 		unityOfWork.getUserSignedUpRepository().save(user10);
 		unityOfWork.getUserSignedUpRepository().save(user11);
-		unityOfWork.getUserSignedUpRepository().save(user12);		
+		unityOfWork.getUserSignedUpRepository().save(user12);	
+		unityOfWork.getUserSignedUpRepository().save(admin);		
+
 	}
 	
 	private void initMagazines() {

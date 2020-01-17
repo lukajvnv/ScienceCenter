@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Magazine } from 'src/app/model/magazine';
 import { MagazineService } from 'src/app/service/magazine/magazine.service';
 import { CheckingMagazineDto } from 'src/app/model/checking-magazine-dto';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-check-new-magazine-data',
@@ -15,7 +16,8 @@ export class CheckNewMagazineDataComponent implements OnInit {
   private taskId: string;
 
 
-  constructor(private activatedRoute: ActivatedRoute, private magazineService: MagazineService, private router: Router) { }
+  constructor(private activatedRoute: ActivatedRoute, private magazineService: MagazineService, private router: Router,
+    private toastrService: ToastrService) { }
 
   ngOnInit() {
     this.activatedRoute.paramMap.subscribe(data => {
@@ -42,7 +44,9 @@ export class CheckNewMagazineDataComponent implements OnInit {
 
     x.subscribe(
       res => {
-        console.log("Rijesi");        
+        console.log("Rijesi");   
+        this.toastrService.success("Operation completed");
+        this.router.navigate(['home']);      
 
       },
       err => {

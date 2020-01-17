@@ -4,6 +4,7 @@ import { Term } from 'src/app/model/term';
 import { NewArticle } from 'src/app/model/new-article';
 import { ArticleService } from 'src/app/service/article/article.service';
 import { ActivatedRoute, Router } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-update-article',
@@ -23,7 +24,7 @@ export class UpdateArticleComponent implements OnInit {
 
   private activeForm: string = 'custom';
 
-  constructor(private activatedRoute: ActivatedRoute, private articleService: ArticleService, private router: Router) { }
+  constructor(private activatedRoute: ActivatedRoute, private articleService: ArticleService, private router: Router, private toastrService: ToastrService) { }
 
   ngOnInit() {
     // this.activeForm == 'custom';
@@ -112,6 +113,8 @@ export class UpdateArticleComponent implements OnInit {
 
     x.subscribe(res => {
       console.log(res);
+      this.toastrService.success('New article published! You will be informed for the further instructions.');
+      this.router.navigate(['home']);
     }, err => {
 
     });

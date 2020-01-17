@@ -7,6 +7,7 @@ import { NewMagazineFormReviewerEditor } from 'src/app/model/new-magazine-form-r
 import { NewMagazineFormReviewerEditorRow } from 'src/app/model/new-magazine-form-reviewer-editor-row';
 import { NewMagazineEditorReviewerRequest } from 'src/app/model/new-magazine-form-reviewer-editor-response';
 import { ScienceArea } from 'src/app/model/science-area';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-new-magazine',
@@ -34,7 +35,7 @@ export class NewMagazineComponent implements OnInit {
   private formDataEditorsReviewers: NewMagazineFormReviewerEditor = new NewMagazineFormReviewerEditor();
 
 
-  constructor(private magazineService: MagazineService, private toastrService: ToastrService) { }
+  constructor(private magazineService: MagazineService, private toastrService: ToastrService, private router: Router) { }
 
   ngOnInit() {
     let x = this.magazineService.startNewMagazine();
@@ -118,7 +119,8 @@ export class NewMagazineComponent implements OnInit {
 
     x.subscribe(
       res => {
-        alert('Resi');
+        this.toastrService.success('New magazine is sent to the admin for verification!');
+        this.router.navigate(['home']);
 
       },
       err => {

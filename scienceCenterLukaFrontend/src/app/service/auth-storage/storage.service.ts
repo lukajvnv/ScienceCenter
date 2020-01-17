@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
+import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 
 const TOKEN_KEY = 'AuthToken';
 const USERNAME_KEY = 'AuthUsername';
 const AUTHORITIES_KEY = 'AuthAuthorities';
 const USER_KEY = 'AuthUser;';
-const RESERVED = 'Reserved;';
 
 @Injectable({
   providedIn: 'root'
@@ -15,6 +15,7 @@ export class StorageService {
   private roles: Array<string> = [];
 
   isLoggedUser: Subject<boolean> = new Subject<boolean>();
+  role: Subject<string> = new Subject<string>();
 
 
   constructor() { }
@@ -22,6 +23,7 @@ export class StorageService {
   public signOut() {
     window.sessionStorage.clear();
     this.isLoggedUser.next(false);
+    this.role.next(undefined);
   }
 
   public saveToken(token: string) {
@@ -50,6 +52,8 @@ export class StorageService {
   public saveAuthorities(authorities: string[]) {
     window.sessionStorage.removeItem(AUTHORITIES_KEY);
     window.sessionStorage.setItem(AUTHORITIES_KEY, JSON.stringify(authorities));
+
+    this.role.next(this.getRole());
   }
 
   public getAuthorities(): string[] {
@@ -64,6 +68,14 @@ export class StorageService {
     return this.roles;
   }
 
+  public getRole(): string {
+    return this.getAuthorities()[0];
+  }
+
+  public hasRole(role: string): boolean{
+    return this.getAuthorities().filter(a => a === role) ? true : false; 
+  }
+
   public saveUser(user: number) {
     window.sessionStorage.removeItem(USER_KEY);
     window.sessionStorage.setItem(USER_KEY, JSON.stringify(user));
@@ -73,12 +85,4 @@ export class StorageService {
     return sessionStorage.getItem(USER_KEY);
   }
 
-  // public saveReserved(num: number) {
-  //   window.sessionStorage.removeItem(RESERVED);
-  //   window.sessionStorage.setItem(RESERVED, JSON.stringify(num));
-  // }
-
-  // public getReserved(): string {
-  //   return sessionStorage.getItem(RESERVED);
-  // }
 }

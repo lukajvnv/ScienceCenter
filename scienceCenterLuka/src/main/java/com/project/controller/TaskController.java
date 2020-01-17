@@ -4,9 +4,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
-import org.apache.tomcat.websocket.server.UriTemplate;
 import org.camunda.bpm.engine.FormService;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.IdentityService;
@@ -17,6 +15,7 @@ import org.camunda.bpm.engine.task.Task;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,11 +23,15 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
+import com.project.config.security.service.UserDetailsServiceImpl;
 import com.project.dto.TaskDto;
+import com.project.model.enums.Role;
+import com.project.model.user.UserSignedUp;
 import com.project.util.TaskUrlEndpoint;
 
 @RestController
 @RequestMapping("/task")
+@CrossOrigin
 public class TaskController {
 	
 	@Autowired
@@ -52,13 +55,23 @@ public class TaskController {
 	@Autowired
 	private TaskUrlEndpoint taskUrlEndpoint;
 	
+	@Autowired
+	private UserDetailsServiceImpl userDetailService;
+	
 	@GetMapping(path = "/assignedToUser/{processInstanceId}", produces = "application/json")
     public @ResponseBody ResponseEntity<List<TaskDto>> get(@PathVariable String processInstanceId) {
 		
-//		String userId = "editorDemo";
-//		List<Task> tasks = taskService.createTaskQuery().taskAssignee(userId).active().list();
+		UserSignedUp loggedUser = userDetailService.getLoggedUser();
+		if(loggedUser == null ) {
+			
+			return null;
+		}
+		List<Task> tasks = taskService.createTaskQuery().taskAssignee(loggedUser.getUserUsername()).active().list();
 		
-		List<Task> tasks = taskService.createTaskQuery().active().list();
+		if(loggedUser.getRole() == Role.ADMIN) {
+			tasks = taskService.createTaskQuery().active().list();
+		}
+//		List<Task> tasks = taskService.createTaskQuery().active().list();
 
 		
 		List<TaskDto> dtos = new ArrayList<TaskDto>();
