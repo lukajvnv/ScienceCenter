@@ -9,7 +9,10 @@ export class UpdateArticleChanges {
      reviewersOpinion: OpinionAboutArticle[];  
      editorsOpinion: OpinionAboutArticle[];    
                                                  
-    authorsMessage: OpinionAboutArticle;          
+    authorsMessage: OpinionAboutArticle;    
+    
+    fields: any[] = [];
+    fieldResults: any[] = [];
 
     constructor() {}
 }

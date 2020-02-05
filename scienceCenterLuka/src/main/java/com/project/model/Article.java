@@ -91,6 +91,6 @@ public class Article {
 	private MagazineEdition magazineEdition;
 	
 	@Column
-	private Float articlePrice;
+	private Long articlePrice;
 
 }

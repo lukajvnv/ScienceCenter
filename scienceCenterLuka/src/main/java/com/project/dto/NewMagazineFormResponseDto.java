@@ -21,11 +21,13 @@ public class NewMagazineFormResponseDto implements Serializable{
 	private String taskId;
 	private String processInstanceId;
 	
-	private String name;
-	private String issn_number;
-	private String payment_option;
-	private Float membership_price;
-	private List<String> science_area;
+	private List<FormSubmissionDto> formFields;
+	
+//	private String name;
+//	private String issn_number;
+//	private String payment_option;
+//	private Float membership_price;
+//	private List<String> science_area;
 	
 	private Long magazineDbId;
 	private boolean update;

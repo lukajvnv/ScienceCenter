@@ -44,18 +44,18 @@ export class MagazineService {
   }
 
   checkingMagazineDataStart(taskId) : Observable<any>{
-    return this.http.get(this.MAGAZINEAPI + "checkingMagazineData/".concat(taskId));
+    return this.http.get(this.MAGAZINEAPI + "checkingMagazineData/".concat(taskId), {headers: this.genHeader()});
   }
 
   checkingMagazineDataPost(response, taskId) : Observable<any>{
-    return this.http.post(this.MAGAZINEAPI + "checkingMagazineData/".concat(taskId), response);
+    return this.http.post(this.MAGAZINEAPI + "checkingMagazineData/".concat(taskId), response, {headers: this.genHeader()});
   }
 
   getAllMagazines(): Observable<any>{
-    return this.http.get(this.MAGAZINEAPI + 'all'); 
+    return this.http.get('http://localhost:8085/article/magazines', {headers: this.genHeader()}); 
   }
 
   getMagazine(magazineId: string): Observable<any>{
-    return this.http.get(this.MAGAZINEAPI  + magazineId); 
+    return this.http.get('http://localhost:8085/article/magazine/'  + magazineId); 
   }
 }

@@ -85,7 +85,7 @@ public class ReviewArticleAdditionalDataInitialization implements TaskListener {
 		
 		OpinionAboutArticle opinion = new OpinionAboutArticle(article.getArticleId(), personOpinionId, ReviewingType.REVIEWING, ArticleStatus.ACCEPTED, "", "", articleProcessDto.getIteration());
 		
-		ReviewingDto reviewingDto = new ReviewingDto(articleDto, magazineDto, opinion, articleProcessDto.getAuthorsMessages(), false);
+		ReviewingDto reviewingDto = new ReviewingDto(articleDto, magazineDto, opinion, articleProcessDto.getAuthorsMessages(), false, null, null);
 		
 		execution.setVariable("additionalReviewing", reviewingDto);
 

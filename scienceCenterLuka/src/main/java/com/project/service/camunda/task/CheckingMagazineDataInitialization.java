@@ -9,6 +9,7 @@ import org.camunda.bpm.engine.FormService;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.delegate.TaskListener;
+import org.camunda.bpm.engine.impl.form.type.StringFormType;
 import org.camunda.bpm.engine.rest.dto.task.UserDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -60,7 +61,7 @@ public class CheckingMagazineDataInitialization implements TaskListener {
 //		
 ////		FormField fieldChiefEditor = taskFormData.getFormFields().stream().filter(f -> f.getId().equals("view_chief_editor")).findFirst().get();
 ////		Object value = fieldChiefEditor.getDefaultValue();
-////		StringFormType type = (StringFormType) fieldChiefEditor.getType();
+//		StringFormType type = (StringFormType) fieldChiefEditor.getType();
 ////		value = chiefEditor.getFirstName() + " " + chiefEditor.getLastName();
 //		
 //		TaskFormData taskFormData = formService.getTaskFormData(delegateTask.getId());
@@ -141,7 +142,7 @@ public class CheckingMagazineDataInitialization implements TaskListener {
 			ScienceArea sc = e.getScienceArea();
 			reviewersDto.add(new EditorReviewerByScienceAreaDto(e.getEditorByScArId(), e.isEditor(), 
 					new com.project.dto.UserDto(chief.getUserId(), chief.getFirstName(), chief.getLastName(), chief.getEmail(), chief.getCity(), chief.getCountry(), chief.getUserUsername(), chief.getVocation()), new ScienceAreaDto(sc.getScienceAreaId(), sc.getScienceAreaName(), sc.getScienceAreaCode()),
-					null));
+					null, 0d, 0d));
 		});
 		
 		editors.stream().forEach(e -> {	
@@ -149,7 +150,7 @@ public class CheckingMagazineDataInitialization implements TaskListener {
 			ScienceArea sc = e.getScienceArea();
 			editorsDto.add(new EditorReviewerByScienceAreaDto(e.getEditorByScArId(), e.isEditor(), 
 					new com.project.dto.UserDto(chief.getUserId(), chief.getFirstName(), chief.getLastName(), chief.getEmail(), chief.getCity(), chief.getCountry(), chief.getUserUsername(), chief.getVocation()), new ScienceAreaDto(sc.getScienceAreaId(), sc.getScienceAreaName(), sc.getScienceAreaCode()),
-					null));
+					null, 0d, 0d));
 		});
 		
 		scieceAreas.stream().forEach(s -> {
@@ -159,7 +160,7 @@ public class CheckingMagazineDataInitialization implements TaskListener {
 		com.project.dto.UserDto chiefDto = new com.project.dto.UserDto(chiefEditor.getUserId(), chiefEditor.getFirstName(), chiefEditor.getLastName(), chiefEditor.getEmail(), chiefEditor.getCity(), chiefEditor.getCountry(), chiefEditor.getUserUsername(), chiefEditor.getVocation());
 
 		DisplayMagazineDto m = new DisplayMagazineDto(magazine.getMagazineId(), magazine.getISSN(), magazine.getName(), scienceAreasDto, magazine.getWayOfPayment(), magazine.getMembershipPrice(), chiefDto, editorsDto, reviewersDto);
-		CheckingMagazineDataDto checkingMagazineDto = new CheckingMagazineDataDto(delegateTask.getId(), m, "", true);
+		CheckingMagazineDataDto checkingMagazineDto = new CheckingMagazineDataDto(delegateTask.getId(), m, null, null);
 		
     	execution.setVariable("checkingMagazineDto", checkingMagazineDto);
 	}

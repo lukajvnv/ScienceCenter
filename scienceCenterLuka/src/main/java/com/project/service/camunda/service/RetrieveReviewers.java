@@ -40,6 +40,7 @@ public class RetrieveReviewers implements JavaDelegate {
 			UserSignedUp u = r.getEditorReviewer();
 			UserDto rDto = new UserDto(u.getUserId(), u.getFirstName(), u.getLastName(), u.getEmail(), u.getCity(), u.getCountry(), u.getUserUsername(), u.getVocation());
 			
+			
 			ScienceArea articleScienceArea = r.getScienceArea();
 			ScienceAreaDto articleScienceAreaDto = new ScienceAreaDto(
 					articleScienceArea.getScienceAreaId(), 
@@ -54,7 +55,9 @@ public class RetrieveReviewers implements JavaDelegate {
 			
 			MagazineDto mDto = new MagazineDto(magazine.getMagazineId(), magazine.getISSN(), magazine.getName(), scienceAreasDto);
 			
-			EditorReviewerByScienceAreaDto e = new EditorReviewerByScienceAreaDto(r.getEditorByScArId(), r.isEditor(), rDto, articleScienceAreaDto, mDto);
+			
+			
+			EditorReviewerByScienceAreaDto e = new EditorReviewerByScienceAreaDto(r.getEditorByScArId(), r.isEditor(), rDto, articleScienceAreaDto, mDto, u.getLongitude(), u.getLatitude());
 			reviewersDto.add(e);
 		});
 		

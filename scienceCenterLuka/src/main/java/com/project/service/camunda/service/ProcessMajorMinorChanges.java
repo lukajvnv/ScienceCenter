@@ -15,6 +15,10 @@ public class ProcessMajorMinorChanges implements JavaDelegate {
 		OpinionAboutArticle authorsMessage = (OpinionAboutArticle) execution.getVariable("authorMessage");
 		ArticleProcessDto articleProcessDto = (ArticleProcessDto) execution.getVariable("articleProcessDto");
 		
+		//setuj komentar tekst komentara
+		String comment = (String) execution.getVariable("change_comment");
+		authorsMessage.setComment(comment);
+		
 		authorsMessage.setIteration(authorsMessage.getIteration() + 1);
 		
 		articleProcessDto.getAuthorsMessages().add(authorsMessage);

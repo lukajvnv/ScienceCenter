@@ -1,6 +1,8 @@
 package com.project.service.camunda.service;
 
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
@@ -28,7 +30,16 @@ public class ShouldUserPay implements JavaDelegate {
 		String userUsername = (String) execution.getVariable("user");
 		UserSignedUp user = unityOfWork.getUserSignedUpRepository().findByUserUsername(userUsername);
 		
-		Membership membership = unityOfWork.getMembershipRepository().findByMagazineAndEndAtBefore(magazine, new Date());
+		Date now = new Date();
+		
+//		List<Membership> r = unityOfWork.getMembershipRepository().findAll();
+//		List<Membership> filtered =		r.stream()
+//					.filter(m -> m.getMagazine().getMagazineId().equals(magazineId))
+//					.filter(m -> m.getSignedUpUser().getUserId().equals(user.getUserId()))
+//					.filter(m -> m.getStartAt().before(now)  && m.getEndAt().after(now))
+//					.collect(Collectors.toList());
+		
+		Membership membership = unityOfWork.getMembershipRepository().findByMagazineAndSignedUpUserAndEndAtAfter(magazine, user, now);
 		boolean shouldPay = true;
 		if( membership != null ) {
 			shouldPay = false;

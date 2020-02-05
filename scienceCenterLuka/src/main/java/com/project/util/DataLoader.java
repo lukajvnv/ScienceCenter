@@ -23,6 +23,7 @@ import com.project.model.enums.ArticleStatus;
 import com.project.model.enums.Role;
 import com.project.model.enums.WayOfPayment;
 import com.project.model.user.UserSignedUp;
+import com.project.model.user.tx.Membership;
 import com.project.repository.UnityOfWork;
 
 @Component
@@ -45,6 +46,8 @@ public class DataLoader implements ApplicationRunner {
 		initUsers();
 		
 		initMagazines();
+		
+		initMemberships();
 		
 		//initArticles();
 		test();
@@ -107,6 +110,8 @@ public class DataLoader implements ApplicationRunner {
 				.vocation("dipling")
 				.role(Role.COMMON_USER)
 				.password(passwordEncoder.encode("lukaAuthor"))
+				.latitude(44.79d)		//bg
+				.longitude(20.45d)
 				.userUsername("lukaAuthor").build();
 		
 		UserSignedUp user01 = UserSignedUp.builder()
@@ -218,6 +223,8 @@ public class DataLoader implements ApplicationRunner {
 				.wantToReviewe(true)
 				.password(passwordEncoder.encode("reviewerDemo"))
 				.userScienceAreas(scAreasSet)
+				.latitude(44.79d)		//bg
+				.longitude(20.45d)
 				.userUsername("reviewerDemo").build();
 		
 		UserSignedUp user8 = UserSignedUp.builder()
@@ -232,6 +239,8 @@ public class DataLoader implements ApplicationRunner {
 				.wantToReviewe(true)
 				.password(passwordEncoder.encode("reviewerDemo1"))
 				.userScienceAreas(scAreasSet)
+				.latitude(44.79d)		//bg
+				.longitude(20.45d)
 				.userUsername("reviewerDemo1").build();
 		
 		UserSignedUp user9 = UserSignedUp.builder()
@@ -246,6 +255,8 @@ public class DataLoader implements ApplicationRunner {
 				.wantToReviewe(true)
 				.password(passwordEncoder.encode("reviewerDemo2"))
 				.userScienceAreas(scAreasSet)
+				.latitude(45.27d)		//ns
+				.longitude(19.83d)
 				.userUsername("reviewerDemo2").build();
 		
 		UserSignedUp user10 = UserSignedUp.builder()
@@ -260,6 +271,8 @@ public class DataLoader implements ApplicationRunner {
 				.wantToReviewe(true)
 				.userScienceAreas(scAreasSet)
 				.password(passwordEncoder.encode("reviewerDemo3"))
+				.latitude(43.32d)		//bg
+				.longitude(21.89d)
 				.userUsername("reviewerDemo3").build();
 		
 		UserSignedUp user11 = UserSignedUp.builder()
@@ -274,6 +287,8 @@ public class DataLoader implements ApplicationRunner {
 				.wantToReviewe(true)
 				.userScienceAreas(scAreasSet)
 				.password(passwordEncoder.encode("reviewerDemo4"))
+				.latitude(44.79d)		//bg
+				.longitude(20.45d)
 				.userUsername("reviewerDemo4").build();
 		
 		UserSignedUp user12 = UserSignedUp.builder()
@@ -288,6 +303,8 @@ public class DataLoader implements ApplicationRunner {
 				.wantToReviewe(true)
 				.userScienceAreas(scAreasSet)
 				.password(passwordEncoder.encode("reviewerDemo5"))
+				.latitude(44.79d)		//bg
+				.longitude(20.45d)
 				.userUsername("reviewerDemo5").build();
 		
 		// ADMIN
@@ -336,11 +353,11 @@ public class DataLoader implements ApplicationRunner {
 		UserSignedUp computerScienceReviewer2 = unityOfWork.getUserSignedUpRepository().findByUserUsername("reviewerDemo2");
 		UserSignedUp artificialIntelligence1 = unityOfWork.getUserSignedUpRepository().findByUserUsername("reviewerDemo3");
 
-		
+		//magazine1
 		Magazine magazine1 = Magazine.builder()
 									.active(true)
 									.ISSN("4563-1232")
-									.membershipPrice(1250f)
+									.membershipPrice(1250l)
 									.name("Computer science informer")
 									.wayOfPayment(WayOfPayment.PAID_ACCESS)
 									.chiefEditor(chiefEditor)
@@ -408,6 +425,114 @@ public class DataLoader implements ApplicationRunner {
 
 		
 		
+		
+		// ************************ magazine2  *****************************************
+		UserSignedUp chiefEditor2 = unityOfWork.getUserSignedUpRepository().findByUserUsername("editorDemo5");
+		List<ScienceArea> scienceAreas2 = unityOfWork.getScienceAreaRepository().findAllById(Arrays.asList(new Long[] {4l, 7l}));
+		ScienceArea ITSystem = scienceAreas.get(0);
+		ScienceArea businessManagment = scienceAreas.get(1);
+		
+		UserSignedUp ITSystemEditor = unityOfWork.getUserSignedUpRepository().findByUserUsername("editorDemo3");
+		UserSignedUp businessManagmentEditor = unityOfWork.getUserSignedUpRepository().findByUserUsername("editorDemo4");
+		
+		UserSignedUp ITSystemReviewer1 = unityOfWork.getUserSignedUpRepository().findByUserUsername("reviewerDemo1");
+		UserSignedUp ITSystemReviewer2 = unityOfWork.getUserSignedUpRepository().findByUserUsername("reviewerDemo4");
+		UserSignedUp businessManagmentReviewer1 = unityOfWork.getUserSignedUpRepository().findByUserUsername("reviewerDemo3");
+		
+		Magazine magazine2 = Magazine.builder()
+									.active(true)
+									.ISSN("4563-4425")
+									.membershipPrice(1250l)
+									.name("Business Managment")
+									.wayOfPayment(WayOfPayment.OPEN_ACCESS)
+									.chiefEditor(chiefEditor2)
+									.scienceAreas(new HashSet<ScienceArea>(scienceAreas2))
+									.build();
+		
+		Magazine persistedMagazine2 = unityOfWork.getMagazineRepository().save(magazine2);
+		
+		MagazineEdition magazineEdition21 = MagazineEdition.builder()
+													.magazineEditionPrice(100f)
+													.publishingDate(new Date())
+													.magazine(persistedMagazine2)
+													.build();
+		
+		MagazineEdition magazineEdition22 = MagazineEdition.builder()
+				.magazineEditionPrice(200f)
+				.publishingDate(new Date(119, 11, 30))  //2019 godina
+				.magazine(persistedMagazine2)
+				.build();
+		
+		unityOfWork.getMagazineEditionRepository().save(magazineEdition21);
+		unityOfWork.getMagazineEditionRepository().save(magazineEdition22);
+		
+		
+		EditorReviewerByScienceArea editor21 = EditorReviewerByScienceArea.builder()
+																		.editor(true)
+																		.magazine(persistedMagazine2)
+																		.scienceArea(ITSystem)
+																		.editorReviewer(ITSystemEditor)
+																		.build();
+		
+		EditorReviewerByScienceArea editor22 = EditorReviewerByScienceArea.builder()
+																		.editor(true)
+																		.magazine(persistedMagazine2)
+																		.scienceArea(businessManagment)
+																		.editorReviewer(businessManagmentEditor)
+																		.build();
+		
+		EditorReviewerByScienceArea reviewer21 = EditorReviewerByScienceArea.builder()
+																		.editor(false)
+																		.magazine(persistedMagazine2)
+																		.scienceArea(ITSystem)
+																		.editorReviewer(ITSystemReviewer1)
+																		.build();
+		
+		EditorReviewerByScienceArea reviewer22 = EditorReviewerByScienceArea.builder()
+																		.editor(false)
+																		.magazine(persistedMagazine2)
+																		.scienceArea(ITSystem)
+																		.editorReviewer(ITSystemReviewer2)
+																		.build();
+		
+		EditorReviewerByScienceArea reviewer23 = EditorReviewerByScienceArea.builder()
+																		.editor(false)
+																		.magazine(persistedMagazine2)
+																		.scienceArea(businessManagment)
+																		.editorReviewer(businessManagmentReviewer1)
+																		.build();
+		
+		unityOfWork.getEditorReviewerByScienceAreaRepository().save(editor21);
+		unityOfWork.getEditorReviewerByScienceAreaRepository().save(editor22);
+		unityOfWork.getEditorReviewerByScienceAreaRepository().save(reviewer21);
+		unityOfWork.getEditorReviewerByScienceAreaRepository().save(reviewer22);
+		unityOfWork.getEditorReviewerByScienceAreaRepository().save(reviewer23);
+		
+		
+	}
+	
+	private void initMemberships() {
+		Magazine magazine = unityOfWork.getMagazineRepository().getOne(2l);
+		UserSignedUp subscriber1 = unityOfWork.getUserSignedUpRepository().findByUserUsername("lukaAuthor");
+//		UserSignedUp subscriber2 = unityOfWork.getUserSignedUpRepository().findByUserUsername("nikolaAuthor");
+		
+		Membership mShip1 = Membership.builder()
+				.price(100f)
+				.startAt(new Date(119, 11, 30))
+				.endAt(new Date(120, 2, 30))
+				.magazine(magazine)
+				.signedUpUser(subscriber1)
+				.build();
+		
+//		Membership mShip2 = Membership.builder()
+//				.price(100f)
+//				.startAt(new Date(119, 11, 30))
+//				.endAt(new Date(119, 11, 30))
+//				.magazine(magazine)
+//				.signedUpUser(subscriber2)
+//				.build();
+		
+		unityOfWork.getMembershipRepository().save(mShip1);
 	}
 	
 	private void initArticles() {
@@ -419,7 +544,7 @@ public class DataLoader implements ApplicationRunner {
 		Article article = Article.builder()
 								.articleTitle("WWW3 memes")
 								.articleAbstract("Abstract")
-								.articlePrice(500f)
+								.articlePrice(500l)
 								.status(ArticleStatus.ACCEPTED)
 								.publishingDate(new Date())
 								.scienceArea(scienceArea)

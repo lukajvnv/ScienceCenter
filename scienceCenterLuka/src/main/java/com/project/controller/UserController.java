@@ -19,6 +19,8 @@ import org.camunda.bpm.engine.task.Task;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,9 +33,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.project.dto.FormFieldsDto;
 import com.project.dto.FormSubmissionDto;
+import com.project.dto.NewEditorDto;
 import com.project.dto.NewUserResponseDto;
 import com.project.dto.ReviewerConfirmationDto;
 import com.project.dto.SignInDto;
+import com.project.model.enums.Role;
+import com.project.model.user.UserSignedUp;
+import com.project.repository.UnityOfWork;
 import com.project.util.Response;
 
 @RestController
@@ -59,6 +65,12 @@ public class UserController {
 	@Autowired
 	private FormService formService;
 	
+	@Autowired
+	private UnityOfWork unityOfWork;
+	
+	@Autowired
+	private PasswordEncoder passwordEncoder;
+	
 	@GetMapping(path = "/register", produces = "application/json")
     public @ResponseBody FormFieldsDto get() {
 		//provera da li korisnik sa id-jem pera postoji
@@ -69,15 +81,12 @@ public class UserController {
 		
 		TaskFormData tfd = formService.getTaskFormData(task.getId());
 		List<FormField> properties = tfd.getFormFields();
-		for(FormField fp : properties) {
-			System.out.println(fp.getId() + " " + fp.getType());
-		}
 		
         return new FormFieldsDto(task.getId(), pi.getId(), properties);
     }
 	
 	@PostMapping(path = "/register/{taskId}", produces = "application/json")
-    public @ResponseBody ResponseEntity post(@RequestBody NewUserResponseDto dto, @PathVariable String taskId) {
+    public @ResponseBody ResponseEntity<?> post(@RequestBody NewUserResponseDto dto, @PathVariable String taskId) {
 		
 		HashMap<String, Object> map = this.mapListToDto(dto.getFormFields());
 		
@@ -154,6 +163,7 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 	
+	@PreAuthorize("hasAuthority('ADMIN')")
 	@GetMapping(path = "/reviewerConfirmationStart/{taskId}", produces = "application/json")
     public @ResponseBody ReviewerConfirmationDto reviewerConfirmation( @PathVariable("taskId") String taskId) {
 		//provera da li korisnik sa id-jem pera postoji
@@ -193,33 +203,54 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 	
-	@PostMapping(path = "/signIn", produces = "application/json")
-    public @ResponseBody ResponseEntity<?> signIn(@RequestBody SignInDto signInDto) {
-		User user = identityService.createUserQuery().userId(signInDto.getUsername()).singleResult();
-		if(user == null) {
-			return new ResponseEntity(HttpStatus.BAD_REQUEST);
-		}
+	@PostMapping(path = "/newEditor", produces = "application/json")
+    public @ResponseBody ResponseEntity<?> newEditor(@RequestBody NewEditorDto newEditor) {
 		
-		boolean ok = identityService.checkPassword(user.getId(), signInDto.getPassword());
-		if(!ok) {
-			
-		}
+		UserSignedUp editor = UserSignedUp.builder()
+				.firstName(newEditor.getFirstName())
+				.lastName(newEditor.getLastName())
+				.activatedAccount(true)
+				.city(newEditor.getCity())
+				.country(newEditor.getCountry())
+				.email(newEditor.getEmail())
+				.vocation(newEditor.getVocation())
+				.role(Role.EDITOR)
+				.wantToReviewe(true)
+				.password(passwordEncoder.encode(newEditor.getPassword()))
+				.userUsername(newEditor.getUsername()).build();
 		
-	
-		identityService.setAuthenticatedUserId(user.getId());
-		// identityService.setAuthentication("demo", Arrays.asList(new String[]{"camunda-admin"}));
-		String s= identityService.getCurrentAuthentication().getUserId(); //ako nema puca exception
+		unityOfWork.getUserSignedUpRepository().save(editor);
 		
         return new ResponseEntity<>(HttpStatus.OK);
     }
 	
-	@GetMapping(path = "/signOut", produces = "application/json")
-    public @ResponseBody ResponseEntity signOut() {
-		
-		identityService.clearAuthentication();
-
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
+//	@PostMapping(path = "/signIn", produces = "application/json")
+//    public @ResponseBody ResponseEntity<?> signIn(@RequestBody SignInDto signInDto) {
+//		User user = identityService.createUserQuery().userId(signInDto.getUsername()).singleResult();
+//		if(user == null) {
+//			return new ResponseEntity(HttpStatus.BAD_REQUEST);
+//		}
+//		
+//		boolean ok = identityService.checkPassword(user.getId(), signInDto.getPassword());
+//		if(!ok) {
+//			
+//		}
+//		
+//	
+//		identityService.setAuthenticatedUserId(user.getId());
+//		// identityService.setAuthentication("demo", Arrays.asList(new String[]{"camunda-admin"}));
+//		String s= identityService.getCurrentAuthentication().getUserId(); //ako nema puca exception
+//		
+//        return new ResponseEntity<>(HttpStatus.OK);
+//    }
+//	
+//	@GetMapping(path = "/signOut", produces = "application/json")
+//    public @ResponseBody ResponseEntity signOut() {
+//		
+//		identityService.clearAuthentication();
+//
+//        return new ResponseEntity<>(HttpStatus.OK);
+//    }
 	
 	private HashMap<String, Object> mapListToDto(List<FormSubmissionDto> list)
 	{

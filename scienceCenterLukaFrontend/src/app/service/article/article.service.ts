@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { StorageService } from '../auth-storage/storage.service';
+import { GenericResponse } from 'src/app/model/GenericResponse';
 
 @Injectable({
   providedIn: 'root'
@@ -22,6 +23,10 @@ export class ArticleService {
     return this.http.get(this.ARTICLEAPI + 'start/'.concat(magazineId), {headers: this.genHeader()}); 
   }
 
+  startNewArticleInitialiaztion(magazineId: string): Observable<any>{
+    return this.http.get(this.ARTICLEAPI + 'startArticleInit/'.concat(magazineId), {headers: this.genHeader()}); 
+  }
+
   postNewArticle(article, taskId) : Observable<any>{
     return this.http.post(this.ARTICLEAPI + "postArticle/".concat(taskId), article);
   }
@@ -38,12 +43,20 @@ export class ArticleService {
     return this.http.get(this.ARTICLEAPI + 'analizeBasicResult/'.concat(taskId, '?topicOk=', topic));
   }
 
+  analizeBasicResultPost(taskId: string, body): Observable<any> {
+    return this.http.post(this.ARTICLEAPI + 'analizeBasicResult/'.concat(taskId), body);
+  }
+
   analizeTextResult(taskId: string, comment: string, textOk: boolean): Observable<any> {
     let text: string = 'true';
     if (!textOk) {
       text = 'false';
     }
     return this.http.post(this.ARTICLEAPI + 'analizeTextResult/'.concat(taskId, '?textOk=', text), comment);
+  }
+
+  analizeTextResultPost(taskId: string, body): Observable<any> {
+    return this.http.post(this.ARTICLEAPI + 'analizeTextResult/'.concat(taskId), body);
   }
 
   startUpdateArticle(taskId: string): Observable<any>{
@@ -61,6 +74,30 @@ export class ArticleService {
   updateChangesArticle(article, taskId) : Observable<any>{
     return this.http.put(this.ARTICLEAPI + "updateArticleChangesPut/".concat(taskId), article);
   }
+
+  uploadFile(taskId, file): Observable<any> {
+    return this.http.post(this.ARTICLEAPI + "upload/".concat(taskId), file);
+  }
+
+  downloadFile(articleId): Observable<Blob>{
+    const headers = new HttpHeaders({ responseType : 'blob'});
+
+		return this.http.get<Blob>(this.ARTICLEAPI + 'download/'.concat(articleId), {headers: headers, responseType: 'blob' as 'json'});
+  }
+
+  // downloadFiles(): Observable<HttpResponse<Blob>>{
+  //   const headers = new HttpHeaders({ responseType : 'blob'});
+
+	// 	return this.http.get<HttpResponse<Blob>>(this.ARTICLEAPI + 'download', {headers: headers, responseType: 'blob' as 'json'});
+  // }
+
+  // downloadFiles() : Observable<HttpResponse<Object>>{
+  //   //kako videti http header response
+  //   return this.http.get<HttpResponse<Blob>>(this.ARTICLEAPI + 'download', {observe: 'response'}).pipe(
+  //     tap(resp => console.log('heaeder', resp.headers.get('ReturnStatus')))
+  //   );
+    
+  // }
 
  
 }

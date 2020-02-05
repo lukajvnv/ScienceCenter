@@ -13,7 +13,7 @@ import com.project.repository.UnityOfWork;
 public class MagazineService {
 
 	@Autowired
-	private UnityOfWork unityOfWork;
+	UnityOfWork unityOfWork;
 	
 	public List<Magazine> getMagazines(){
 		return unityOfWork.getMagazineRepository().findAll().stream().filter(m -> m.isActive()).collect(Collectors.toList());

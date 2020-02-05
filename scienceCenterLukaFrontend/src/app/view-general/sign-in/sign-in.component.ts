@@ -37,7 +37,7 @@ export class SignInComponent implements OnInit {
           this.router.navigate(['home']);
     }, err => {
       this.toastrService.error('Code:'+ err.error.status + ', message:' + err.error.message);
-    });
+    })
   }
 
 }

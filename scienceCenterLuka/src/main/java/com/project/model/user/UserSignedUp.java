@@ -92,5 +92,11 @@ public class UserSignedUp  {
 	
 	@Column
 	private String password;
+	
+	@Column
+	private Double longitude;
+	
+	@Column
+	private Double latitude;
 
 }

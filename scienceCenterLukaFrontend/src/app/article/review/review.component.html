@@ -31,12 +31,7 @@
                             File preview
                         </th>
                         <td>
-                            <!-- <a href="{{article.file.value.toString()}}" download ></a> -->
-                            <!-- <a [href]="article.file.toString()" download="proba.pdf" >Text</a>
-                            <a href="#" (click)="preview()" >Text</a> -->
-                            <a [href]="fileUrl" download>DownloadFile</a>
-                            <!-- <iframe [src]="fileUrl" frameborder="0"></iframe>
-                            <object data=""></object> -->
+                            <input type="button" (click)="download()" value="Download File"/>
                         </td>
                     </tr>
                 </table>
@@ -92,7 +87,7 @@
         </div>
         <div>
             <h2 class="text-center">Your decision</h2>
-            <form #f="ngForm" (ngSubmit)="f.form.valid && reviewPost()" novalidate>
+            <!-- <form #f="ngForm" (ngSubmit)="f.form.valid && reviewPost()" novalidate>
                 <div class="form-group row" >
                     <div class="col-lg-3"><label for="comment">Comment:</label></div>
                     <div class="col-lg-9">
@@ -135,8 +130,52 @@
                 </div>
 
             </div>
+            </form> -->
+            <form #f="ngForm" (ngSubmit)="reviewPost(f.value, f)" novalidate>
+                <div class="form-group row" *ngFor="let fieldWrapper of formFieldsWrapper">
+                    <div class="col-lg-4"> <label for={{fieldWrapper.field.id}} class="col-lg-4">{{fieldWrapper.field.label}}</label></div>
+        
+                    <input class="col-lg-3 form-control" type="text" name={{fieldWrapper.field.id}}   *ngIf="fieldWrapper.field.type.name=='string' && !fieldWrapper.field.properties['textarea'] && !fieldWrapper.field.properties['file']" ngModel>
+            
+                    <div class="col-lg-6" *ngIf="fieldWrapper.field.type.name=='string' && fieldWrapper.field.properties['textarea']">
+                        <textarea rows="5" class="form-control" name={{fieldWrapper.field.id}}  ngModel 
+                        >
+        
+                        </textarea>
+                    </div>
+                    
+                    <input class="col-lg-3" type="checkbox" name={{fieldWrapper.field.id}} ngModel   *ngIf="fieldWrapper.field.type.name=='boolean'" >
+                    <input class="col-lg-3 form-control" type="number" name={{fieldWrapper.field.id}}  [(ngModel)]="fieldWrapper.field.value.value"  *ngIf="fieldWrapper.field.type.name=='long'" >
+        
+                     <select class="col-lg-3 form-control" name="{{fieldWrapper.field.id}}" *ngIf="fieldWrapper.field.type.name=='enum' && !fieldWrapper.field.properties['multiple']" [(ngModel)]="fieldWrapper.field.value.value"  >
+                      <option *ngFor="let val of fieldWrapper.dataSource" value={{val}}>
+                        {{fieldWrapper.field.type.values[val]}}
+                      </option>
+                    </select>
+        
+                    <select class="col-lg-3 form-control" name="{{fieldWrapper.field.id}}" *ngIf="fieldWrapper.field.type.name=='enum' && fieldWrapper.field.properties['multiple']" [(ngModel)]="fieldWrapper.field.value.value" multiple  size="{{fieldWrapper.dataSource.length}}">
+                        <option *ngFor="let val of fieldWrapper.dataSource" value={{val}}>
+                          {{fieldWrapper.field.type.values[val]}}
+                        </option>
+                      </select>
+        
+                    <div  *ngIf="f.submitted" class="col-lg-3 text-danger">
+                        <div>{{fieldWrapper.errorField}}</div>
+                    </div>
+    
+                    
+                </div>
+                
+    
+                <div class="row">
+                    <div class="col-lg-3">
+          
+                    </div>
+                    <div class="col-lg-3">
+                      <input type="submit" class="btn btn-success form-control" value="Save decision">
+                    </div>
+                  </div>
             </form>
-
         </div>
         
     </div>

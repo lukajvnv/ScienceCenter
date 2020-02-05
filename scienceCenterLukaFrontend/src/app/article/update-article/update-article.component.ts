@@ -5,6 +5,10 @@ import { NewArticle } from 'src/app/model/new-article';
 import { ArticleService } from 'src/app/service/article/article.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
+import { ScienceArea } from 'src/app/model/science-area';
+import { EncodeDecode } from 'src/app/util/base64';
+import { DomSanitizer } from '@angular/platform-browser';
+import { HttpResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-update-article',
@@ -22,9 +26,15 @@ export class UpdateArticleComponent implements OnInit {
   private customTerm: Term = new Term();
   private customUser: User = new User();
 
+  private scArea: ScienceArea = new ScienceArea();
+  private magScArea: ScienceArea[] = [];
+
   private activeForm: string = 'custom';
 
-  constructor(private activatedRoute: ActivatedRoute, private articleService: ArticleService, private router: Router, private toastrService: ToastrService) { }
+  private fileUrl;
+
+  constructor(private activatedRoute: ActivatedRoute, private articleService: ArticleService, private router: Router, private toastrService: ToastrService
+    , private sanitizer: DomSanitizer) { }
 
   ngOnInit() {
     // this.activeForm == 'custom';
@@ -42,6 +52,14 @@ export class UpdateArticleComponent implements OnInit {
           this.processInstanceId = res.newArticleRequestDto.processInstanceId;
 
           this.articleData = res.newAarticleResponseDto;
+
+          this.magScArea = this.articleFormDto.articleScienceAreas;
+          this.scArea = this.magScArea.filter(sc => sc.scienceAreaId === +this.articleData.articleScienceArea)[0];
+        
+        
+          let t1 = EncodeDecode.b64DecodeUnicode(this.articleData.file.toString());
+          const blob1 = new Blob([t1], { type: 'application/octet-stream' });
+          this.fileUrl = this.sanitizer.bypassSecurityTrustResourceUrl(window.URL.createObjectURL(blob1));
         },
         err => {
           console.log("Error occured");
@@ -83,29 +101,75 @@ export class UpdateArticleComponent implements OnInit {
     this.articleData.articleCoAuthors.push(user);
   }
 
-  onFileUpload(event) {
+  // onFileUpload(event) {
     
-    let file: File = event.target.files[0];
-    const reader = new FileReader();
+  //   let file: File = event.target.files[0];
+  //   const reader = new FileReader();
 
-      // ucitavanje fajla preko readera, pregled fajla -> filter formata
-      reader.onload = () => {
+  //     // ucitavanje fajla preko readera, pregled fajla -> filter formata
+  //     reader.onload = () => {
 
-        console.log(file.name);
-        console.log(reader);
-        console.log(reader.result);
-        this.articleData.file = reader.result;
+  //       console.log(file.name);
+  //       console.log(reader);
+  //       console.log(reader.result);
+  //       this.articleData.file = reader.result;
         
-      };
+  //     };
       
-      reader.readAsDataURL(file);   // rezultat na kraju je 64bitni enkodirana string
+  //     reader.readAsDataURL(file);   // rezultat na kraju je 64bitni enkodirana string
       
-    console.log(event);
+  //   console.log(event);
 
+    
+  // }
+
+  onFileUpload(event) {
+    let fileList: FileList = event.target.files;
+    let file: File = fileList.item(0);
+    
+    let formData = new FormData(); 
+    formData.append('file', file, file.name); 
+
+    let x = this.articleService.uploadFile(this.taskId, formData);
+
+    x.subscribe(data => {
+
+    }, err => {
+      console.log(err.error);
+    });
     
   }
 
-  onSubmit(value, form){
+  download() {
+    let articleId: number = this.update.articleIdk;
+    this.articleService.downloadFile(articleId).subscribe( (data: Blob )=> {
+			//let blob:any = new Blob([response.blob()], { type: 'text/json; charset=utf-8' });
+			//const url= window.URL.createObjectURL(blob);
+      //window.open(url);
+
+      
+      
+      var file = new Blob([data], { type: 'application/pdf' })
+      var fileURL = URL.createObjectURL(file);
+
+      //window.location.href = data.type;
+
+      window.open(fileURL); 
+      var a         = document.createElement('a');
+      a.href        = fileURL; 
+      a.target      = '_blank';
+      a.download    = 'bill.pdf';
+      document.body.appendChild(a);
+      a.click();
+      
+			//fileSaver.saveAs(blob, 'employees.json');
+		}, error =>  {
+      console.log('Error downloading the file');
+    });  
+  }
+
+
+  onSubmit(value, form) {
     console.log(this.articleData);
     console.log(this.taskId);
 

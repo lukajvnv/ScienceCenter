@@ -18,4 +18,6 @@ public class UpdateArticleDto implements Serializable{/**
 	private NewArticleResponseDto newAarticleResponseDto;
 	
 	private String comment;
+	private long articleId;
+
 }

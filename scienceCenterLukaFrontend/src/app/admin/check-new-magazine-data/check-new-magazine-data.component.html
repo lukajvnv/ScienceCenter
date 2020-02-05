@@ -94,7 +94,7 @@
         </div>
 
         <form #f="ngForm" (ngSubmit)="f.form.valid && submit(f.value, f)" novalidate>
-            <div class="form-group row" >
+            <!-- <div class="form-group row" >
                 <div class="col-lg-4"><label for="textDecision">Magazine valid:</label></div>
                 <div class="col-lg-3"><input type="checkbox" class="form-control" name="textDecision" [(ngModel)]="checkingMagazine.valid" #textDecision="ngModel"
                 />
@@ -109,6 +109,41 @@
                     >
     
                     </textarea>
+                </div>
+            </div> -->
+
+            <div class="form-group row" *ngFor="let fieldWrapper of formFieldsWrapper">
+               
+                <div class="col-lg-4"> <label for={{fieldWrapper.field.id}} class="col-lg-4">{{fieldWrapper.field.label}}</label></div>
+    
+                
+                <div class="col-lg-5" *ngIf="fieldWrapper.field.type.name=='string'">
+                    <textarea rows="5" class="form-control" name={{fieldWrapper.field.id}}  ngModel 
+                    >
+    
+                    </textarea>
+                </div>
+                
+                <div class="col-lg-3" *ngIf="fieldWrapper.field.type.name=='boolean'">
+                    <input type="checkbox" class="form-control" name={{fieldWrapper.field.id}} ngModel/>
+                </div>
+                
+                <input class="col-lg-3 form-control" type="number" name={{fieldWrapper.field.id}}  ngModel  *ngIf="fieldWrapper.field.type.name=='long'" >
+    
+                 <select class="col-lg-3 form-control" name="{{fieldWrapper.field.id}}" *ngIf="fieldWrapper.field.type.name=='enum' && !fieldWrapper.field.properties['multiple']" ngModel  >
+                  <option *ngFor="let val of fieldWrapper.dataSource" value={{val}}>
+                    {{fieldWrapper.field.type.values[val]}}
+                  </option>
+                </select>
+    
+                <select class="col-lg-3 form-control" name="{{fieldWrapper.field.id}}" *ngIf="fieldWrapper.field.type.name=='enum' && fieldWrapper.field.properties['multiple']" ngModel multiple  size="{{fieldWrapper.dataSource.length}}">
+                    <option *ngFor="let val of fieldWrapper.dataSource" value={{val}}>
+                      {{fieldWrapper.field.type.values[val]}}
+                    </option>
+                  </select>
+    
+                <div  *ngIf="f.submitted" class="col-lg-3 text-danger">
+                    <div>{{fieldWrapper.errorField}}</div>
                 </div>
             </div>
         <div class="row">  

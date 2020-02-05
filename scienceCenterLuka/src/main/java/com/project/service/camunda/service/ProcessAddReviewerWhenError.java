@@ -2,11 +2,13 @@ package com.project.service.camunda.service;
 
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
+import org.springframework.stereotype.Service;
 
 import com.project.dto.ArticleProcessDto;
 import com.project.dto.ReviewArticleMfDto;
 import com.project.dto.ReviewingDto;
 
+@Service
 public class ProcessAddReviewerWhenError implements JavaDelegate {
 
 	@Override

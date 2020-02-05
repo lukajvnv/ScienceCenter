@@ -3,6 +3,8 @@ package com.project.dto;
 import java.io.Serializable;
 import java.util.List;
 
+import org.camunda.bpm.engine.form.FormField;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -23,5 +25,9 @@ public class AddReviewersDto implements Serializable {
 	
 	private String subProcessMfExecutionId;
 	private boolean insideMf;
+	
+	private List<FormField> fields;
+	private List<FormSubmissionDto> fieldValues;
+
 
 }

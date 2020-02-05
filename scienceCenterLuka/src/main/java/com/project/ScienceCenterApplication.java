@@ -16,6 +16,10 @@ public class ScienceCenterApplication {
     
 //    ApplicationContext ctx = SpringApplication.run(ScienceCenterApplication.class, args);
 //    JavaMailSender mailService = (JavaMailSender) ctx.getBean("proba");
+    
+    
   }
+  
+  
 
 }

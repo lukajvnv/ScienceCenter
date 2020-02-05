@@ -1,1 +1,99 @@
-<p>new-editor works!</p>
+<div class="jumbotron" >
+    <h2 class="text-center">New editor form</h2>
+    <div class="container">
+        
+      <form #f="ngForm" (ngSubmit)="f.form.valid && onSubmit(f.value, f)" novalidate>
+        <div class="form-group row" >
+            <div class="col-lg-4"><label for="firstName">First name:</label></div>
+            <div class="col-lg-3"><input type="text" class="form-control" name="firstName" [(ngModel)]="formData.firstName" #firstName="ngModel"
+                [ngClass]="{ 'is-invalid': f.submitted && firstName.invalid }" required /></div>
+            <div  *ngIf="f.submitted && firstName.invalid" class="col-lg-3 text-danger">
+                <div *ngIf="firstName.errors.required">First name is required</div>
+            </div>
+        </div>
+
+        <div class="form-group row" >
+            <div class="col-lg-4"><label for="lastName">Last name:</label></div>
+            <div class="col-lg-3"><input type="text" class="form-control" name="lastName" [(ngModel)]="formData.lastName" #lastName="ngModel"
+                [ngClass]="{ 'is-invalid': f.submitted && lastName.invalid }" required /></div>
+            <div  *ngIf="f.submitted && lastName.invalid" class="col-lg-3 text-danger">
+                <div *ngIf="lastName.errors.required">Last name is required</div>
+                
+            </div>
+        </div>
+
+        <div class="form-group row" >
+            <div class="col-lg-4"><label for="email">Email:</label></div>
+            <div class="col-lg-3"><input type="text" class="form-control" name="email" [(ngModel)]="formData.email" #email="ngModel"
+                [ngClass]="{ 'is-invalid': f.submitted && email.invalid }" required /></div>
+            <div  *ngIf="f.submitted && email.invalid" class="col-lg-3 text-danger">
+                <div *ngIf="email.errors.required">Email is required</div>
+            </div>
+        </div>
+
+        <div class="form-group row" >
+            <div class="col-lg-4"><label for="city">City:</label></div>
+            <div class="col-lg-3"><input type="text" class="form-control" name="city" [(ngModel)]="formData.city" #city="ngModel"
+                [ngClass]="{ 'is-invalid': f.submitted && city.invalid }" required /></div>
+            <div  *ngIf="f.submitted && city.invalid" class="col-lg-3 text-danger">
+                <div *ngIf="city.errors.required">City is required</div>
+            </div>
+        </div>
+
+        <div class="form-group row" >
+            <div class="col-lg-4"><label for="country">Country:</label></div>
+            <div class="col-lg-3"><input type="text" class="form-control" name="country" [(ngModel)]="formData.country" #country="ngModel"
+                [ngClass]="{ 'is-invalid': f.submitted && country.invalid }" required /></div>
+            <div  *ngIf="f.submitted && country.invalid" class="col-lg-3 text-danger">
+                <div *ngIf="country.errors.required">Country is required</div>
+                
+            </div>
+        </div>
+
+        <div class="form-group row" >
+            <div class="col-lg-4"><label for="username">Username:</label></div>
+            <div class="col-lg-3"><input type="text" class="form-control" name="username" [(ngModel)]="formData.username" #username="ngModel"
+                [ngClass]="{ 'is-invalid': f.submitted && username.invalid }" required minlength="3"/></div>
+            <div  *ngIf="f.submitted && username.invalid" class="col-lg-3 text-danger">
+                <div *ngIf="username.errors.required">Username is required</div>
+                <div *ngIf="username.errors.minlength">Min length is 3</div>
+
+            </div>
+        </div>
+
+        <div class="form-group row" >
+            <div class="col-lg-4"><label for="password">Password:</label></div>
+            <div class="col-lg-3"><input type="text" class="form-control" name="password" [(ngModel)]="formData.password" #password="ngModel"
+                [ngClass]="{ 'is-invalid': f.submitted && password.invalid }" required minlength="3"/></div>
+            <div  *ngIf="f.submitted && password.invalid" class="col-lg-3 text-danger">
+                <div *ngIf="password.errors.required">Password is required</div>
+                <div *ngIf="username.errors.minlength">Min length is 3</div>
+
+            </div>
+        </div>
+
+        <div class="form-group row" >
+            <div class="col-lg-4"><label for="vocation">Profession:</label></div>
+            <div class="col-lg-3"><input type="text" class="form-control" name="vocation" [(ngModel)]="formData.vocation" #profession="ngModel"
+                [ngClass]="{ 'is-invalid': f.submitted && profession.invalid }" required /></div>
+            <div  *ngIf="f.submitted && profession.invalid" class="col-lg-3 text-danger">
+                <div *ngIf="profession.errors.required">Profession is required</div>
+                
+            </div>
+        </div>
+
+        <div class="row">
+          <div class="col-lg-3">
+
+          </div>
+          <div class="col-lg-3">
+            <input type="submit" class="btn btn-success form-control" value="Sign Up">
+          </div>
+        </div>
+      </form>
+
+    </div>
+  
+  
+</div>
+

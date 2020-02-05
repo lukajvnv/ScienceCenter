@@ -13,5 +13,7 @@ export class NewArticle{
     fileName: string;
     file: string | ArrayBuffer;
 
+    fields: any[] = [];
+
     constructor(){}
 }

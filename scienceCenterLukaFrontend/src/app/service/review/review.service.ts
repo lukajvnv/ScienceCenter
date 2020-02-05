@@ -44,6 +44,10 @@ export class ReviewService {
     return this.http.post(this.REVIEWAPI + 'addReviewer/'.concat(taskId), obj);
   }
 
+  filterReviewers(taskId: string, obj: any): Observable<any> {
+    return this.http.post(this.REVIEWAPI + 'filterReviewer/'.concat(taskId), obj);
+  }
+
   startAddingReviewerWhenError(taskId: string) : Observable<any> {
     return this.http.get(this.REVIEWAPI + 'addReviewerWhenError/'.concat(taskId));
   }
@@ -58,6 +62,14 @@ export class ReviewService {
 
   defineTimeForReview(taskId: string, time:string) : Observable<any> {
     return this.http.get(this.REVIEWAPI + 'defineTimeForReview/'.concat(taskId,'/',time));
+  }
+
+  defineTimeForReviewStart(taskId: string) : Observable<any> {
+    return this.http.get(this.REVIEWAPI + 'defineTimeForReview/'.concat(taskId));
+  }
+
+  defineTimeForReviewPost(taskId: string, body) : Observable<any> {
+    return this.http.post(this.REVIEWAPI + 'defineTimeForReview/'.concat(taskId), body);
   }
 
   

@@ -1,18 +1,107 @@
 <div class="jumbotron">
     <div class="container" *ngIf="articleFormDto">  
         <div class="form-group row">
-        <div class="col-lg-4"><label for="comment">Comment from editor:</label></div>
-            <div class="col-lg-5">
-                <!-- <input type="text" class="form-control" name="abstract" [(ngModel)]="articleData.articleAbstract" #abstract="ngModel"
-                [ngClass]="{ 'is-invalid': f.submitted && abstract.invalid }" required /> -->
-                <textarea rows="3" class="form-control" name="comment" >{{update.comment}}
-                </textarea>
+            <div class="col-lg-4">
+                <label for="comment">Comment from editor:</label>
             </div>
+                <div class="col-lg-5">
+                    <textarea rows="3" class="form-control" name="comment" >{{update.comment}}
+                    </textarea>
+                </div>
         </div>
       <h1 class="text-center">Update article</h1>
-      <!-- <p class="text-center">New article</p> -->
+      <div class="row">
+        <div class="col-lg-6">
+            <h3>Basic</h3>
+            <table class="table table-bordered">
+                <tr>
+                    <th>Title</th>
+                    <td>{{articleData.articleTitle}}</td>
+                </tr>
+                <tr>
+                    <th>Abstract</th>
+                    <textarea class="form-control" name="" id=""  rows="10">{{articleData.articleAbstract}}</textarea>
+                </tr>
+                <tr>
+                    <th>Science area</th>
+                    <td>Code {{scArea.scienceAreaCode}} , Name: {{scArea.scienceAreaName}}</td>
+                </tr>
+                <!-- <tr>
+                    <th>Author</th>
+                    <td>{{articleData.author.firstName}} {{articleData.author.lastName}}</td>
+                </tr> -->
+                <tr>
+                    <th>Key terms</th>
+                    <td><span *ngFor="let term of articleData.articleTerm" class="badge badge-primary ml-3">{{term.termName}}</span></td>
+                </tr>
+                <tr>
+                    <th>
+                        File preview
+                    </th>
+                    <td>
+                        <!-- <a href="{{article.file.value.toString()}}" download ></a> -->
+                        <!-- <a [href]="article.file.toString()" download="proba.pdf" >Text</a>
+                        <a href="#" (click)="preview()" >Text</a> -->
+                        <!-- <a [href]="fileUrl" download>DownloadFile</a> -->
+                        <!-- <iframe [src]="fileUrl" frameborder="0"></iframe>
+                        <object data=""></object> -->
+                        <input type="button" (click)="download()" value="Download File"/>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="col-lg-6">
+            <!-- <h3>About magazine</h3>
+            <table class="table table-bordered">
+                    <tr>
+                        <th>Id</th>
+                        <td>{{reviewingDto.magazine.magazineId}}</td>
+                    </tr>
+                    <tr>
+                        <th>Name</th>
+                        <td>{{reviewingDto.magazine.name}}</td>
+                    </tr>
+                    <tr>
+                        <th>Issn</th>
+                        <td>{{reviewingDto.magazine.issn}}</td>
+                    </tr>
+                    <tr>
+                        <th>Science areas</th>
+                        <td><table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Code</th>
+                                    <th>Name</th>
+                                </tr>
+                            </thead>
+                            <tr *ngFor="let sc of reviewingDto.magazine.scienceAreas">
+                                <td>{{sc.scienceAreaCode}}</td>
+                                <td>{{sc.scienceAreaName}}</td>
+                            </tr>
+                        </table></td>
+                    </tr>
+            </table> -->
+            <div *ngIf="articleData.articleCoAuthors.length > 0">
+                <h3>Co authors</h3>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>First name</th>
+                            <th>Last name</th>
+                        </tr>
+                    </thead>
+                    <tr *ngFor="let coathor of articleData.articleCoAuthors">
+                        <td>{{coathor.firstName}}</td>
+                        <td>{{coathor.lastName}}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+       
+    </div>
       <form #f="ngForm" (ngSubmit)="f.form.valid && onSubmit(f.value, f)" novalidate>
-        <div class="form-group row" >
+        <h2>Upload new file</h2>
+        <!-- <div class="form-group row" >
             <div class="col-lg-4"><label for="title">Title:</label>
             </div>
             <div class="col-lg-5"><input type="text" class="form-control" name="title" [(ngModel)]="articleData.articleTitle" #title="ngModel"
@@ -63,7 +152,7 @@
             <div  *ngIf="f.submitted && science_area.invalid" class="col-lg-3 text-danger">
                 <div *ngIf="science_area.errors.required">Science area is required</div>
             </div>
-        </div>
+        </div> -->
 
         <div class="form-group row" >
             <div class="col-lg-4"><label for="articleText">Upload text:</label></div>
@@ -88,7 +177,7 @@
 
        </form>
 
-        <div class="row">
+        <!-- <div class="row">
             <div class="col">
                 <h2 class="text-center">Terms</h2>
                 <div class="form-group row" >
@@ -199,7 +288,6 @@
                                 [ngClass]="{ 'is-invalid': f.submitted && customEmail.invalid }" required >
                                 <div  *ngIf="f.submitted && customEmail.invalid" class="text-danger">
                                     <div *ngIf="customEmail.errors.required">Email is required</div>
-                                    <!-- <div *ngIf="customEmail.errors.typeMismatch">Email pattern required</div> -->
                                 </div>
                               </div>
                             <div class="form-group">
@@ -223,7 +311,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> -->
         
 
         

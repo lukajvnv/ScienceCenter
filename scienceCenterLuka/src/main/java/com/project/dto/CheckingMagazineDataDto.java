@@ -3,6 +3,8 @@ package com.project.dto;
 import java.io.Serializable;
 import java.util.List;
 
+import org.camunda.bpm.engine.form.FormField;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -23,7 +25,11 @@ public class CheckingMagazineDataDto implements Serializable {
 	
 	private String taskId;
 	private DisplayMagazineDto magazine;
-	private String comment;
-	private boolean valid;
+	
+	private List<FormField> fields;
+	private List<FormSubmissionDto> fieldsResponse;
+
+//	private String comment;
+//	private boolean valid;
 
 }

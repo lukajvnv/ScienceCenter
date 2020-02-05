@@ -1,6 +1,7 @@
 package com.project.dto;
 
 import java.io.Serializable;
+import java.util.List;
 
 public class FormSubmissionDto implements Serializable{
 	
@@ -9,8 +10,12 @@ public class FormSubmissionDto implements Serializable{
 	 */
 	private static final long serialVersionUID = 9031161914394638372L;
 	private String fieldId;
-	private String fieldValue;
+	private Object fieldValue;
+	private List<Object> fieldMultiValues;
+
+	private String multiple;
 	
+	private String multiEnum;
 	
 	public FormSubmissionDto() {
 		super();
@@ -31,13 +36,38 @@ public class FormSubmissionDto implements Serializable{
 		this.fieldId = fieldId;
 	}
 
-	public String getFieldValue() {
+	public Object getFieldValue() {
 		return fieldValue;
 	}
 
-	public void setFieldValue(String fieldValue) {
+	public void setFieldValue(Object fieldValue) {
 		this.fieldValue = fieldValue;
 	}
+
+	public String getMultiple() {
+		return multiple;
+	}
+
+	public void setMultiple(String multiple) {
+		this.multiple = multiple;
+	}
+
+	public List<Object> getFieldMultiValues() {
+		return fieldMultiValues;
+	}
+
+	public void setFieldMultiValues(List<Object> fieldMultiValues) {
+		this.fieldMultiValues = fieldMultiValues;
+	}
+
+	public String getMultiEnum() {
+		return multiEnum;
+	}
+
+	public void setMultiEnum(String multiEnum) {
+		this.multiEnum = multiEnum;
+	}
+	
 	
 	
 }

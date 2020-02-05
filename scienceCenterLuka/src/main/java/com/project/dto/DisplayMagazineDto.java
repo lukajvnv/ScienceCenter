@@ -29,7 +29,7 @@ public class DisplayMagazineDto implements Serializable{
 	private List<ScienceAreaDto> scienceAreas;
 	private WayOfPayment wayOfPayment;
 	
-	private Float membershipPrice;
+	private Long membershipPrice;
 	private UserDto chiefEditor;
 	private List<EditorReviewerByScienceAreaDto> editors;
 	private List<EditorReviewerByScienceAreaDto> reviewers;

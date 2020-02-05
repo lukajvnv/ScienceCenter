@@ -8,8 +8,6 @@
                     <label for="comment">Comment from editor:</label>
                 </div>
                     <div class="col-lg-5">
-                        <!-- <input type="text" class="form-control" name="abstract" [(ngModel)]="articleData.articleAbstract" #abstract="ngModel"
-                        [ngClass]="{ 'is-invalid': f.submitted && abstract.invalid }" required /> -->
                         <textarea rows="3" class="form-control" name="comment" >{{ formFieldsDto?.commentIfExist }}
                         </textarea>
                     </div>
@@ -17,70 +15,29 @@
         </div>
         
       <form #f="ngForm" (ngSubmit)="f.form.valid && onSubmit(f.value, f)" novalidate>
-        <div class="form-group row" >
-            <div class="col-lg-4"><label for="name">Name:</label></div>
-            <div class="col-lg-3"><input type="text" class="form-control" name="name" [(ngModel)]="formData.name" #name="ngModel"
-                [ngClass]="{ 'is-invalid': f.submitted && name.invalid }" required /></div>
-            <div  *ngIf="f.submitted && name.invalid" class="col-lg-3 text-danger">
-                <div *ngIf="name.errors.required">Name is required</div>
-            </div>
-        </div>
+        <div class="form-group row" *ngFor="let fieldWrapper of formFieldsWrapper">
+            <div class="col-lg-4"> <label for={{fieldWrapper.field.id}} class="col-lg-4">{{fieldWrapper.field.label}}</label></div>
 
-        <div class="form-group row" >
-            <div class="col-lg-4"><label for="issn_number">Issn number:</label></div>
-            <div class="col-lg-3"><input type="text" class="form-control" name="issn_number" [(ngModel)]="formData.issn_number" #issn_number="ngModel"
-                [ngClass]="{ 'is-invalid': f.submitted && issn_number.invalid }" required minlength="8" maxlength="9" /></div>
-            <div  *ngIf="f.submitted && issn_number.invalid" class="col-lg-3 text-danger">
-                <div *ngIf="issn_number.errors.required">Issn number is required</div>
-                <div *ngIf="issn_number.errors.minlength">Issn number must be at least 8 characters long</div>
-                <div *ngIf="issn_number.errors.maxlength">Issn number must be max 9 characters long</div>
-            </div>
-        </div>
+            <input class="col-lg-3 form-control" type="text" name={{fieldWrapper.field.id}}   *ngIf="fieldWrapper.field.type.name=='string'" [(ngModel)]="fieldWrapper.field.value.value">
+            <input class="col-lg-3" type="checkbox" name={{fieldWrapper.field.id}} ngModel   *ngIf="fieldWrapper.field.type.name=='boolean'" >
+            <input class="col-lg-3 form-control" type="number" name={{fieldWrapper.field.id}}  [(ngModel)]="fieldWrapper.field.value.value"  *ngIf="fieldWrapper.field.type.name=='long'" >
 
-        <div class="form-group row" >
-            <div class="col-lg-4"><label for="membership_price">Membership price:</label></div>
-            <div class="col-lg-3"><input type="number" class="form-control" name="membership_price" [(ngModel)]="formData.membership_price" #membership_price="ngModel"
-                [ngClass]="{ 'is-invalid': f.submitted && membership_price.invalid }" required /></div>
-            <div  *ngIf="f.submitted && membership_price.invalid" class="col-lg-3 text-danger">
-                <div *ngIf="membership_price.errors.required">Membership is required</div>
-                <!-- <div>Please enter the number</div> -->
-            </div>
-        </div>
+             <select class="col-lg-3 form-control" name="{{fieldWrapper.field.id}}" *ngIf="fieldWrapper.field.type.name=='enum' && !fieldWrapper.field.properties['multiple']" [(ngModel)]="fieldWrapper.field.value.value"  >
+              <option *ngFor="let val of fieldWrapper.dataSource" value={{val}}>
+                {{fieldWrapper.field.type.values[val]}}
+              </option>
+            </select>
 
-        <div class="form-group row" >
-            <div class="col-lg-4"><label for="payment_option">Payment option:</label></div>
-            <div class="col-lg-3">
-                <!-- <input type="text" class="form-control" name="payment_option" [(ngModel)]="formData.payment_option" #payment_option="ngModel"
-                [ngClass]="{ 'is-invalid': f.submitted && payment_option.invalid }" required /> -->
-                <select class="form-control" name="payment_option" [(ngModel)]="formData.payment_option" #payment_option="ngModel"
-                [ngClass]="{ 'is-invalid': f.submitted && payment_option.invalid }" required>
-                    <option *ngFor="let val of paymentOptionsValues" value={{val}}>
-                      {{formFieldsDto.payment_option.type.values[val]}}
-                    </option>
-                </select>
-            </div>
-            <div  *ngIf="f.submitted && payment_option.invalid" class="col-lg-3 text-danger">
-                <div *ngIf="payment_option.errors.required">Payment option is required</div>
-            </div>
-        </div>
+            <select class="col-lg-3 form-control" name="{{fieldWrapper.field.id}}" *ngIf="fieldWrapper.field.type.name=='enum' && fieldWrapper.field.properties['multiple']" [(ngModel)]="fieldWrapper.field.value.value" multiple  size="{{fieldWrapper.dataSource.length}}">
+                <option *ngFor="let val of fieldWrapper.dataSource" value={{val}}>
+                  {{fieldWrapper.field.type.values[val]}}
+                </option>
+              </select>
 
-        <div class="form-group row" >
-            <div class="col-lg-4"><label for="science_area">Science area:</label></div>
-            <div class="col-lg-3">
-                <!-- <input type="text" class="form-control" name="science_area" [(ngModel)]="formData.science_area" #science_area="ngModel"
-                [ngClass]="{ 'is-invalid': f.submitted && science_area.invalid }" required /> -->
-                <select class="form-control" name="science_area" [(ngModel)]="formData.science_area" #science_area="ngModel"
-                [ngClass]="{ 'is-invalid': f.submitted && payment_option.invalid }" multiple required size="{{scAreaValues?.length}}">
-                    <option *ngFor="let val of scAreaValues" value={{val}}>
-                      {{formFieldsDto.science_area.type.values[val]}}
-                    </option>
-                </select>
+            <div  *ngIf="f.submitted" class="col-lg-3 text-danger">
+                <div>{{fieldWrapper.errorField}}</div>
             </div>
-            
-            <div  *ngIf="f.submitted && science_area.invalid" class="col-lg-3 text-danger">
-                <div *ngIf="science_area.errors.required">Science area is required</div>
-            </div>
-        </div>
+        </div>    
         
 
         <div class="row">

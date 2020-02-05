@@ -13,6 +13,7 @@ import com.project.dto.ArticleProcessDto;
 import com.project.dto.ReviewArticleMfDto;
 import com.project.dto.ReviewingDto;
 import com.project.model.OpinionAboutArticle;
+import com.project.model.enums.ArticleStatus;
 
 @Service
 public class ProcessReviewingAdditional implements JavaDelegate {
@@ -29,7 +30,15 @@ public class ProcessReviewingAdditional implements JavaDelegate {
 		ReviewingDto reviewingDto = (ReviewingDto) execution.getVariable("additionalReviewing");
 
 		OpinionAboutArticle opinion = reviewingDto.getOpinion();
-			
+		
+		String rev_comment_additional = (String) execution.getVariable("rev_comment_additional");
+		String rev_comment_editor_additional = (String) execution.getVariable("rev_comment_editor_additional");
+		String rev_decision_additional = (String) execution.getVariable("rev_decision_additional");
+
+		reviewingDto.getOpinion().setComment(rev_comment_additional);
+		reviewingDto.getOpinion().setOpinion(ArticleStatus.valueOf(rev_decision_additional));
+		reviewingDto.getOpinion().setCommentOnlyForEditor(rev_comment_editor_additional);
+	
 		articleProcessDto.getOpinions().add(opinion);
 		execution.setVariable("articleProcessDto", articleProcessDto);
 	}

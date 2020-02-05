@@ -3,6 +3,8 @@ package com.project.dto;
 import java.io.Serializable;
 import java.util.List;
 
+import org.camunda.bpm.engine.form.FormField;
+
 import com.project.model.OpinionAboutArticle;
 
 import lombok.AllArgsConstructor;
@@ -24,4 +26,7 @@ public class UpdateArticleChangesDto implements Serializable{/**
 	private List<OpinionAboutArticle> editorsOpinion;
 	
 	private OpinionAboutArticle authorsMessage;
+	
+	private List<FormField> fields;
+	private List<FormSubmissionDto> fieldResults;
 }

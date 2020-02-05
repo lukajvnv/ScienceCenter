@@ -22,11 +22,13 @@ public class NewArticleResponseDto implements Serializable {
 	private String articleTitle;
 	private String articleAbstract;
 	private String articleScienceArea;
-	private Float articlePrice;
+	private Long articlePrice;
 	private List<TermDto> articleTerm;
 	private List<UserDto> articleCoAuthors;
     
 	private String fileName;
 	private String file;
+	
+	private List<FormSubmissionDto> fields;
 	
 }

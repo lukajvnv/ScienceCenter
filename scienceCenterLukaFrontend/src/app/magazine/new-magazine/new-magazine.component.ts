@@ -8,6 +8,7 @@ import { NewMagazineFormReviewerEditorRow } from 'src/app/model/new-magazine-for
 import { NewMagazineEditorReviewerRequest } from 'src/app/model/new-magazine-form-reviewer-editor-response';
 import { ScienceArea } from 'src/app/model/science-area';
 import { Router } from '@angular/router';
+import { FormFieldDtoWrapper } from 'src/app/model/form-field-dto';
 
 @Component({
   selector: 'app-new-magazine',
@@ -18,7 +19,8 @@ export class NewMagazineComponent implements OnInit {
 
   private repeated_password = "";
   private categories = [];
-  private formFieldsDto = null;
+  private formFieldsDto : NewMagazineFormSubmissionDto = null;
+  private formFieldsWrapper: FormFieldDtoWrapper[] = [];
   private formFieldsEditor: NewMagazineEditorReviewerRequest = null;
   private flag1 = true;
   private flag2 = false;
@@ -48,18 +50,19 @@ export class NewMagazineComponent implements OnInit {
         // this.formFields = res.formFields;
         this.processInstance = res.processInstanceId;
 
-        let payment = this.formFieldsDto.payment_option;
-        this.paymentOptionsValues = Object.keys(payment.type.values)
+       
 
-        let scArea = this.formFieldsDto.science_area;
-        this.scAreaValues = Object.keys(scArea.type.values)
+        this.formFieldsDto.formFields.forEach( (field) =>{
+          let newFieldWrapper = new FormFieldDtoWrapper(field);
+          if( field.type.name=='enum'){
+            newFieldWrapper.dataSource = Object.keys(field.type.values);
+          }
 
-        // this.formFields.forEach( (field) =>{
-          
-        //   if( field.type.name=='enum'){
-        //     this.enumValues = Object.keys(field.type.values);
-        //   }
-        // });
+          if( field.type.name=='multiEnum'){
+            newFieldWrapper.dataSource = Object.keys(field.type.values);
+          }
+          this.formFieldsWrapper.push(newFieldWrapper);
+        });
       },
       err => {
         console.log("Error occured");
@@ -67,7 +70,7 @@ export class NewMagazineComponent implements OnInit {
     );
   }
 
-  onSubmit(value, form){
+  onSubmit(fieldValues, form){
     console.log(this.formData);
     // let controls = form.controls;
     // for (var field in controls){
@@ -78,6 +81,26 @@ export class NewMagazineComponent implements OnInit {
     //   }
     // }
 
+    let valid = this.validate(fieldValues, form);
+    if(!valid){
+      return;
+    }
+
+    for(let fieldWrapper of this.formFieldsWrapper) {
+      let value = fieldValues[fieldWrapper.field.id];
+
+      let multiple: string = (fieldWrapper.field.properties['multiple']) ? 'multiple' : '';
+      if(multiple === 'multiple'){
+        let multi: Array<string> = value;
+        value = multi.join(':');
+      }
+      this.formData.formFields.push({fieldId : fieldWrapper.field.id, fieldValue : value, multiple: multiple});
+
+
+    
+    }
+
+    
     let x = this.magazineService.postMagazineBasicData(this.formData, this.formFieldsDto.taskId);
 
     x.subscribe(
@@ -99,10 +122,80 @@ export class NewMagazineComponent implements OnInit {
       },
       err => {
         console.log("Error occured");
+        this.toastrService.error(err.error);
       }
     );
 
   
+  }
+
+  validate(fieldValues, form) {
+    this.formFieldsWrapper.forEach(field => field.errorField = '');
+
+    for(let fieldWrapper of this.formFieldsWrapper) {
+      let value = fieldValues[fieldWrapper.field.id];
+
+      let fieldValid = this.validateByType(value, fieldWrapper);
+      if(!fieldValid){
+        return false;
+      }
+
+      console.log(fieldWrapper);
+    }
+
+    return true;
+  }
+
+  validateByType(value, fieldWrapper) {
+    for(let constraint of fieldWrapper.field.validationConstraints){
+      switch(constraint.name){
+        case 'required':
+          if(value === ''){
+            fieldWrapper.errorField = 'Value is required';
+            return false;
+          }
+
+          if(value instanceof Array){
+            if(value.length === 0){
+              fieldWrapper.errorField = 'Please select something';
+              return false;
+            }
+            
+          }
+          break;
+        case 'minlength':
+          if(value.length < +constraint.configuration){
+            fieldWrapper.errorField = 'Min length should be: ' + constraint.configuration;
+            return false;
+          }
+          break;
+        case 'maxlength':
+          if(value.length > +constraint.configuration){
+            fieldWrapper.errorField = 'Max length should be: ' + constraint.configuration;
+            return false;
+          }
+          break;
+        case 'min':
+          if(value < +constraint.configuration){
+            fieldWrapper.errorField = 'Minimum value should be: ' + constraint.configuration;
+            return false;
+          }
+          break;
+        case 'max':
+          if(value > +constraint.configuration){
+            fieldWrapper.errorField = 'Maximum value should be: ' + constraint.configuration;
+            return false;
+          }
+          break;
+        case 'readonly':
+          break;
+        default:
+          break;
+      }
+    }
+
+
+    return true;
   }
 
   submitReviewersEditors(){
@@ -125,6 +218,7 @@ export class NewMagazineComponent implements OnInit {
       },
       err => {
         console.log("Error occured");
+        this.toastrService.error(err.error);
       }
     );
 

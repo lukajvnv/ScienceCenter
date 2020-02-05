@@ -3,6 +3,7 @@ package com.project.service;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -33,6 +34,14 @@ public class ArticleService {
 		return unityOfWork.getArticleRepository().getOne(articleId);
 	}
 	
+	public List<Article> findAll(){
+		return unityOfWork.getArticleRepository().findAll();
+	}
+	
+	public Article save(Article article) {
+		return unityOfWork.getArticleRepository().save(article);
+	}
+	
 	public String getDocument(Long articleId) {
 		Article article = getArticle(articleId);
 		
@@ -43,6 +52,12 @@ public class ArticleService {
 		 String ret = encoded;
 		
 		return ret;
+	}
+	
+	public byte[] getFile(Long articleId) {
+		Article article = getArticle(articleId);
+		
+		return article.getFile();
 	}
 	
 	public void generateDoi() {
@@ -58,7 +73,7 @@ public class ArticleService {
 		Article article = Article.builder()
 								.articleTitle("WWW3 memes")
 								.articleAbstract("Abstract")
-								.articlePrice(500f)
+								.articlePrice(500l)
 								.status(ArticleStatus.ACCEPTED)
 								.publishingDate(new Date())
 								.scienceArea(scienceArea)
@@ -88,4 +103,6 @@ public class ArticleService {
 		
 		return builder.toString();
 	}
+	
+	
 }

@@ -46,6 +46,7 @@ import { Notauthorized } from './path-guards/nonauthorized.guard';
 import { AdminGuard } from './path-guards/admin.guard';
 import { EditorGuard } from './path-guards/editor.guard';
 import { Authorized } from './path-guards/authorized.guard';
+import { NewArticleInitComponent } from './article/new-article-init/new-article-init.component';
 
 
 const routes = [
@@ -62,6 +63,9 @@ const routes = [
       path: 'sign-in', component: SignInComponent, canActivate: [Notauthorized]
     },
     {
+      path: 'new-editor', component: NewEditorComponent, canActivate: [AdminGuard]
+    },
+    {
       path: 'new-magazine', component: NewMagazineComponent,
     },
     {
@@ -74,7 +78,10 @@ const routes = [
       path: 'update-magazine/:taskId', component: UpdateMagazineComponent,
     },
     {
-      path: 'new-article/:magazineId', component: NewArticleComponent,
+      path: 'new-article/:taskId', component: NewArticleComponent,
+    },
+    {
+      path: 'new-article-init/:magazineId', component: NewArticleInitComponent,
     },
     {
       path: 'update-article/:taskId', component: UpdateArticleComponent,
@@ -148,7 +155,8 @@ const routes = [
     UpdateArticleChangesComponent,
     CheckNewMagazineDataComponent,
     ReviewerConfirmationComponent,
-    NewEditorComponent
+    NewEditorComponent,
+    NewArticleInitComponent
   ],
   imports: [
     BrowserModule,

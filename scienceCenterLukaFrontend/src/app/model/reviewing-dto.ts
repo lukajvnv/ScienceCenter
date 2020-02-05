@@ -12,5 +12,8 @@ export class ReviewingDto{
 
      insideMf: boolean;
 
+     fields: any[];
+     fieldResults: any[];
+
     constructor(){}
 }

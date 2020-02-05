@@ -20,14 +20,30 @@
             <camunda:validation>
               <camunda:constraint name="required" />
               <camunda:constraint name="minlength" config="8" />
+              <camunda:constraint name="validator" config="com.project.util.camunda.validation.MaxLength" />
             </camunda:validation>
           </camunda:formField>
           <camunda:formField id="payment_option" label="Way of payment*:" type="enum" defaultValue="OPEN_ACCESS">
+            <camunda:validation>
+              <camunda:constraint name="required" />
+            </camunda:validation>
             <camunda:value id="OPEN_ACCESS" name="OPEN_ACCESS" />
             <camunda:value id="PAID_ACCESS" name="PAID_ACCESS" />
           </camunda:formField>
-          <camunda:formField id="membership_price" label="Membership price:" type="string" />
-          <camunda:formField id="science_area" label="Science area:" type="enum" />
+          <camunda:formField id="membership_price" label="Membership price:" type="long">
+            <camunda:validation>
+              <camunda:constraint name="required" />
+              <camunda:constraint name="min" config="1" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="science_area" label="Science area:" type="enum">
+            <camunda:properties>
+              <camunda:property id="multiple" value="a" />
+            </camunda:properties>
+            <camunda:validation>
+              <camunda:constraint name="required" />
+            </camunda:validation>
+          </camunda:formField>
         </camunda:formData>
         <camunda:taskListener class="com.project.service.camunda.task.NewMagazineFormScienceAreaDatasource" event="create" />
       </bpmn:extensionElements>
@@ -72,7 +88,7 @@
       <bpmn:extensionElements>
         <camunda:formData>
           <camunda:formField id="view_comment" label="Comment:" type="string" />
-          <camunda:formField id="view_is_valid" label="Valid?:" type="boolean" />
+          <camunda:formField id="view_is_valid" label="Valid?:" type="boolean" defaultValue="false" />
         </camunda:formData>
         <camunda:taskListener class="com.project.service.camunda.task.CheckingMagazineDataInitialization" event="create" />
       </bpmn:extensionElements>

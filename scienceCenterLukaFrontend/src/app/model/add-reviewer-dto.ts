@@ -9,7 +9,10 @@ export class AddReviewerDto {
      editorsReviewersDto: EditorReviewer[];
                                                          
      subProcessMfExecutionId: string;
-     insideMf: boolean;                          
+     insideMf: boolean;  
+     
+     fields: any[];
+     fieldValues: any[];
 
     constructor() {}
 }

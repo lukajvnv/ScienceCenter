@@ -2,11 +2,16 @@ package com.project.service.camunda.task;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import org.camunda.bpm.engine.FormService;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.delegate.TaskListener;
+import org.camunda.bpm.engine.form.FormField;
+import org.camunda.bpm.engine.form.TaskFormData;
+import org.camunda.bpm.engine.impl.form.type.EnumFormType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +34,9 @@ public class AddReviewerForArticleWhenErrorDataInitialization implements TaskLis
 
 	@Autowired
 	private UnityOfWork unityOfWork;
+	
+	@Autowired
+	private FormService formService;
 	
 	@Override
 	public void notify(DelegateTask delegateTask) {
@@ -65,12 +73,35 @@ public class AddReviewerForArticleWhenErrorDataInitialization implements TaskLis
 		
 		List<EditorReviewerByScienceAreaDto> reviewersDto = (ArrayList<EditorReviewerByScienceAreaDto>) execution.getVariable("reviewersByScArea");
 		
+		// ***********************
 		reviewersDto = filterReviewers(execution, articleProcessDto, reviewersDto);
+		
+		// reviewers enum datasource init
+		TaskFormData formData =  formService.getTaskFormData(delegateTask.getId());
+		FormField field = formData.getFormFields().stream().filter(f -> f.getId().equals("reviewer_error")).findFirst().get();
+		EnumFormType ft = (EnumFormType)field.getType();
+		Map<String, String> map = ft.getValues();
+		
+		reviewersDto.forEach(rev -> { 
+			ScienceAreaDto scDto = rev.getScienceArea();
+			UserDto userDto = rev.getEditorReviewer();
+			String text = new StringBuilder(userDto.getFirstName())
+					.append(" ")
+					.append(userDto.getLastName())
+					.append(", ")
+					.append(userDto.getCity())
+					.append(", scienceArea: ")
+					.append(scDto.getScienceAreaCode())
+					.append(" : ")
+					.append(scDto.getScienceAreaName())
+					.toString();
+		  map.put(userDto.getUserUsername(), text);
+		});
 		
 //		String subProcessId = execution.getParentId();
 		String subProcessId = execution.getParentActivityInstanceId();
 
-		AddReviewersDto addReviewersDto = new AddReviewersDto(articleDto, magazineDto, reviewersDto, subProcessId, true);
+		AddReviewersDto addReviewersDto = new AddReviewersDto(articleDto, magazineDto, reviewersDto, subProcessId, true, null, null);
 		execution.setVariable("addReviewersDto", addReviewersDto);
 	}
 	

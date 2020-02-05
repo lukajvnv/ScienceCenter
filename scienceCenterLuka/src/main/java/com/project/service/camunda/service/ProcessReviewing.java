@@ -37,6 +37,7 @@ public class ProcessReviewing implements JavaDelegate {
 		ReviewingDto reviewingDto = ra.getReviewerOpinion();
 		OpinionAboutArticle opinion = reviewingDto.getOpinion();
 		
+		
 		//ovo ovde ne sljaka
 //		VariableInstance user = runtimeService.createVariableInstanceQuery()
 //                .processInstanceIdIn(processInstanceId)

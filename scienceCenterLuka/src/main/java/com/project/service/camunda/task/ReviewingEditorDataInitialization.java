@@ -82,7 +82,7 @@ public class ReviewingEditorDataInitialization implements TaskListener {
 		
 		OpinionAboutArticle editorsOpinion = new OpinionAboutArticle(article.getArticleId(), articleProcessDto.getWhoIsScienceEditor(), ReviewingType.REVIEWING_ANALIZE_BY_EDITOR, ArticleStatus.ACCEPTED, "", "", articleProcessDto.getIteration());
 		
-		ReviewingEditorDto reviewingDto = new ReviewingEditorDto(articleDto, magazineDto, articleProcessDto.getOpinions(), articleProcessDto.getAuthorsMessages(), editorsOpinion);
+		ReviewingEditorDto reviewingDto = new ReviewingEditorDto(articleDto, magazineDto, articleProcessDto.getOpinions(), articleProcessDto.getAuthorsMessages(), editorsOpinion, null, null);
 		execution.setVariable("editorsReviewing", reviewingDto);
 	}
 

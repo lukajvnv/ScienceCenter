@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository;
 import com.project.model.Magazine;
 
 
-@Repository
+//@Repository
 public interface MagazineRepository extends JpaRepository<Magazine, Long> {
 
 }

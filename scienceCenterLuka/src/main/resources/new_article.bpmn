@@ -112,7 +112,11 @@
       <bpmn:extensionElements>
         <camunda:formData>
           <camunda:formField id="is_text_ok" label="Text ok?" type="boolean" defaultValue="true" />
-          <camunda:formField id="analize_article_comment" label="Comment:" type="string" />
+          <camunda:formField id="analize_article_comment" label="Comment:" type="string">
+            <camunda:properties>
+              <camunda:property id="textarea" value="a" />
+            </camunda:properties>
+          </camunda:formField>
         </camunda:formData>
       </bpmn:extensionElements>
       <bpmn:incoming>SequenceFlow_1rtrmep</bpmn:incoming>
@@ -139,6 +143,16 @@
     <bpmn:userTask id="update_article_text" name="Update article text" camunda:assignee="${user}">
       <bpmn:extensionElements>
         <camunda:taskListener class="com.project.service.camunda.task.NewArticleUpdateFormDataInitialization" event="create" />
+        <camunda:formData>
+          <camunda:formField id="updated_file" label="Updated file:" type="file">
+            <camunda:properties>
+              <camunda:property id="file" value="a" />
+            </camunda:properties>
+            <camunda:validation>
+              <camunda:constraint name="required" />
+            </camunda:validation>
+          </camunda:formField>
+        </camunda:formData>
       </bpmn:extensionElements>
       <bpmn:incoming>SequenceFlow_1bqi0sv</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_0n7nf39</bpmn:outgoing>
@@ -167,6 +181,16 @@
     <bpmn:userTask id="add_reviewer" name="Add reviewer for article" camunda:assignee="${articleProcessDto.getWhoIsScienceEditor()}">
       <bpmn:extensionElements>
         <camunda:taskListener class="com.project.service.camunda.task.AddReviewerForArticleDataInitialization" event="create" />
+        <camunda:formData>
+          <camunda:formField id="reviewer_begin" label="Reviewers:" type="enum">
+            <camunda:properties>
+              <camunda:property id="multiple" value="a" />
+            </camunda:properties>
+            <camunda:validation>
+              <camunda:constraint name="required" />
+            </camunda:validation>
+          </camunda:formField>
+        </camunda:formData>
       </bpmn:extensionElements>
       <bpmn:incoming>SequenceFlow_13a71ug</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_1bfe9h3</bpmn:outgoing>
@@ -191,6 +215,27 @@
       <bpmn:userTask id="review_article" name="Review article" camunda:assignee="${subProcessData.getTaskInitiator()}" camunda:candidateGroups="reviewer">
         <bpmn:extensionElements>
           <camunda:taskListener class="com.project.service.camunda.task.ReviewArticleDataInitialization" event="create" />
+          <camunda:formData>
+            <camunda:formField id="rev_comment" label="Comment:" type="string">
+              <camunda:properties>
+                <camunda:property id="textarea" value="a" />
+              </camunda:properties>
+            </camunda:formField>
+            <camunda:formField id="rev_comment_editor" label="Comment[Editor]:" type="string">
+              <camunda:properties>
+                <camunda:property id="textarea" value="a" />
+              </camunda:properties>
+            </camunda:formField>
+            <camunda:formField id="rev_decision" label="Decision" type="enum">
+              <camunda:validation>
+                <camunda:constraint name="required" />
+              </camunda:validation>
+              <camunda:value id="ACCEPTED" name="ACCEPTED" />
+              <camunda:value id="REJECTED" name="REJECTED" />
+              <camunda:value id="DO_MINOR_CHANGES" name="DO_MINOR_CHANGES" />
+              <camunda:value id="DO_MAJOR_CHANGES" name="DO_MAJOR_CHANGES" />
+            </camunda:formField>
+          </camunda:formData>
         </bpmn:extensionElements>
         <bpmn:incoming>SequenceFlow_0sq98ps</bpmn:incoming>
         <bpmn:outgoing>SequenceFlow_1sh7o35</bpmn:outgoing>
@@ -198,7 +243,7 @@
       <bpmn:boundaryEvent id="BoundaryEvent_0a5guwo" name="Not reviewing_on_time" attachedToRef="review_article">
         <bpmn:outgoing>SequenceFlow_0x2rup8</bpmn:outgoing>
         <bpmn:timerEventDefinition id="TimerEventDefinition_1m2k4tj">
-          <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">${reviewing_deadline}</bpmn:timeDuration>
+          <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">P${reviewing_deadline_day}DT${reviewing_deadline_hour}H${reviewing_deadline_minute}M</bpmn:timeDuration>
         </bpmn:timerEventDefinition>
       </bpmn:boundaryEvent>
       <bpmn:serviceTask id="process_reviewing" name="Process reviewing" camunda:class="com.project.service.camunda.service.ProcessReviewing">
@@ -211,6 +256,13 @@
       <bpmn:userTask id="add_rev_when_error" name="Add reviewer for article when error" camunda:assignee="${articleProcessDto.getWhoIsScienceEditor()}">
         <bpmn:extensionElements>
           <camunda:taskListener class="com.project.service.camunda.task.AddReviewerForArticleWhenErrorDataInitialization" event="create" />
+          <camunda:formData>
+            <camunda:formField id="reviewer_error" label="Reviewer:" type="enum">
+              <camunda:validation>
+                <camunda:constraint name="required" />
+              </camunda:validation>
+            </camunda:formField>
+          </camunda:formData>
         </bpmn:extensionElements>
         <bpmn:incoming>SequenceFlow_1n7wf0d</bpmn:incoming>
         <bpmn:outgoing>SequenceFlow_1vzxv11</bpmn:outgoing>
@@ -247,7 +299,21 @@
       <bpmn:extensionElements>
         <camunda:taskListener class="com.project.service.camunda.task.ReviewingEditorDataInitialization" event="create" />
         <camunda:formData>
-          <camunda:formField id="article_decision" type="string" />
+          <camunda:formField id="article_decision" label="Decision:" type="enum">
+            <camunda:validation>
+              <camunda:constraint name="required" />
+            </camunda:validation>
+            <camunda:value id="ACCEPTED" name="ACCEPTED" />
+            <camunda:value id="REJECTED" name="REJECTED" />
+            <camunda:value id="DO_MINOR_CHANGES" name="DO_MINOR_CHANGES" />
+            <camunda:value id="DO_MAJOR_CHANGES" name="DO_MAJOR_CHANGES" />
+            <camunda:value id="ADD_ADDITIONAL_EDITOR" name="ADD_ADDITIONAL_EDITOR" />
+          </camunda:formField>
+          <camunda:formField id="article_editor_comment" label="Comment:" type="string">
+            <camunda:properties>
+              <camunda:property id="textarea" value="a" />
+            </camunda:properties>
+          </camunda:formField>
         </camunda:formData>
       </bpmn:extensionElements>
       <bpmn:incoming>SequenceFlow_0qhz88s</bpmn:incoming>
@@ -269,14 +335,23 @@
       <bpmn:outgoing>SequenceFlow_02y6vn3</bpmn:outgoing>
     </bpmn:sendTask>
     <bpmn:sequenceFlow id="SequenceFlow_0i8083t" sourceRef="editor_review" targetRef="proccess_editor_reviewing" />
-    <bpmn:serviceTask id="ServiceTask_15xe90a" name="Process pdf minor/major changes to the db" camunda:class="com.project.service.camunda.service.ProcessArticleData">
+    <bpmn:serviceTask id="ServiceTask_15xe90a" name="Process pdf minor/major changes to the db" camunda:class="com.project.service.camunda.service.UpdateFileChanges">
       <bpmn:incoming>SequenceFlow_17w5lyq</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_0lmofnu</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:userTask id="upload_pdf_minor_major_changes" name="Upload pdf minor/major changes" camunda:assignee="${user}">
       <bpmn:extensionElements>
         <camunda:formData>
-          <camunda:formField id="FormField_1gslgij" label="Your comment:" type="string" />
+          <camunda:formField id="change_file" label="Your file:" type="file">
+            <camunda:validation>
+              <camunda:constraint name="required" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="change_comment" label="Comment:" type="string">
+            <camunda:properties>
+              <camunda:property id="textarea" value="a" />
+            </camunda:properties>
+          </camunda:formField>
         </camunda:formData>
         <camunda:taskListener class="com.project.service.camunda.task.NewArticleUpdateFormChangesDataInitialization" event="create" />
       </bpmn:extensionElements>
@@ -316,18 +391,18 @@
         <bpmn:incoming>SequenceFlow_1e110t5</bpmn:incoming>
       </bpmn:endEvent>
       <bpmn:sequenceFlow id="SequenceFlow_1e110t5" sourceRef="Task_10pxn5a" targetRef="EndEvent_106gk58" />
-      <bpmn:serviceTask id="Task_10pxn5a" name="Init payment" camunda:expression="${user}">
+      <bpmn:serviceTask id="Task_10pxn5a" name="Init payment" camunda:class="com.project.service.camunda.service.PaymentHandler">
         <bpmn:incoming>SequenceFlow_0uf38e4</bpmn:incoming>
         <bpmn:outgoing>SequenceFlow_1e110t5</bpmn:outgoing>
       </bpmn:serviceTask>
       <bpmn:sequenceFlow id="SequenceFlow_0twxzc2" sourceRef="IntermediateThrowEvent_11pvssb" targetRef="EndEvent_1ujoz4t" />
       <bpmn:boundaryEvent id="IntermediateThrowEvent_11pvssb" name="Init payment failed" attachedToRef="Task_10pxn5a">
         <bpmn:outgoing>SequenceFlow_0twxzc2</bpmn:outgoing>
-        <bpmn:errorEventDefinition errorRef="Error_0p8oo7l" />
+        <bpmn:errorEventDefinition errorRef="Error_06g5eqn" />
       </bpmn:boundaryEvent>
       <bpmn:endEvent id="EndEvent_1ujoz4t">
         <bpmn:incoming>SequenceFlow_0twxzc2</bpmn:incoming>
-        <bpmn:errorEventDefinition errorRef="Error_0ah03wd" />
+        <bpmn:errorEventDefinition errorRef="Error_06g5eqn" />
       </bpmn:endEvent>
     </bpmn:subProcess>
     <bpmn:sequenceFlow id="SequenceFlow_0tresf6" sourceRef="select_magazine" targetRef="magazine_payment_type" />
@@ -347,7 +422,7 @@
       <bpmn:incoming>SequenceFlow_0qzzgb0</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_09bbn2p</bpmn:outgoing>
     </bpmn:sendTask>
-    <bpmn:serviceTask id="process_update_article" name="Process update article text" camunda:class="com.project.service.camunda.service.ProcessArticleData">
+    <bpmn:serviceTask id="process_update_article" name="Process update article text" camunda:class="com.project.service.camunda.service.UpdateFile">
       <bpmn:incoming>SequenceFlow_0n7nf39</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_0ima3nv</bpmn:outgoing>
     </bpmn:serviceTask>
@@ -385,9 +460,9 @@
     <bpmn:sequenceFlow id="SequenceFlow_0z1iu5u" sourceRef="Task_0ijyvsd" targetRef="EndEvent_0kv7s6h" />
     <bpmn:boundaryEvent id="IntermediateThrowEvent_1gmftfv" name="Payment failed" attachedToRef="Task_18ru3xa">
       <bpmn:outgoing>SequenceFlow_1f42mox</bpmn:outgoing>
-      <bpmn:errorEventDefinition errorRef="Error_1ri7ri8" />
+      <bpmn:errorEventDefinition errorRef="Error_06g5eqn" camunda:errorCodeVariable="PAYMENT_ERROR" camunda:errorMessageVariable="PAYMENT_ERROR" />
     </bpmn:boundaryEvent>
-    <bpmn:serviceTask id="Task_0ijyvsd" name="Process unsuccessful payment" camunda:expression="${user}">
+    <bpmn:serviceTask id="Task_0ijyvsd" name="Process unsuccessful payment" camunda:class="com.project.service.camunda.service.PaymentErrorHandler">
       <bpmn:incoming>SequenceFlow_1f42mox</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_0z1iu5u</bpmn:outgoing>
     </bpmn:serviceTask>
@@ -403,7 +478,25 @@
     <bpmn:userTask id="define_time_to_respond" name="Define time to respond" camunda:assignee="${articleProcessDto.getWhoIsScienceEditor()}">
       <bpmn:extensionElements>
         <camunda:formData>
-          <camunda:formField id="reviewing_deadline" label="Broj dana:" type="string" />
+          <camunda:formField id="reviewing_deadline_day" label="Days:" type="long">
+            <camunda:validation>
+              <camunda:constraint name="min" config="0" />
+              <camunda:constraint name="max" config="5" />
+              <camunda:constraint name="validator" config="com.project.util.camunda.validation.TimeToRespondValidator" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="reviewing_deadline_hour" label="Hours:" type="long">
+            <camunda:validation>
+              <camunda:constraint name="min" config="0" />
+              <camunda:constraint name="max" config="23" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="reviewing_deadline_minute" label="Minute:" type="long">
+            <camunda:validation>
+              <camunda:constraint name="min" config="0" />
+              <camunda:constraint name="max" config="59" />
+            </camunda:validation>
+          </camunda:formField>
         </camunda:formData>
       </bpmn:extensionElements>
       <bpmn:incoming>SequenceFlow_1nbbmej</bpmn:incoming>
@@ -422,6 +515,46 @@
     <bpmn:userTask id="enter_article_data" name="Enter article&#39;s data" camunda:assignee="${user}">
       <bpmn:extensionElements>
         <camunda:taskListener class="com.project.service.camunda.task.NewArticleFormDataInitialization" event="create" />
+        <camunda:formData>
+          <camunda:formField id="article_title" label="Title:" type="string">
+            <camunda:validation>
+              <camunda:constraint name="required" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="article_abstract" label="Abstract:" type="string">
+            <camunda:properties>
+              <camunda:property id="textarea" value="a" />
+            </camunda:properties>
+          </camunda:formField>
+          <camunda:formField id="article_price" label="Price:" type="long">
+            <camunda:validation>
+              <camunda:constraint name="required" />
+              <camunda:constraint name="min" config="1" />
+              <camunda:constraint name="max" config="1000" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="article_science_area" label="Science area:" type="enum">
+            <camunda:validation>
+              <camunda:constraint name="required" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="article_file" label="File:" type="file">
+            <camunda:properties>
+              <camunda:property id="file" value="a" />
+            </camunda:properties>
+            <camunda:validation>
+              <camunda:constraint name="required" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="article_key_terms" label="Terms:" type="multiEnum" />
+          <camunda:formField id="article_co_authors" label="CoAuthors:" type="multiEnumCoAuthor" />
+          <camunda:formField id="article_co_authors_out" label="Custom:" type="multiEnumCoAuthorOut">
+            <camunda:properties>
+              <camunda:property id="first_name" value="First name:" />
+            </camunda:properties>
+          </camunda:formField>
+          <camunda:formField id="article_key_terms_out" type="multiEnumTermOut" />
+        </camunda:formData>
       </bpmn:extensionElements>
       <bpmn:incoming>SequenceFlow_0cu8bsy</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_1tvj0i8</bpmn:outgoing>
@@ -526,7 +659,11 @@
     <bpmn:userTask id="add_additional_reviewing" name="Adding Aditional reviewing" camunda:assignee="${articleProcessDto.getWhoIsScienceEditor()}">
       <bpmn:extensionElements>
         <camunda:formData>
-          <camunda:formField id="additional_reviewer" type="string" />
+          <camunda:formField id="additional_reviewer" label="Reviewer:" type="enum">
+            <camunda:validation>
+              <camunda:constraint name="required" />
+            </camunda:validation>
+          </camunda:formField>
         </camunda:formData>
         <camunda:taskListener class="com.project.service.camunda.task.AddReviewerForArticleAdditionalDataInitialization" event="create" />
       </bpmn:extensionElements>
@@ -573,9 +710,30 @@
     <bpmn:sequenceFlow id="SequenceFlow_0covefw" sourceRef="Task_0k4bg49" targetRef="additional_reviewing" />
     <bpmn:sequenceFlow id="SequenceFlow_1vsvxf1" sourceRef="additional_reviewing" targetRef="Task_0zwneks" />
     <bpmn:sequenceFlow id="SequenceFlow_06pog5l" sourceRef="Task_0zwneks" targetRef="ExclusiveGateway_1tanl9s" />
-    <bpmn:userTask id="additional_reviewing" name="Additional reviewing" camunda:assignee="${additional_reviewer}">
+    <bpmn:userTask id="additional_reviewing" name="Additional reviewing" camunda:assignee="${newInitiator}">
       <bpmn:extensionElements>
         <camunda:taskListener class="com.project.service.camunda.task.ReviewArticleAdditionalDataInitialization" event="create" />
+        <camunda:formData>
+          <camunda:formField id="rev_comment_additional" label="Comment:" type="string">
+            <camunda:properties>
+              <camunda:property id="textarea" value="a" />
+            </camunda:properties>
+          </camunda:formField>
+          <camunda:formField id="rev_comment_editor_additional" label="Comment[Editor]:" type="string">
+            <camunda:properties>
+              <camunda:property id="textarea" value="a" />
+            </camunda:properties>
+          </camunda:formField>
+          <camunda:formField id="rev_decision_additional" label="Decision:" type="enum">
+            <camunda:validation>
+              <camunda:constraint name="required" />
+            </camunda:validation>
+            <camunda:value id="ACCEPTED" name="ACCEPTED" />
+            <camunda:value id="REJECTED" name="REJECTED" />
+            <camunda:value id="DO_MINOR_CHANGES" name="DO_MINOR_CHANGES" />
+            <camunda:value id="DO_MAJOR_CHANGES" name="DO_MAJOR_CHANGES" />
+          </camunda:formField>
+        </camunda:formData>
       </bpmn:extensionElements>
       <bpmn:incoming>SequenceFlow_0covefw</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_1vsvxf1</bpmn:outgoing>
@@ -621,6 +779,7 @@ ROZA: RECEZENT</bpmn:text>
   <bpmn:error id="Error_1ri7ri8" name="Error_03sco75" />
   <bpmn:error id="Error_0ah03wd" name="Error_2pplbpb" errorCode="PAYMENT_FAILED" />
   <bpmn:error id="Error_0uio0n0" name="UnexpectedError" errorCode="UnexpectedError" camunda:errorMessage="UnexpectedError" />
+  <bpmn:error id="Error_06g5eqn" name="PAYMENT_ERROR" errorCode="PAYMENT_ERROR" camunda:errorMessage="PAYMENT_ERROR" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="new_article">
       <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
@@ -640,10 +799,10 @@ ROZA: RECEZENT</bpmn:text>
         <dc:Bounds x="620" y="300" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="UserTask_1m37wwj_di" bpmnElement="enter_article_data" bioc:stroke="rgb(30, 136, 229)" bioc:fill="rgb(187, 222, 251)">
-        <dc:Bounds x="1040" y="390" width="100" height="80" />
+        <dc:Bounds x="970" y="390" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="ServiceTask_112ksq4_di" bpmnElement="process_article_data">
-        <dc:Bounds x="1200" y="390" width="100" height="80" />
+        <dc:Bounds x="1250" y="390" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="ExclusiveGateway_0bs4av2_di" bpmnElement="ExclusiveGateway_0bs4av2" isMarkerVisible="true">
         <dc:Bounds x="565" y="405" width="50" height="50" />
@@ -652,7 +811,7 @@ ROZA: RECEZENT</bpmn:text>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="ExclusiveGateway_1fztipp_di" bpmnElement="ExclusiveGateway_1fztipp" isMarkerVisible="true">
-        <dc:Bounds x="945" y="405" width="50" height="50" />
+        <dc:Bounds x="845" y="405" width="50" height="50" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="EndEvent_1h0lnvx_di" bpmnElement="EndEvent_1h0lnvx">
         <dc:Bounds x="3132" y="332" width="36" height="36" />
@@ -683,9 +842,9 @@ ROZA: RECEZENT</bpmn:text>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="SequenceFlow_1ijcn9n_di" bpmnElement="SequenceFlow_1ijcn9n">
         <di:waypoint x="615" y="430" />
-        <di:waypoint x="945" y="430" />
+        <di:waypoint x="845" y="430" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="775" y="412" width="13" height="14" />
+          <dc:Bounds x="725" y="412" width="13" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_0pbmvzx_di" bpmnElement="SequenceFlow_0pbmvzx">
@@ -700,17 +859,18 @@ ROZA: RECEZENT</bpmn:text>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_089qi7s_di" bpmnElement="SequenceFlow_089qi7s">
-        <di:waypoint x="945" y="340" />
-        <di:waypoint x="970" y="340" />
-        <di:waypoint x="970" y="405" />
+        <di:waypoint x="920" y="365" />
+        <di:waypoint x="920" y="385" />
+        <di:waypoint x="870" y="385" />
+        <di:waypoint x="870" y="405" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_0oe1juk_di" bpmnElement="SequenceFlow_0oe1juk">
         <di:waypoint x="490" y="430" />
         <di:waypoint x="565" y="430" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_0cu8bsy_di" bpmnElement="SequenceFlow_0cu8bsy">
-        <di:waypoint x="995" y="430" />
-        <di:waypoint x="1040" y="430" />
+        <di:waypoint x="895" y="430" />
+        <di:waypoint x="970" y="430" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_0lpe940_di" bpmnElement="SequenceFlow_0lpe940">
         <di:waypoint x="1770" y="290" />
@@ -745,7 +905,7 @@ ROZA: RECEZENT</bpmn:text>
         <dc:Bounds x="1920" y="250" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="ServiceTask_0ufme84_di" bpmnElement="find_chief_editor" bioc:stroke="rgb(251, 140, 0)" bioc:fill="rgb(255, 224, 178)">
-        <dc:Bounds x="1360" y="390" width="100" height="80" />
+        <dc:Bounds x="1370" y="390" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="SequenceFlow_1qrwnma_di" bpmnElement="SequenceFlow_1qrwnma">
         <di:waypoint x="2240" y="320" />
@@ -1088,12 +1248,12 @@ ROZA: RECEZENT</bpmn:text>
         <di:waypoint x="960" y="675" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_1tvj0i8_di" bpmnElement="SequenceFlow_1tvj0i8">
-        <di:waypoint x="1140" y="430" />
-        <di:waypoint x="1200" y="430" />
+        <di:waypoint x="1070" y="430" />
+        <di:waypoint x="1250" y="430" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_0o5cz67_di" bpmnElement="SequenceFlow_0o5cz67">
-        <di:waypoint x="1300" y="430" />
-        <di:waypoint x="1360" y="430" />
+        <di:waypoint x="1350" y="430" />
+        <di:waypoint x="1370" y="430" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_0ima3nv_di" bpmnElement="SequenceFlow_0ima3nv">
         <di:waypoint x="2440" y="230" />
@@ -1101,8 +1261,9 @@ ROZA: RECEZENT</bpmn:text>
         <di:waypoint x="1480" y="315" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_16ffw7c_di" bpmnElement="SequenceFlow_16ffw7c">
-        <di:waypoint x="1460" y="430" />
-        <di:waypoint x="1480" y="430" />
+        <di:waypoint x="1420" y="390" />
+        <di:waypoint x="1420" y="378" />
+        <di:waypoint x="1480" y="378" />
         <di:waypoint x="1480" y="365" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_0046knf_di" bpmnElement="SequenceFlow_0046knf">

@@ -1,9 +1,8 @@
 <div class="jumbotron">
     <div class="container" *ngIf="articleFormDto">  
       <h1 class="text-center">New article</h1>
-      <!-- <p class="text-center">New article</p> -->
       <form #f="ngForm" (ngSubmit)="f.form.valid && onSubmit(f.value, f)" novalidate>
-        <div class="form-group row" >
+        <!-- <div class="form-group row" >
             <div class="col-lg-4"><label for="title">Title:</label>
             </div>
             <div class="col-lg-5"><input type="text" class="form-control" name="title" [(ngModel)]="articleData.articleTitle" #title="ngModel"
@@ -17,8 +16,6 @@
         <div class="form-group row" >
             <div class="col-lg-4"><label for="abstract">Abstract:</label></div>
             <div class="col-lg-5">
-                <!-- <input type="text" class="form-control" name="abstract" [(ngModel)]="articleData.articleAbstract" #abstract="ngModel"
-                [ngClass]="{ 'is-invalid': f.submitted && abstract.invalid }" required /> -->
                 <textarea rows="3" class="form-control" name="abstract" [(ngModel)]="articleData.articleAbstract" #abstract="ngModel"
                 [ngClass]="{ 'is-invalid': f.submitted && abstract.invalid }" required>
 
@@ -68,6 +65,70 @@
             <div  *ngIf="f.submitted && articleText.invalid" class="col-lg-3 text-danger">
                 <div *ngIf="articleText.errors.required">File is required</div>
             </div>
+        </div> -->
+
+        <div class="form-group row" *ngFor="let fieldWrapper of formFieldsWrapper">
+            <div class="col-lg-5"> <label for={{fieldWrapper.field.id}} class="col-lg-4">{{fieldWrapper.field.label}}</label></div>
+
+            <input class="col-lg-3 form-control" type="text" name={{fieldWrapper.field.id}}   *ngIf="fieldWrapper.field.type.name=='string' && !fieldWrapper.field.properties['textarea'] && !fieldWrapper.field.properties['file']" ngModel>
+            
+            <div class="col-lg-6" *ngIf="fieldWrapper.field.type.name=='string' && fieldWrapper.field.properties['textarea']">
+                <textarea rows="5" class="form-control" name={{fieldWrapper.field.id}}  ngModel 
+                >
+
+                </textarea>
+            </div>
+            
+            
+            <input class="col-lg-3" type="checkbox" name={{fieldWrapper.field.id}} ngModel   *ngIf="fieldWrapper.field.type.name=='boolean'" >
+            
+            <input class="col-lg-3 form-control" type="number" name={{fieldWrapper.field.id}}  [(ngModel)]="fieldWrapper.field.value.value"  *ngIf="fieldWrapper.field.type.name=='long'" >
+
+            <select class="col-lg-3 form-control" name="{{fieldWrapper.field.id}}" *ngIf="fieldWrapper.field.type.name=='enum' && !fieldWrapper.field.properties['multiple']" ngModel >
+              <option *ngFor="let val of fieldWrapper.dataSource" value={{val}}>
+                {{fieldWrapper.field.type.values[val]}}
+              </option>
+            </select>
+
+            <select class="col-lg-3 form-control" name="{{fieldWrapper.field.id}}" *ngIf="fieldWrapper.field.type.name=='enum' && fieldWrapper.field.properties['multiple']" ngModel multiple  size="{{fieldWrapper.dataSource.length}}">
+                <option *ngFor="let val of fieldWrapper.dataSource" value={{val}}>
+                  {{fieldWrapper.field.type.values[val]}}
+                </option>
+            </select>
+
+            <div class="col-lg-3" *ngIf="fieldWrapper.field.properties['file']">
+                <input type="file" class="form-control-file"  name="{{fieldWrapper.field.id}}" [(ngModel)]="articleData.fileName"  
+                
+                (change)="onFileUpload($event)"/>
+            </div>
+
+            <select class="col-lg-3 form-control" name="{{fieldWrapper.field.id}}" *ngIf="fieldWrapper.field.type.name=='multiEnum' " ngModel multiple  size="{{fieldWrapper.dataSource.length}}">
+                <option *ngFor="let val of fieldWrapper.dataSource" value={{val}}>
+                  {{fieldWrapper.field.type.values[val]}}
+                </option>
+            </select>
+
+            <select class="col-lg-3 form-control" name="{{fieldWrapper.field.id}}" *ngIf="fieldWrapper.field.type.name=='multiEnumCoAuthor' " ngModel multiple  size="{{fieldWrapper.dataSource.length}}">
+                <option *ngFor="let val of fieldWrapper.dataSource" value={{val}}>
+                  {{fieldWrapper.field.type.values[val]}}
+                </option>
+            </select>
+
+            <div  *ngIf="f.submitted" class="col-lg-3 text-danger">
+                <div>{{fieldWrapper.errorField}}</div>
+            </div>
+        </div>
+
+        <div class="form-group row" >
+            <div class="col-lg-4"><label for="articleText">Upload text:</label></div>
+            <div class="col-lg-5">
+                <input type="file" class="form-control-file"  name="articleText" [(ngModel)]="articleData.fileName"  #articleText="ngModel"
+                [ngClass]="{ 'is-invalid': f.submitted && articleText.invalid }" required 
+                (change)="onFileUpload($event)"
+                /></div>
+            <div  *ngIf="f.submitted && articleText.invalid" class="col-lg-3 text-danger">
+                <div *ngIf="articleText.errors.required">File is required</div>
+            </div>
         </div>
 
         <div class="row">
@@ -79,7 +140,36 @@
             </div>
         </div>
 
+        
+
        </form>
+
+       <!-- Pokusaj din forme za koautore-->
+       <!-- <div>
+        <form #f="ngForm" (ngSubmit)="f.form.valid && onSubmit(f.value, f)" novalidate>
+            <div class="form-group row" *ngFor="let fieldWrapper of formFieldsWrapper">
+             <div class="col-lg-5"> <label for={{fieldWrapper.field.id}} class="col-lg-4">{{fieldWrapper.field.label}}</label></div>
+     
+             <input class="col-lg-3 form-control" type="text" name={{fieldWrapper.field.id}}   *ngIf="fieldWrapper.field.type.name=='string' && !fieldWrapper.field.properties['textarea'] && !fieldWrapper.field.properties['file']" ngModel>
+             
+     
+             <div  *ngIf="f.submitted" class="col-lg-3 text-danger">
+                 <div>{{fieldWrapper.errorField}}</div>
+             </div>
+         </div>
+     
+         <div class="row">
+             <div class="col-lg-6">
+     
+             </div>
+             <div class="col-lg-3">
+               <input type="submit" class="btn btn-success form-control" value="Add article">
+             </div>
+         </div>
+     
+        </form>
+       </div> -->
+       
 
         <div class="row">
             <div class="col">
@@ -108,7 +198,7 @@
                             </tr>
                         </table>
                     </div>
-                    <div class="col">
+                    <!-- <div class="col">
                         <h3 class="text-center">Terms to select</h3>
                         <table class="table table-bordered">
                             <thead>
@@ -122,19 +212,19 @@
                                 <td><button class="btn btn-info" (click)="add(term)">Add</button></td>
                             </tr>
                         </table>
-                    </div>
+                    </div> -->
                 </div>
             </div>
             <div class="col">
                 <h2 class="text-center">Coauthors</h2>
                 <div class="row">
-                    <div class="col-lg-5">
+                    <!-- <div class="col-lg-5">
                         <button class="btn btn-info" (click)="activeForm = 'custom'">Add custom</button>
                     </div>
                     <div class="col-lg-2"></div>
                     <div class="col-lg-5" >
                         <button class="btn btn-info" (click)="activeForm = 'existing'">Add existing</button>
-                    </div>
+                    </div> -->
                 </div>
                 <div class="row">
                     <div class="col-lg-6">

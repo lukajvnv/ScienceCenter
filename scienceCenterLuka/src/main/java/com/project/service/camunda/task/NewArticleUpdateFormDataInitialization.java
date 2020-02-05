@@ -59,7 +59,7 @@ public class NewArticleUpdateFormDataInitialization implements TaskListener {
 		terms.stream().forEach(t -> termsDto.add(new TermDto(t.getTermId(), t.getTermName())));
 		coAuthors.stream().forEach(c -> coAuthorsDto.add(new UserDto(c.getUserId(), c.getFirstName(), c.getLastName(), c.getEmail(), c.getCity(), c.getCountry(), c.getUserUsername(), c.getVocation())));
 	
-		NewArticleRequestDto requestDto = new NewArticleRequestDto(taskId, proccessId, scienceAreasDto, termsDto, coAuthorsDto);
+		NewArticleRequestDto requestDto = new NewArticleRequestDto(taskId, proccessId, scienceAreasDto, termsDto, coAuthorsDto, null);
 
 		
 		ArticleProcessDto articleDto = (ArticleProcessDto) execution.getVariable("articleProcessDto");
@@ -79,11 +79,11 @@ public class NewArticleUpdateFormDataInitialization implements TaskListener {
 				oldSavedArticle.getArticleTitle(), oldSavedArticle.getArticleAbstract(), 
 				Long.toString(oldSavedArticle.getScienceArea().getScienceAreaId()), oldSavedArticle.getArticlePrice(), 
 				termsArticleDto, coAuthorsArticleDto, 
-				oldSavedArticle.getFileFormat(), decodedFile);
+				oldSavedArticle.getFileFormat(), decodedFile, null);
 		
 		String comment = (String) execution.getVariable("analize_article_comment");
 		
-		UpdateArticleDto updateDto = new UpdateArticleDto(requestDto, responseDto, comment);
+		UpdateArticleDto updateDto = new UpdateArticleDto(requestDto, responseDto, comment, oldSavedArticle.getArticleId());
 		
 		execution.setVariable("updateArticleRequestDto", updateDto);
 	}

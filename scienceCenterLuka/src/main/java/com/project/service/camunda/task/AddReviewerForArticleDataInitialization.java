@@ -2,11 +2,16 @@ package com.project.service.camunda.task;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import org.camunda.bpm.engine.FormService;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.delegate.TaskListener;
+import org.camunda.bpm.engine.form.FormField;
+import org.camunda.bpm.engine.form.TaskFormData;
+import org.camunda.bpm.engine.impl.form.type.EnumFormType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +33,9 @@ public class AddReviewerForArticleDataInitialization implements TaskListener {
 
 	@Autowired
 	private UnityOfWork unityOfWork;
+	
+	@Autowired
+	private FormService formService;
 	
 	@Override
 	public void notify(DelegateTask delegateTask) {
@@ -64,7 +72,29 @@ public class AddReviewerForArticleDataInitialization implements TaskListener {
 		
 		List<EditorReviewerByScienceAreaDto> reviewersDto = (ArrayList<EditorReviewerByScienceAreaDto>) execution.getVariable("reviewersByScArea");
 		
-		AddReviewersDto addReviewersDto = new AddReviewersDto(articleDto, magazineDto, reviewersDto, "", false);
+		// reviewers enum datasource init
+		TaskFormData formData =  formService.getTaskFormData(delegateTask.getId());
+		FormField field = formData.getFormFields().stream().filter(f -> f.getId().equals("reviewer_begin")).findFirst().get();
+		EnumFormType ft = (EnumFormType)field.getType();
+		Map<String, String> map = ft.getValues();
+		
+		reviewersDto.forEach(rev -> { 
+			ScienceAreaDto scDto = rev.getScienceArea();
+			UserDto userDto = rev.getEditorReviewer();
+			String text = new StringBuilder(userDto.getFirstName())
+					.append(" ")
+					.append(userDto.getLastName())
+					.append(", ")
+					.append(userDto.getCity())
+					.append(", scienceArea: ")
+					.append(scDto.getScienceAreaCode())
+					.append(" : ")
+					.append(scDto.getScienceAreaName())
+					.toString();
+		  map.put(rev.getEditorByScArId().toString(), text);
+		});
+		
+		AddReviewersDto addReviewersDto = new AddReviewersDto(articleDto, magazineDto, reviewersDto, "", false, null, null);
 		execution.setVariable("addReviewersDto", addReviewersDto);
 	}
 

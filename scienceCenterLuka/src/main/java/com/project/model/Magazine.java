@@ -92,7 +92,7 @@ public class Magazine {
 	private boolean active;
 	
 	@Column
-	private Float membershipPrice;
+	private Long membershipPrice;
 	
 	//zbog KP
 //	private Long sellerIdentifier;

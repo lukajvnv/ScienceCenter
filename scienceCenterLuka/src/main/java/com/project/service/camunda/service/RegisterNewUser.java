@@ -61,7 +61,7 @@ public class RegisterNewUser implements JavaDelegate {
 			List<FormSubmissionDto> fields = registrationDto.getFormFields();
 			Map<String, String> map = new HashMap<String, String>();
 			fields.forEach(f -> {
-				map.put(f.getFieldId(), f.getFieldValue());
+				map.put(f.getFieldId(), (String)f.getFieldValue());
 			});
 			
 			List<User> usersWithSameId = identityService.createUserQuery().userId(map.get("username")).list();

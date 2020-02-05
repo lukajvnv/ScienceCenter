@@ -34,7 +34,7 @@ public class ArticleDto implements Serializable {
 	private List<UserDto> coAuthors;
 	private List<TermDto> keyTerms;
 	
-	private Float price;
+	private Long price;
 	
 	private String file;
 	//file, doi, edition, status

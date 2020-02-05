@@ -20,6 +20,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import com.project.config.security.jwt.JwtAuthEntryPoint;
 import com.project.config.security.jwt.JwtAuthTokenFilter;
 import com.project.config.security.service.UserDetailsServiceImpl;
+import com.project.model.enums.Role;
 
 
 
@@ -70,11 +71,6 @@ public class JwtSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable().
                 authorizeRequests()
-//              .antMatchers("/booking/**").permitAll()
-//              .antMatchers("/accomodation/**").permitAll()
-//              .antMatchers("/user/**").permitAll()
-//               .antMatchers("/api/auth/**").permitAll()
-//               .antMatchers("/ws/**").permitAll()
                 .antMatchers("/article/**").permitAll()
                 .antMatchers("/magazine/**").permitAll()
                 .antMatchers("/welcome/**").permitAll()

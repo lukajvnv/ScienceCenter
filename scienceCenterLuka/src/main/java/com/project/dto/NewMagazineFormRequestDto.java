@@ -16,11 +16,13 @@ public class NewMagazineFormRequestDto {
 	private String taskId;
 	private String processInstanceId;
 	
-	private FormField name;
-	private FormField issn_number;
-	private FormField payment_option;
-	private FormField membership_price;
-	private FormField science_area;
+//	private FormField name;
+//	private FormField issn_number;
+//	private FormField payment_option;
+//	private FormField membership_price;
+//	private FormField science_area;
+	
+	private List<FormField> formFields;
 	
 	private String commentIfExist;
 

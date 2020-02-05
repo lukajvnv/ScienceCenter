@@ -13,6 +13,10 @@ import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.form.FormField;
+import org.camunda.bpm.engine.form.TaskFormData;
+import org.camunda.bpm.engine.impl.form.type.EnumFormType;
+import org.camunda.bpm.engine.impl.form.validator.FormFieldValidatorException;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.task.Task;
@@ -32,8 +36,10 @@ import com.project.dto.AddReviewersDto;
 import com.project.dto.ArticleDto;
 import com.project.dto.ArticleProcessDto;
 import com.project.dto.EditorReviewerByScienceAreaDto;
+import com.project.dto.FormSubmissionDto;
 import com.project.dto.MagazineDto;
 import com.project.dto.ReviewArticleMfDto;
+import com.project.dto.ReviewerFilterDto;
 import com.project.dto.ReviewingDto;
 import com.project.dto.ReviewingEditorDto;
 import com.project.dto.ScienceAreaDto;
@@ -84,7 +90,7 @@ public class ReviewingController {
 	private ArticleService articleService;
 	
 	@GetMapping(path = "/addReviewer/{taskId}", produces = "application/json")
-    public @ResponseBody ResponseEntity<AddReviewersDto> get(@PathVariable String taskId) {
+    public @ResponseBody ResponseEntity<AddReviewersDto> addReviewer(@PathVariable String taskId) {
 
 		Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
 		String proccessInstanceId = task.getProcessInstanceId();
@@ -92,25 +98,108 @@ public class ReviewingController {
 		AddReviewersDto requestDto = (AddReviewersDto) runtimeService.getVariable(proccessInstanceId, "addReviewersDto");
 		// runtimeService.removeVariable(proccessInstanceId, "addReviewersDto");
 		
+		TaskFormData data = formService.getTaskFormData(taskId);
+		List<FormField> fields =  data.getFormFields();
+		requestDto.setFields(fields);
+		
         return new ResponseEntity<AddReviewersDto>(requestDto, HttpStatus.OK);
     }
-	
+		
 	@PostMapping(path = "/addReviewer/{taskId}", produces = "application/json")
-    public @ResponseBody ResponseEntity<ArticleDto> analizeTextResult(@PathVariable String taskId, @RequestBody List<EditorReviewerByScienceAreaDto> response) {
+    public @ResponseBody ResponseEntity<?> addReviewer(@PathVariable String taskId, @RequestBody List<FormSubmissionDto> response) {
+
+		Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
+		
+		String proccessInstanceId = task.getProcessInstanceId();
+		ProcessInstance processInstance =  runtimeService.createProcessInstanceQuery().processInstanceId(proccessInstanceId).singleResult();
+				
+		Map<String, Object> map = mapListToDto(response, proccessInstanceId);
+		try {
+			formService.submitTaskForm(taskId, map);
+		} catch (FormFieldValidatorException e) {
+			// TODO Auto-generated catch block
+			//e.printStackTrace();
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
+		}
+		
+
+		
+        return new ResponseEntity<ArticleDto>(HttpStatus.OK);
+    }
+	
+	@PostMapping(path = "/filterReviewer/{taskId}", produces = "application/json")
+    public @ResponseBody ResponseEntity<?> filterReviewer(@PathVariable String taskId, @RequestBody ReviewerFilterDto searchRequest) {
 
 		Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
 		
 		String proccessInstanceId = task.getProcessInstanceId();
 		ProcessInstance processInstance =  runtimeService.createProcessInstanceQuery().processInstanceId(proccessInstanceId).singleResult();
 		
-		runtimeService.setVariable(proccessInstanceId, "reviewers", response);
+		List<EditorReviewerByScienceAreaDto> reviewersDto = (ArrayList<EditorReviewerByScienceAreaDto>) runtimeService.getVariable(proccessInstanceId, "reviewersByScArea");
+		List<EditorReviewerByScienceAreaDto> reviewersDtoFilter = new ArrayList<EditorReviewerByScienceAreaDto>(reviewersDto);
 		
-		taskService.complete(task.getId());
-		// formService.submitTaskForm(task.getId(), properties);
-		
+		ArticleProcessDto articleProcessDto = (ArticleProcessDto)  runtimeService.getVariable(proccessInstanceId, "articleProcessDto");
 
 		
-        return new ResponseEntity<ArticleDto>(new ArticleDto(), HttpStatus.OK);
+		if(searchRequest.isScienceAreaFilter()) {
+			Article article = unityOfWork.getArticleRepository().getOne(articleProcessDto.getArticleId());
+			ScienceArea scArea = article.getScienceArea();
+			
+			reviewersDtoFilter = reviewersDto.stream()
+				.filter(r -> r.getScienceArea().getScienceAreaId().equals(scArea.getScienceAreaId()))
+				.collect(Collectors.toList());
+			
+		}
+		
+		List<EditorReviewerByScienceAreaDto> revToRemove = new ArrayList<EditorReviewerByScienceAreaDto>();
+
+		
+		if(searchRequest.isGeoFilter()) {
+			UserSignedUp author = unityOfWork.getUserSignedUpRepository().findByUserUsername(articleProcessDto.getAuthor());
+			
+			if(author.getLatitude() != null && author.getLatitude() != null) {
+				reviewersDtoFilter.forEach(r -> {	
+					if(r.getLatitude() != null && r.getLatitude() != null) {
+						double dist = getDistanceFromLatLonInKm(author.getLatitude(), author.getLongitude(), r.getLatitude(), r.getLongitude());
+						if(dist < 100) {
+							revToRemove.add(r);
+						}
+					}
+						
+				});
+			}
+
+			
+		}
+		
+		reviewersDtoFilter.removeAll(revToRemove);
+		
+		// reviewers enum datasource init
+		TaskFormData formData =  formService.getTaskFormData(taskId);
+		List<FormField> fields = formData.getFormFields();
+		FormField field = formData.getFormFields().stream().filter(f -> f.getId().equals("reviewer_begin")).findFirst().get();
+		EnumFormType ft = (EnumFormType)field.getType();
+		Map<String, String> map = ft.getValues();
+		map.clear();
+		
+		reviewersDtoFilter.forEach(rev -> { 
+			ScienceAreaDto scDto = rev.getScienceArea();
+			UserDto userDto = rev.getEditorReviewer();
+			String text = new StringBuilder(userDto.getFirstName())
+					.append(" ")
+					.append(userDto.getLastName())
+					.append(", ")
+					.append(userDto.getCity())
+					.append(", scienceArea: ")
+					.append(scDto.getScienceAreaCode())
+					.append(" : ")
+					.append(scDto.getScienceAreaName())
+					.toString();
+		  map.put(rev.getEditorByScArId().toString(), text);
+		});
+
+		
+        return new ResponseEntity<>(fields, HttpStatus.OK);
     }
 	
 	@GetMapping(path = "/addReviewerWhenError/{taskId}", produces = "application/json")
@@ -122,16 +211,22 @@ public class ReviewingController {
 		AddReviewersDto requestDto = (AddReviewersDto) runtimeService.getVariable(proccessInstanceId, "addReviewersDto");
 		// runtimeService.removeVariable(proccessInstanceId, "addReviewersDto");
 		
+		TaskFormData data = formService.getTaskFormData(taskId);
+		List<FormField> fields =  data.getFormFields();
+		requestDto.setFields(fields);
+		
         return new ResponseEntity<AddReviewersDto>(requestDto, HttpStatus.OK);
     }
 	
 	@PostMapping(path = "/addReviewerWhenError/{taskId}", produces = "application/json")
-    public @ResponseBody ResponseEntity<ArticleDto> addReviewerWhenErrorPost(@PathVariable String taskId, @RequestBody AddReviewersDto response) {
+    public @ResponseBody ResponseEntity<?> addReviewerWhenErrorPost(@PathVariable String taskId, @RequestBody AddReviewersDto response) {
 
 		Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
 		
 		String proccessInstanceId = task.getProcessInstanceId();
 		ProcessInstance processInstance =  runtimeService.createProcessInstanceQuery().processInstanceId(proccessInstanceId).singleResult();
+		
+		
 		
 		VariableInstance reviewVariableMf = runtimeService.createVariableInstanceQuery()
                 .processInstanceIdIn(proccessInstanceId)
@@ -148,16 +243,23 @@ public class ReviewingController {
 		String subProcessExecutionId = reviewVariableMf.getExecutionId();
 		
 		ReviewArticleMfDto reviewArticleMfDto = (ReviewArticleMfDto) reviewVariableMf.getValue();
-		reviewArticleMfDto.setTaskInitiator(response.getEditorsReviewersDto().get(0).getEditorReviewer().getUserUsername());
 		
+		Map<String, Object> map = mapListToDto(response.getFieldValues(), proccessInstanceId);
+		String newTaskInitiator = (String) map.get("reviewer_error");
+		
+//		reviewArticleMfDto.setTaskInitiator(response.getEditorsReviewersDto().get(0).getEditorReviewer().getUserUsername());
+		reviewArticleMfDto.setTaskInitiator(newTaskInitiator);
+
 		runtimeService.setVariable(subProcessExecutionId, "subProcessData", reviewArticleMfDto);
 		
-		taskService.complete(taskId);
+		try {
+			formService.submitTaskForm(taskId, map);
+		} catch (FormFieldValidatorException e) {
+			// TODO Auto-generated catch block
+			//e.printStackTrace();
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
+		}
 		
-		
-		// formService.submitTaskForm(task.getId(), properties);
-		
-
 		
         return new ResponseEntity<ArticleDto>(new ArticleDto(), HttpStatus.OK);
     }
@@ -175,7 +277,7 @@ public class ReviewingController {
 //    }
 	
 	@PostMapping(path = "/addAdditionalReviewer/{taskId}", produces = "application/json")
-    public @ResponseBody ResponseEntity<ArticleDto> addAdditionalReviewerPost(@PathVariable String taskId, @RequestBody AddReviewersDto response) {
+    public @ResponseBody ResponseEntity<?> addAdditionalReviewerPost(@PathVariable String taskId, @RequestBody AddReviewersDto response) {
 
 		Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
 		String proccessInstanceId = task.getProcessInstanceId();
@@ -183,9 +285,14 @@ public class ReviewingController {
 		runtimeService.setVariable(proccessInstanceId, "addReviewersDto", response);
 		// runtimeService.removeVariable(proccessInstanceId, "addReviewersDto");
 		
-		Map<String, Object> properties = new HashMap<String, Object>();
-		properties.put("additional_reviewer", response.getEditorsReviewersDto().get(0).getEditorReviewer().getUserUsername());
-		formService.submitTaskForm(task.getId(), properties);
+		Map<String, Object> map = mapListToDto(response.getFieldValues(), proccessInstanceId);
+		try {
+			formService.submitTaskForm(taskId, map);
+		} catch (FormFieldValidatorException e) {
+			// TODO Auto-generated catch block
+			//e.printStackTrace();
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
+		}
 		
         return new ResponseEntity<ArticleDto>(new ArticleDto(), HttpStatus.OK);
     }
@@ -199,12 +306,15 @@ public class ReviewingController {
 		ReviewingDto reviewingDto = (ReviewingDto) runtimeService.getVariable(proccessInstanceId, "additionalReviewing");
 		// runtimeService.removeVariable(proccessInstanceId, "addReviewersDto");
 
+		TaskFormData data = formService.getTaskFormData(taskId);
+		List<FormField> fields =  data.getFormFields();
+		reviewingDto.setFields(fields);
 		
 		return new ResponseEntity<ReviewingDto>(reviewingDto, HttpStatus.OK);
 	}
 	
 	@PostMapping(path = "/startReviewingAdditional/{taskId}", produces = "application/json")
-	public @ResponseBody ResponseEntity<ReviewingDto> reviewAdditionalPost (@PathVariable String taskId, @RequestBody ReviewingDto requestBody){
+	public @ResponseBody ResponseEntity<?> reviewAdditionalPost (@PathVariable String taskId, @RequestBody ReviewingDto requestBody){
 		
 		Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
 		String proccessInstanceId = task.getProcessInstanceId();
@@ -212,7 +322,15 @@ public class ReviewingController {
 		
 		runtimeService.setVariable(proccessInstanceId, "additionalReviewing", requestBody);
 		
-		taskService.complete(taskId);
+		Map<String, Object> map = mapListToDto(requestBody.getFieldResults(), proccessInstanceId);
+		try {
+			formService.submitTaskForm(taskId, map);
+		} catch (FormFieldValidatorException e) {
+			// TODO Auto-generated catch block
+			//e.printStackTrace();
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
+		}
+		
 		
 		return new ResponseEntity<ReviewingDto>(new ReviewingDto(), HttpStatus.OK);
 	}
@@ -226,11 +344,17 @@ public class ReviewingController {
 		ReviewingEditorDto requestDto = (ReviewingEditorDto) runtimeService.getVariable(proccessInstanceId, "editorsReviewing");
 		// runtimeService.removeVariable(proccessInstanceId, "addReviewersDto");
 		
+		TaskFormData data = formService.getTaskFormData(taskId);
+		List<FormField> fields =  data.getFormFields();
+		// requestDto.setFields(fields);
+		
+		requestDto.setFields(fields);
+		
         return new ResponseEntity<ReviewingEditorDto>(requestDto, HttpStatus.OK);
     }
 	
 	@PostMapping(path = "/editorReview/{taskId}", produces = "application/json")
-    public @ResponseBody ResponseEntity<ReviewingEditorDto> editorReviewPost(@PathVariable String taskId, @RequestBody ReviewingEditorDto response) {
+    public @ResponseBody ResponseEntity<?> editorReviewPost(@PathVariable String taskId, @RequestBody ReviewingEditorDto response) {
 
 		Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
 		
@@ -239,29 +363,51 @@ public class ReviewingController {
 		
 		runtimeService.setVariable(proccessInstanceId, "editorsReviewing", response);
 		
-		Map<String, Object> properties = new HashMap<String, Object>();
-		properties.put("article_decision", response.getEditorOpinion().getOpinion().toString());
-		formService.submitTaskForm(task.getId(), properties);
-		// taskService.complete(task.getId());
+		Map<String, Object> map = mapListToDto(response.getFieldResults(), proccessInstanceId);
+		
+		try {
+			formService.submitTaskForm(taskId, map);
+		} catch (FormFieldValidatorException e) {
+			// TODO Auto-generated catch block
+			//e.printStackTrace();
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
+		}
 
 
 		
         return new ResponseEntity<ReviewingEditorDto>(new ReviewingEditorDto(), HttpStatus.OK);
     }
 	
-	@GetMapping(path = "/defineTimeForReview/{taskId}/{time}", produces = "application/json")
-    public @ResponseBody ResponseEntity<?> defineTimeForReviewPost(@PathVariable String taskId, @PathVariable String time) {
+	@GetMapping(path = "/defineTimeForReview/{taskId}", produces = "application/json")
+    public @ResponseBody ResponseEntity<?> defineTimeForReviewStart(@PathVariable String taskId) {
 
 		Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
 		String proccessInstanceId = task.getProcessInstanceId();
 		
-		Map<String, Object> properties = new HashMap<String, Object>();
-		properties.put("reviewing_deadline", time);
-		formService.submitTaskForm(task.getId(), properties);
+		TaskFormData data = formService.getTaskFormData(taskId);
+		List<FormField> fields =  data.getFormFields();
 		
 		
+        return new ResponseEntity<>(fields, HttpStatus.OK);
+    }
+	
+
+	@PostMapping(path = "/defineTimeForReview/{taskId}", produces = "application/json")
+    public @ResponseBody ResponseEntity<?> defineTimeForReviewPost(@PathVariable String taskId, @RequestBody List<FormSubmissionDto> fields) {
+
+		Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
+		String proccessInstanceId = task.getProcessInstanceId();
 		
-        return new ResponseEntity<>(null, HttpStatus.OK);
+		Map<String, Object> map = mapListToDto(fields, proccessInstanceId);
+		try {
+			formService.submitTaskForm(taskId, map);
+		} catch (FormFieldValidatorException e) {
+			// TODO Auto-generated catch block
+			//e.printStackTrace();
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
+		}
+		
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 	
 	@GetMapping(path = "/start/{taskId}", produces = "application/json")
@@ -269,14 +415,30 @@ public class ReviewingController {
 		
 		ReviewingDto dto = createReviewingDto(taskId);
 		
+		TaskFormData data = formService.getTaskFormData(taskId);
+		List<FormField> fields =  data.getFormFields();
+		// requestDto.setFields(fields);
+		
+		dto.setFields(fields);
+		
 		return new ResponseEntity<ReviewingDto>(dto, HttpStatus.OK);
 	}
 	
 	@PostMapping(path = "/reviewPost/{taskId}", produces = "application/json")
-	public @ResponseBody ResponseEntity<ReviewingDto> reviewPost (@PathVariable String taskId, @RequestBody ReviewingDto requestBody){
+	public @ResponseBody ResponseEntity<?> reviewPost (@PathVariable String taskId, @RequestBody ReviewingDto requestBody){
 		
 		Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
 		String proccessInstanceId = task.getProcessInstanceId();
+		
+		Map<String, Object> map = mapListToDto(requestBody.getFieldResults(), proccessInstanceId);
+		
+		String rev_comment = (String) map.get("rev_comment");
+		String rev_comment_editor = (String) map.get("rev_comment_editor");
+		String rev_decision = (String) map.get("rev_decision");
+//
+		requestBody.getOpinion().setComment(rev_comment);
+		requestBody.getOpinion().setCommentOnlyForEditor(rev_comment_editor);
+		requestBody.getOpinion().setOpinion(ArticleStatus.valueOf(rev_decision));
 
 		VariableInstance reviewVariableMf = runtimeService.createVariableInstanceQuery()
                 .processInstanceIdIn(proccessInstanceId)
@@ -296,7 +458,13 @@ public class ReviewingController {
 		
 		runtimeService.setVariable(subProcessExecutionId, "subProcessData", reviewArticleMfDto);
 		
-		taskService.complete(taskId);
+		try {
+			formService.submitTaskForm(taskId, map);
+		} catch (FormFieldValidatorException e) {
+			// TODO Auto-generated catch block
+			//e.printStackTrace();
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
+		}
 		
 		return new ResponseEntity<ReviewingDto>(new ReviewingDto(), HttpStatus.OK);
 	}
@@ -355,7 +523,7 @@ public class ReviewingController {
 		
 		OpinionAboutArticle opinion = new OpinionAboutArticle(article.getArticleId(), personOpinionId, ReviewingType.REVIEWING, ArticleStatus.ACCEPTED, "", "", articleProcessDto.getIteration());
 		
-		ReviewingDto reviewingDto = new ReviewingDto(articleDto, magazineDto, opinion, articleProcessDto.getAuthorsMessages(), true);
+		ReviewingDto reviewingDto = new ReviewingDto(articleDto, magazineDto, opinion, articleProcessDto.getAuthorsMessages(), true, null, null);
 		
 		
 //		VariableInstance user = runtimeService.createVariableInstanceQuery()
@@ -375,16 +543,36 @@ public class ReviewingController {
 //                .collect(Collectors.toSet());
 		
 		
-		
-		Set<String> subProcessExecutionIds = runtimeService.createVariableInstanceQuery()
-                .processInstanceIdIn(proccessInstanceId)
-                .variableName("task_initiator")
-                .list()
-                .stream()
-                .map(VariableInstance::getExecutionId)
-                .collect(Collectors.toSet());
-		
 		return reviewingDto;
+	}
+	
+	private HashMap<String, Object> mapListToDto(List<FormSubmissionDto> list, String processInstanceId)
+	{
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		for(FormSubmissionDto temp : list){
+			if(!temp.getMultiple().isEmpty()) {
+				String value = ((String)temp.getFieldValue()).split(":")[0];
+				this.runtimeService.setVariable(processInstanceId, temp.getFieldId() + "Multi", temp.getFieldValue());
+				map.put(temp.getFieldId(), value);
+			} else {
+				map.put(temp.getFieldId(), temp.getFieldValue());
+			}
+		}
+		
+		return map;
+	}
+	
+	public double getDistanceFromLatLonInKm(double lat1, double lon1, double lat2, double lon2) {
+	    long R = 6371; // Radius of the earth in km
+	    double dLat = Math.toRadians(lat2-lat1);  // deg2rad below
+	    double dLon = Math.toRadians(lon2-lon1); 
+	    double a = 
+	      Math.sin(dLat/2) * Math.sin(dLat/2) +
+	      Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) * 
+	      Math.sin(dLon/2) * Math.sin(dLon/2); 
+	    double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+	    double d = R * c; // Distance in km
+	    return d;
 	}
 	
 }

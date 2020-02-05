@@ -1,6 +1,7 @@
 package com.project.service.camunda.service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
@@ -39,20 +40,31 @@ public class ProcessNewMagazineData implements JavaDelegate {
 			NewMagazineFormResponseDto newMagazineDto = (NewMagazineFormResponseDto) execution.getVariable("newMagazineBasicInfo");
 
 			List<Long> scAreasId = new ArrayList<Long>();
-			newMagazineDto.getScience_area().forEach(scId -> {
+			String multiIds = (String) execution.getVariable("science_areaMulti");
+//			newMagazineDto.getScience_area().forEach(scId -> {
+//				scAreasId.add(Long.parseLong(scId));
+//			});
+			Arrays.asList(multiIds.split(":")).forEach(scId -> {
 				scAreasId.add(Long.parseLong(scId));
-			});
+			}); ;
 			
 			List<ScienceArea> selectedScienceAreas = unityOfWork.getScienceAreaRepository().findAllById(scAreasId);
 
 			String userId = (String) execution.getVariable("user");
 			UserSignedUp chiefEditor = unityOfWork.getUserSignedUpRepository().findByUserUsername(userId);
+			
+			String name = (String) execution.getVariable("name");
+			String issn_number = (String) execution.getVariable("issn_number");
+			String payment_option = (String) execution.getVariable("payment_option");
+			Long membership_price = (Long) execution.getVariable("membership_price");
+
+
 
 			Magazine newMagazine = Magazine.builder()
-					.ISSN(newMagazineDto.getIssn_number())
-					.membershipPrice(newMagazineDto.getMembership_price())
-					.name(newMagazineDto.getName())
-					.wayOfPayment(WayOfPayment.valueOf(newMagazineDto.getPayment_option()))
+					.ISSN(issn_number)
+					.membershipPrice(membership_price)
+					.name(name)
+					.wayOfPayment(WayOfPayment.valueOf(payment_option))
 					.scienceAreas(new HashSet<ScienceArea>(selectedScienceAreas))
 					.chiefEditor(chiefEditor)
 					.build();

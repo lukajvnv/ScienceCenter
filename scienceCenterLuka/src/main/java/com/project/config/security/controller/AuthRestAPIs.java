@@ -54,10 +54,10 @@ public class AuthRestAPIs {
    
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody SignInDto loginRequest) {
-    	User user = identityService.createUserQuery().userId(loginRequest.getUsername()).singleResult();
+//    	User user = identityService.createUserQuery().userId(loginRequest.getUsername()).singleResult();
     	UserSignedUp userDb = userSignedUpRepository.findByUserUsername(loginRequest.getUsername());
     	
-    	if(user == null || userDb == null) {
+    	if(/*user == null || */userDb == null) {
 			// return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 			return new ResponseEntity<>(new Response("Invalid username or password", HttpStatus.UNAUTHORIZED), HttpStatus.UNAUTHORIZED);
 		}

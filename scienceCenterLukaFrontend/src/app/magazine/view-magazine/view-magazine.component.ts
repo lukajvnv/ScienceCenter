@@ -40,7 +40,7 @@ export class ViewMagazineComponent implements OnInit {
   }
 
   newText(){
-    this.router.navigate(['new-article', this.magazine.magazineId])
+    this.router.navigate(['new-article-init', this.magazine.magazineId])
   }
 
   viewEditions(){

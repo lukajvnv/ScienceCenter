@@ -64,7 +64,7 @@ public class NewArticleUpdateFormChangesDataInitialization implements TaskListen
 		terms.stream().forEach(t -> termsDto.add(new TermDto(t.getTermId(), t.getTermName())));
 		coAuthors.stream().forEach(c -> coAuthorsDto.add(new UserDto(c.getUserId(), c.getFirstName(), c.getLastName(), c.getEmail(), c.getCity(), c.getCountry(), c.getUserUsername(), c.getVocation())));
 	
-		NewArticleRequestDto requestDto = new NewArticleRequestDto(taskId, proccessId, scienceAreasDto, termsDto, coAuthorsDto);
+		NewArticleRequestDto requestDto = new NewArticleRequestDto(taskId, proccessId, scienceAreasDto, termsDto, coAuthorsDto, null);
 
 		
 		ArticleProcessDto articleDto = (ArticleProcessDto) execution.getVariable("articleProcessDto");
@@ -84,13 +84,13 @@ public class NewArticleUpdateFormChangesDataInitialization implements TaskListen
 				oldSavedArticle.getArticleTitle(), oldSavedArticle.getArticleAbstract(), 
 				Long.toString(oldSavedArticle.getScienceArea().getScienceAreaId()), oldSavedArticle.getArticlePrice(), 
 				termsArticleDto, coAuthorsArticleDto, 
-				oldSavedArticle.getFileFormat(), decodedFile);
+				oldSavedArticle.getFileFormat(), decodedFile, null);
 		
 		String authorId = (String) execution.getVariable("user");
 		
 		OpinionAboutArticle opinion = new OpinionAboutArticle(articleDto.getArticleId(), authorId, ReviewingType.AUTHOR_RESPONSE, ArticleStatus.ACCEPTED, "", "", articleDto.getIteration());
 
-		UpdateArticleChangesDto updateArticleChangesDto = new UpdateArticleChangesDto(requestDto, responseDto, articleDto.getOpinions(), articleDto.getEditorOpinions(), opinion);
+		UpdateArticleChangesDto updateArticleChangesDto = new UpdateArticleChangesDto(requestDto, responseDto, articleDto.getOpinions(), articleDto.getEditorOpinions(), opinion, null, null);
 		
 		execution.setVariable("updateArticleChangesDto", updateArticleChangesDto);
 	}

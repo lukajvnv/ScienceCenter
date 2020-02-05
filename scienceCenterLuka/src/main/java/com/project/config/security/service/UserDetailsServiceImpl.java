@@ -34,17 +34,17 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public UserDetails loadUserByUsername(String username)
             throws UsernameNotFoundException {
 
-    	        User camundaUser = identityService.createUserQuery().userId(username).singleResult();
-        // Administrator admin = adminRepo.getByEmail(username);
+    	User camundaUser = identityService.createUserQuery().userId(username).singleResult();
         
-        if(camundaUser != null) {
-        	UserSignedUp dbUser = userSignedUpRepository.findByUserUsername(username);
-            return UserPrinciple.build(camundaUser, dbUser);      	
-        } else {
-        	return null;
-        }
+//        if(camundaUser != null) {
+//        	UserSignedUp dbUser = userSignedUpRepository.findByUserUsername(username);
+//            return UserPrinciple.build(camundaUser, dbUser);      	
+//        } else {
+//        	return null;
+//        }
         
-       
+        UserSignedUp dbUser = userSignedUpRepository.findByUserUsername(username);
+        return UserPrinciple.build(camundaUser, dbUser);  
        
     }
     

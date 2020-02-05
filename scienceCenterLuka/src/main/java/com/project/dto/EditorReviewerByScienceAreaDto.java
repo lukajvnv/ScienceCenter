@@ -25,4 +25,7 @@ public class EditorReviewerByScienceAreaDto implements Serializable{
 	private ScienceAreaDto scienceArea;
 	
 	private MagazineDto magazine;
+	
+	private Double longitude;
+	private Double latitude;
 }

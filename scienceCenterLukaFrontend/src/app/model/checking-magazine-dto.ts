@@ -4,4 +4,7 @@ export class CheckingMagazineDto {
 	  magazine;
 	 comment: string;
 	 valid: boolean;
+
+	 fields: any[] = [];
+	 fieldsResponse: any[] = [];
 }

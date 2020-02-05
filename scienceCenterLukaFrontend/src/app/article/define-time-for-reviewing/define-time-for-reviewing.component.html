@@ -1,37 +1,39 @@
 <div class="jumbotron">
     <div class="container">
-        <form  (ngSubmit)="postResult()" class="mt-3">
+        <form #f="ngForm" (ngSubmit)="postResult(f.value, f)" novalidate>
             <h2>Define time deadline for reaving</h2>
-            <div class="form-group row" >
-                <div class="col-lg-2">
-                    <label for="days">Days:</label>
-                </div>
-                <div class="col-lg-1">
-                    <input type="number" class="form-control" name="days" [(ngModel)]="days" 
-                     />
-                </div>
-                <div class="col-lg-2">
-                    <label for="hours">Hours:</label>
-                </div>
-                <div class="col-lg-1">
-                    <input type="number" class="form-control" name="hours" [(ngModel)]="hours" 
-                     />
-                </div>
-                <div class="col-lg-2">
-                    <label for="minutes">Minutes:</label>
-                </div>
-                <div class="col-lg-1">
-                    <input type="number" class="form-control" name="minutes" [(ngModel)]="minutes" 
-                     />
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-lg-6">
+            <div class="form-group row" *ngFor="let fieldWrapper of formFieldsWrapper">
+                <div class="col-lg-4"> <label for={{fieldWrapper.field.id}} class="col-lg-4">{{fieldWrapper.field.label}}</label></div>
     
+                <input class="col-lg-3 form-control" type="text" name={{fieldWrapper.field.id}}   *ngIf="fieldWrapper.field.type.name=='string'" [(ngModel)]="fieldWrapper.field.value.value">
+                <input class="col-lg-3" type="checkbox" name={{fieldWrapper.field.id}} ngModel   *ngIf="fieldWrapper.field.type.name=='boolean'" >
+                <input class="col-lg-3 form-control" type="number" name={{fieldWrapper.field.id}}  [(ngModel)]="fieldWrapper.field.value.value"  *ngIf="fieldWrapper.field.type.name=='long'" >
+    
+                 <select class="col-lg-3 form-control" name="{{fieldWrapper.field.id}}" *ngIf="fieldWrapper.field.type.name=='enum' && !fieldWrapper.field.properties['multiple']" [(ngModel)]="fieldWrapper.field.value.value"  >
+                  <option *ngFor="let val of fieldWrapper.dataSource" value={{val}}>
+                    {{fieldWrapper.field.type.values[val]}}
+                  </option>
+                </select>
+    
+                <select class="col-lg-3 form-control" name="{{fieldWrapper.field.id}}" *ngIf="fieldWrapper.field.type.name=='enum' && fieldWrapper.field.properties['multiple']" [(ngModel)]="fieldWrapper.field.value.value" multiple  size="{{fieldWrapper.dataSource.length}}">
+                    <option *ngFor="let val of fieldWrapper.dataSource" value={{val}}>
+                      {{fieldWrapper.field.type.values[val]}}
+                    </option>
+                  </select>
+    
+                <div  *ngIf="f.submitted" class="col-lg-3 text-danger">
+                    <div>{{fieldWrapper.errorField}}</div>
                 </div>
-                <div class="col-lg-3">
-                    <input type="submit" class="btn btn-lg btn-success" value="Submit">
-                </div>
+            </div>    
+            
+    
+            <div class="row">
+              <div class="col-lg-3">
+    
+              </div>
+              <div class="col-lg-3">
+                <input type="submit" class="btn btn-success form-control" value="Sign Up">
+              </div>
             </div>
         </form>
     </div>
