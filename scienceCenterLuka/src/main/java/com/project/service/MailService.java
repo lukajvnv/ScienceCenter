@@ -22,9 +22,9 @@ public class MailService {
 		
 		mimeMessage.setContent(email.getContent(), email.getMessageType());
 		helper.setTo(email.getSendTo());
-		helper.setSubject("Acount activation:");
+		helper.setSubject("Science center notification:");
 		helper.setFrom(email.getSendFrom());
-//		mailSender.send(mimeMessage);
+		//mailSender.send(mimeMessage);
 		System.out.println("saljem mejl");	
 	}
 }

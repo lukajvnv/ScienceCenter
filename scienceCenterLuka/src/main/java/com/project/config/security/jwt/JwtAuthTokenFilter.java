@@ -1,12 +1,15 @@
 package com.project.config.security.jwt;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.camunda.bpm.engine.IdentityService;
+import org.camunda.bpm.engine.identity.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,9 +30,37 @@ public class JwtAuthTokenFilter extends OncePerRequestFilter {
 
     @Autowired
     private UserDetailsServiceImpl userDetailsService;
+    
+    @Autowired
+    private IdentityService identityService;
 
     private static final Logger logger = LoggerFactory.getLogger(JwtAuthTokenFilter.class);
 
+//    @Override
+//    protected void doFilterInternal(HttpServletRequest request, 
+//    								HttpServletResponse response, 
+//    								FilterChain filterChain) 
+//    										throws ServletException, IOException {
+//        try {
+//            String jwt = getJwt(request);
+//            if (jwt!=null && tokenProvider.validateJwtToken(jwt)) {
+//                String username = tokenProvider.getUserNameFromJwtToken(jwt);
+//
+//                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+//                UsernamePasswordAuthenticationToken authentication 
+//                		= new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+//                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+//
+//                SecurityContextHolder.getContext().setAuthentication(authentication);
+//            }
+//        } catch (Exception e) {
+//            logger.error("Can NOT set user authentication -> Message: {}", e);
+//        }
+//
+//        filterChain.doFilter(request, response);
+//        
+//    }
+    
     @Override
     protected void doFilterInternal(HttpServletRequest request, 
     								HttpServletResponse response, 
@@ -38,14 +69,24 @@ public class JwtAuthTokenFilter extends OncePerRequestFilter {
         try {
             String jwt = getJwt(request);
             if (jwt!=null && tokenProvider.validateJwtToken(jwt)) {
+
                 String username = tokenProvider.getUserNameFromJwtToken(jwt);
-
-                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-                UsernamePasswordAuthenticationToken authentication 
-                		= new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                
+                User a = identityService.createUserQuery().userId(username).singleResult();
+            	if(a != null) {
+            		// identityService.setAuthentication(currentAuthentication);
+                    identityService.setAuthenticatedUserId(username);
+            	}
+                
+               
+//                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+//                UsernamePasswordAuthenticationToken authentication 
+//                		= new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+//                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+//
+//                SecurityContextHolder.getContext().setAuthentication(authentication);
+            } else {
+            	identityService.setAuthentication("guest", Arrays.asList(new String[] {"guest"}));
             }
         } catch (Exception e) {
             logger.error("Can NOT set user authentication -> Message: {}", e);

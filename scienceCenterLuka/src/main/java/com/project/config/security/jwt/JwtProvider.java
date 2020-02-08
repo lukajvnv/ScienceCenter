@@ -28,12 +28,22 @@ public class JwtProvider {
     @Value("86400")
     private int jwtExpiration;
 
-    public String generateJwtToken(Authentication authentication) {
-
-        UserPrinciple userPrincipal = (UserPrinciple) authentication.getPrincipal();
+//    public String generateJwtToken(Authentication authentication) {
+//
+//        UserPrinciple userPrincipal = (UserPrinciple) authentication.getPrincipal();
+//
+//        return Jwts.builder()
+//		                .setSubject((userPrincipal.getUsername()))
+//		                .setIssuedAt(new Date())
+//		                .setExpiration(new Date((new Date()).getTime() + jwtExpiration*1000))
+//		                .signWith(SignatureAlgorithm.HS512, jwtSecret)
+//		                .compact();
+//    }
+    
+    public String generateJwtToken(String username) {
 
         return Jwts.builder()
-		                .setSubject((userPrincipal.getUsername()))
+		                .setSubject((username))
 		                .setIssuedAt(new Date())
 		                .setExpiration(new Date((new Date()).getTime() + jwtExpiration*1000))
 		                .signWith(SignatureAlgorithm.HS512, jwtSecret)

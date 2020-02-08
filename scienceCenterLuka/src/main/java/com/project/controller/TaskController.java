@@ -11,6 +11,7 @@ import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.task.Task;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,7 +27,7 @@ import org.springframework.web.client.RestTemplate;
 import com.project.config.security.service.UserDetailsServiceImpl;
 import com.project.dto.TaskDto;
 import com.project.model.enums.Role;
-import com.project.model.user.UserSignedUp;
+import com.project.util.Response;
 import com.project.util.TaskUrlEndpoint;
 
 @RestController
@@ -38,39 +39,47 @@ public class TaskController {
 	private IdentityService identityService;
 	
 	@Autowired
-	private RuntimeService runtimeService;
-	
-	@Autowired
-	private HistoryService historyService;
-	
-	@Autowired
-	private RepositoryService repositoryService;
-	
-	@Autowired
 	private TaskService taskService;
-	
-	@Autowired
-	private FormService formService;
 	
 	@Autowired
 	private TaskUrlEndpoint taskUrlEndpoint;
 	
-	@Autowired
-	private UserDetailsServiceImpl userDetailService;
+	private final static String ADMIN_GROUP_ID = "camunda-admin";
+	private final static String GUEST_GROUP_ID = "guest";
+	private final static String REVIEWER_GROUP_ID = "reviewer";
+	private final static String EDITOR_GROUP_ID = "editor";
+	private final static String AUTHOR_GROUP_ID = "author";
+
+
 	
 	@GetMapping(path = "/assignedToUser/{processInstanceId}", produces = "application/json")
-    public @ResponseBody ResponseEntity<List<TaskDto>> get(@PathVariable String processInstanceId) {
+    public @ResponseBody ResponseEntity<?> get(@PathVariable String processInstanceId) {
 		
-		UserSignedUp loggedUser = userDetailService.getLoggedUser();
-		if(loggedUser == null ) {
-			
-			return null;
+//		UserSignedUp loggedUser = userDetailService.getLoggedUser();
+//		if(loggedUser == null ) {
+//			
+//			return null;
+//		}
+		
+		String username = "";
+		try {
+		   username = identityService.getCurrentAuthentication().getUserId(); //ako nema puca exception
+		} catch (Exception e) {
+			return new ResponseEntity<>(new Response("Cannot find logged user", HttpStatus.CONFLICT), HttpStatus.CONFLICT);
 		}
-		List<Task> tasks = taskService.createTaskQuery().taskAssignee(loggedUser.getUserUsername()).active().list();
+
 		
-		if(loggedUser.getRole() == Role.ADMIN) {
+		List<Task> tasks = taskService.createTaskQuery().taskAssignee(username).active().list();
+		
+		Group adminGroup = identityService.createGroupQuery().groupMember(username).groupName("camunda BPM Administrators").singleResult();
+		
+		if(adminGroup != null) {
 			tasks = taskService.createTaskQuery().active().list();
 		}
+		
+//		if(loggedUser.getRole() == Role.ADMIN) {
+//			tasks = taskService.createTaskQuery().active().list();
+//		}
 //		List<Task> tasks = taskService.createTaskQuery().active().list();
 
 		
@@ -95,6 +104,11 @@ public class TaskController {
 	@GetMapping(path = "/removeTask/{taskId}", produces = "application/json")
     public @ResponseBody ResponseEntity<?> delete(@PathVariable String taskId) throws URISyntaxException {
 		
+		boolean authorized = authorize(ADMIN_GROUP_ID);
+		if(!authorized) {
+			return new ResponseEntity<>(new Response("Cannot find logged user", HttpStatus.UNAUTHORIZED), HttpStatus.UNAUTHORIZED);
+		}
+		
 
 		Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
 		String processInstanceId = task.getProcessInstanceId();
@@ -108,5 +122,22 @@ public class TaskController {
 		
         return new ResponseEntity<>(HttpStatus.OK);
     }
+	
+	private boolean authorize(String requestedGroupId) {
+		String username = "";
+		try {
+		   username = identityService.getCurrentAuthentication().getUserId(); //ako nema puca exception
+		} catch (Exception e) {
+			return false;
+		}
+		
+		Group group = identityService.createGroupQuery().groupMember(username).groupId(requestedGroupId).singleResult();
+		
+		if(group != null) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 
 }

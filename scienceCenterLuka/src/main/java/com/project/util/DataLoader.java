@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.camunda.bpm.engine.IdentityService;
+import org.camunda.bpm.engine.identity.Group;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -38,6 +40,9 @@ public class DataLoader implements ApplicationRunner {
 //	@Autowired
 //	private DoiGeneratorRepository doiGeneratorRepository;
 	
+	@Autowired
+	private IdentityService identityService;
+	
 	@Override
 	public void run(ApplicationArguments args) throws Exception {
 		// TODO Auto-generated method stub
@@ -49,8 +54,8 @@ public class DataLoader implements ApplicationRunner {
 		
 		initMemberships();
 		
-		//initArticles();
-		test();
+		initCamunda();
+		
 	}
 	
 	private void initTermData() {
@@ -562,10 +567,34 @@ public class DataLoader implements ApplicationRunner {
 //		DoiGenerator dSaved = doiGeneratorRepository.save(d);
 	}
 	
-	private void test() {
-//		Magazine persistedMagazine2 = unityOfWork.getMagazineRepository().getOne(1l);
-//		String t = persistedMagazine2.getName();
-//		Set<EditorReviewerByScienceArea> list = persistedMagazine2.getEditorsReviewersByScienceArea();
 
+	
+	private void initCamunda() {
+//		Group authorGroup = identityService.newGroup("author");
+//		authorGroup.setName("Author");
+//		authorGroup.setType("");
+//		identityService.saveGroup(authorGroup);
+		
+//		identityService.createMembership("editorDemo2", "editor");
+//		identityService.createMembership("editorDemo3", "editor");
+//		identityService.createMembership("editorDemo4", "editor");
+//		identityService.createMembership("editorDemo5", "editor");
+//		
+//		identityService.createMembership("editorDemo", "reviewer");
+//		identityService.createMembership("editorDemo1", "reviewer");
+//		identityService.createMembership("editorDemo2", "reviewer");
+//		identityService.createMembership("editorDemo3", "reviewer");
+//		identityService.createMembership("editorDemo4", "reviewer");
+//		identityService.createMembership("editorDemo5", "reviewer");
+//		
+//		identityService.createMembership("reviewerDemo", "reviewer");
+//		identityService.createMembership("reviewerDemo1", "reviewer");
+//		identityService.createMembership("reviewerDemo2", "reviewer");
+//		identityService.createMembership("reviewerDemo3", "reviewer");
+//		identityService.createMembership("reviewerDemo4", "reviewer");
+//		identityService.createMembership("reviewerDemo5", "reviewer");
+
+
+		
 	}
 }

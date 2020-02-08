@@ -5,6 +5,8 @@ export class Magazine {
     magazineId: number;
 	issn: string;
 	name: string;
+
+	payment: string;
 	
 	scienceAreas: ScienceArea[];
     

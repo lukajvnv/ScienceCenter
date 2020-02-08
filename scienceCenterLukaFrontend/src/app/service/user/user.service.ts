@@ -35,7 +35,7 @@ export class UserService {
   }
 
   registerEditor(user) : Observable<any>{
-    return this.http.post(this.USERAPI + "newEditor", user);
+    return this.http.post(this.USERAPI + "newEditor", user, {headers: this.genHeader()});
   }
 
   startReviewerConfirmation(taskId): Observable<any>{

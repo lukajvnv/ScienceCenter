@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.project.model.Magazine;
+import com.project.model.enums.WayOfPayment;
 import com.project.repository.UnityOfWork;
 
 @Service
@@ -22,6 +23,10 @@ public class RetrieveMagazinePaymentType implements JavaDelegate {
 		Magazine magazine = unityOfWork.getMagazineRepository().getOne(magazineId);
 		
 		execution.setVariable("payment_type", magazine.getWayOfPayment().toString());
+		
+		if(magazine.getWayOfPayment().equals(WayOfPayment.PAID_ACCESS)) {
+			execution.setVariable("should_pay", false);
+		}
 	}
 
 }

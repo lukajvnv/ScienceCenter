@@ -1,5 +1,6 @@
 package com.project.service.camunda.service;
 
+import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
@@ -17,6 +18,9 @@ public class ProcessReviewerConfirmation implements JavaDelegate {
 	@Autowired
 	private UnityOfWork unityOfWork;
 	
+	@Autowired
+	private IdentityService identityService;
+	
 	@Override
 	public void execute(DelegateExecution execution) throws Exception {
 		// TODO Auto-generated method stub
@@ -29,6 +33,8 @@ public class ProcessReviewerConfirmation implements JavaDelegate {
 				UserSignedUp user = unityOfWork.getUserSignedUpRepository().findByUserUsername(code.getUserId());
 				user.setRole(Role.REVIEWER);
 				unityOfWork.getUserSignedUpRepository().save(user);
+				
+				identityService.createMembership(code.getUserId(), "reviewer");
 			}
 		} catch (Exception e) {
 			 throw new BpmnError("UnexpectedError", "UnexpectedfddError");

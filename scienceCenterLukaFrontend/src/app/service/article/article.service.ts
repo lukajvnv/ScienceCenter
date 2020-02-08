@@ -19,7 +19,6 @@ export class ArticleService {
   }
 
   startNewArticle(magazineId: string): Observable<any>{
-    //return this.http.get(this.ARTICLEAPI + 'start/'.concat(magazineId)); 
     return this.http.get(this.ARTICLEAPI + 'start/'.concat(magazineId), {headers: this.genHeader()}); 
   }
 
@@ -28,11 +27,11 @@ export class ArticleService {
   }
 
   postNewArticle(article, taskId) : Observable<any>{
-    return this.http.post(this.ARTICLEAPI + "postArticle/".concat(taskId), article);
+    return this.http.post(this.ARTICLEAPI + "postArticle/".concat(taskId), article, {headers: this.genHeader()});
   }
 
   analizeArticle(taskId: string){
-    return this.http.get(this.ARTICLEAPI + 'analizeBasic/'.concat(taskId));
+    return this.http.get(this.ARTICLEAPI + 'analizeBasic/'.concat(taskId), {headers: this.genHeader()});
   }
 
   analizeBasicResult(taskId: string, topicOk: boolean): Observable<any> {
@@ -40,11 +39,11 @@ export class ArticleService {
     if (!topicOk) {
       topic = 'false';
     }
-    return this.http.get(this.ARTICLEAPI + 'analizeBasicResult/'.concat(taskId, '?topicOk=', topic));
+    return this.http.get(this.ARTICLEAPI + 'analizeBasicResult/'.concat(taskId, '?topicOk=', topic), {headers: this.genHeader()});
   }
 
   analizeBasicResultPost(taskId: string, body): Observable<any> {
-    return this.http.post(this.ARTICLEAPI + 'analizeBasicResult/'.concat(taskId), body);
+    return this.http.post(this.ARTICLEAPI + 'analizeBasicResult/'.concat(taskId), body, {headers: this.genHeader()});
   }
 
   analizeTextResult(taskId: string, comment: string, textOk: boolean): Observable<any> {
@@ -52,27 +51,27 @@ export class ArticleService {
     if (!textOk) {
       text = 'false';
     }
-    return this.http.post(this.ARTICLEAPI + 'analizeTextResult/'.concat(taskId, '?textOk=', text), comment);
+    return this.http.post(this.ARTICLEAPI + 'analizeTextResult/'.concat(taskId, '?textOk=', text), comment, {headers: this.genHeader()});
   }
 
   analizeTextResultPost(taskId: string, body): Observable<any> {
-    return this.http.post(this.ARTICLEAPI + 'analizeTextResult/'.concat(taskId), body);
+    return this.http.post(this.ARTICLEAPI + 'analizeTextResult/'.concat(taskId), body, {headers: this.genHeader()});
   }
 
   startUpdateArticle(taskId: string): Observable<any>{
-    return this.http.get(this.ARTICLEAPI + 'updateArticleStart/'.concat(taskId)); 
+    return this.http.get(this.ARTICLEAPI + 'updateArticleStart/'.concat(taskId), {headers: this.genHeader()}); 
   }
 
   updateArticle(article, taskId) : Observable<any>{
-    return this.http.put(this.ARTICLEAPI + "updateArticle/".concat(taskId), article);
+    return this.http.put(this.ARTICLEAPI + "updateArticle/".concat(taskId), article, {headers: this.genHeader()});
   }
 
   startUpdateChangesArticle(taskId: string): Observable<any>{
-    return this.http.get(this.ARTICLEAPI + 'updateArticleChangesStart/'.concat(taskId)); 
+    return this.http.get(this.ARTICLEAPI + 'updateArticleChangesStart/'.concat(taskId), {headers: this.genHeader()}); 
   }
 
   updateChangesArticle(article, taskId) : Observable<any>{
-    return this.http.put(this.ARTICLEAPI + "updateArticleChangesPut/".concat(taskId), article);
+    return this.http.put(this.ARTICLEAPI + "updateArticleChangesPut/".concat(taskId), article, {headers: this.genHeader()});
   }
 
   uploadFile(taskId, file): Observable<any> {

@@ -29,9 +29,10 @@ export class SignInComponent implements OnInit {
     x.subscribe(res => {
       console.log(res);
           this.tokenStorage.saveToken(res.accessToken);
-          this.tokenStorage.saveUsername(res.username);
-          this.tokenStorage.saveAuthorities(res.authorities);
-          this.tokenStorage.saveUser(res.user_id);
+          // this.tokenStorage.saveUsername(res.username);
+          // this.tokenStorage.saveAuthorities(res.authorities);
+          // this.tokenStorage.saveUser(res.user_id);
+          this.tokenStorage.saveGroups(res.groups);
 
           this.toastrService.success('Welcome:' + this.signInDto.username + '!');
           this.router.navigate(['home']);

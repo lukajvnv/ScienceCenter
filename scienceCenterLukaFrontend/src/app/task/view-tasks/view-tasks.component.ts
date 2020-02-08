@@ -3,6 +3,7 @@ import { TaskService } from 'src/app/service/task/task.service';
 import { Router } from '@angular/router';
 import { Task } from 'src/app/model/task';
 import { StorageService } from 'src/app/service/auth-storage/storage.service';
+import { AdminGuard } from 'src/app/path-guards/admin.guard';
 
 @Component({
   selector: 'app-view-tasks',
@@ -13,11 +14,13 @@ export class ViewTasksComponent implements OnInit {
 
   private tasks: Task[] = null;
   private role: string;
+  private admin: boolean;
 
   constructor(private taskService: TaskService, private router: Router, private tokenService: StorageService) { }
 
   ngOnInit() {
-    this.role = this.tokenService.getRole();
+    // this.role = this.tokenService.getRole();
+    this.admin = this.tokenService.isAdmin();
     let x = this.taskService.getAllUserTask(2);
 
     x.subscribe(res => {

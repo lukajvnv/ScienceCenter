@@ -23,7 +23,7 @@
                     </tr>
                     <tr>
                         <th>Key terms</th>
-                        <td><span *ngFor="let term of displayArticle.keyTerms" class="badge badge-primary ml-3">{{term.termName}}</span></td>
+                        <td><span *ngFor="let term of displayArticle.displayArticle.keyTerms" class="badge badge-primary ml-3">{{term.termName}}</span></td>
                     </tr>
                     <tr *ngIf="article">
                         <th>
@@ -45,7 +45,7 @@
                             <th>Last name</th>
                         </tr>
                     </thead>
-                    <tr *ngFor="let coathor of displayArticle.coAuthors">
+                    <tr *ngFor="let coathor of displayArticle.displayArticle.coAuthors">
                         <td>{{coathor.firstName}}</td>
                         <td>{{coathor.lastName}}</td>
                     </tr>

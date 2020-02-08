@@ -53,7 +53,7 @@ public class RetrieveReviewers implements JavaDelegate {
 				scienceAreasDto.add(new ScienceAreaDto(sc.getScienceAreaId(), sc.getScienceAreaName(), sc.getScienceAreaCode()));
 			});
 			
-			MagazineDto mDto = new MagazineDto(magazine.getMagazineId(), magazine.getISSN(), magazine.getName(), scienceAreasDto);
+			MagazineDto mDto = new MagazineDto(magazine.getMagazineId(), magazine.getISSN(), magazine.getName(),magazine.getWayOfPayment(), scienceAreasDto);
 			
 			
 			

@@ -14,6 +14,7 @@ import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.form.FormField;
 import org.camunda.bpm.engine.form.TaskFormData;
+import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.impl.form.validator.FormFieldValidationException;
 import org.camunda.bpm.engine.impl.form.validator.FormFieldValidatorException;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
@@ -75,6 +76,12 @@ public class MagazineController {
 	
 	@Autowired
 	MagazineService magazineService;
+	
+	private final static String ADMIN_GROUP_ID = "camunda-admin";
+	private final static String GUEST_GROUP_ID = "guest";
+	private final static String REVIEWER_GROUP_ID = "reviewer";
+	private final static String EDITOR_GROUP_ID = "editor";
+	private final static String AUTHOR_GROUP_ID = "author";
 	
 	
 	@GetMapping(path = "/start", produces = "application/json")
@@ -226,9 +233,14 @@ public class MagazineController {
         return new ResponseEntity<NewMagazineFormEditorsReviewersRequestDto>(revEditorDto, HttpStatus.OK);
     }
 	
-	@PreAuthorize("hasAuthority('ADMIN')")
+	//@PreAuthorize("hasAuthority('ADMIN')")
 	@GetMapping(path = "/checkingMagazineData/{taskId}", produces = "application/json")
-    public @ResponseBody CheckingMagazineDataDto checkingMagazineData(@PathVariable String taskId) {
+    public @ResponseBody ResponseEntity<?> checkingMagazineData(@PathVariable String taskId) {
+		boolean authorized = authorize(ADMIN_GROUP_ID);
+		if(!authorized) {
+			return new ResponseEntity<>(new Response("Cannot find logged user", HttpStatus.UNAUTHORIZED), HttpStatus.UNAUTHORIZED);
+		}
+		
 		Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
 		String processInstanceId = task.getProcessInstanceId();
 		
@@ -240,12 +252,17 @@ public class MagazineController {
 
 		request.setFields(properties);
 		
-        return request;
+        return new ResponseEntity<>(request, HttpStatus.OK);
     }
 	
-	@PreAuthorize("hasAuthority('ADMIN')")
+	//@PreAuthorize("hasAuthority('ADMIN')")
 	@PostMapping(path = "/checkingMagazineData/{taskId}", produces = "application/json")
     public @ResponseBody ResponseEntity<?> checkingMagazineData(@RequestBody CheckingMagazineDataDto dto, @PathVariable String taskId) {
+		
+		boolean authorized = authorize(ADMIN_GROUP_ID);
+		if(!authorized) {
+			return new ResponseEntity<>(new Response("Cannot find logged user", HttpStatus.UNAUTHORIZED), HttpStatus.UNAUTHORIZED);
+		}
 		
 		Map<String, Object> properties = this.mapListToDto(dto.getFieldsResponse(), "");
 		formService.submitTaskForm(taskId, properties);
@@ -282,6 +299,23 @@ public class MagazineController {
 //		
 //		return new MagazineDto(magazine.getMagazineId(), magazine.getISSN(), magazine.getName(), areasDto);		
 //	}
+	
+	private boolean authorize(String requestedGroupId) {
+		String username = "";
+		try {
+		   username = identityService.getCurrentAuthentication().getUserId(); //ako nema puca exception
+		} catch (Exception e) {
+			return false;
+		}
+		
+		Group group = identityService.createGroupQuery().groupMember(username).groupId(requestedGroupId).singleResult();
+		
+		if(group != null) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 		
 	private HashMap<String, Object> mapListToDto(List<FormSubmissionDto> list, String processInstanceId)
 	{

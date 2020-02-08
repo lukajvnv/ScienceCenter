@@ -32,18 +32,18 @@ public class GenerateHash implements JavaDelegate{
 			NewUserResponseDto registrationDto = (NewUserResponseDto) execution.getVariable("registration");
 					
 			List<FormSubmissionDto> fields = registrationDto.getFormFields();
-			Map<String, String> map = new HashMap<String, String>();
+			Map<String, Object> map = new HashMap<String, Object>();
 			fields.forEach(f -> {
-				map.put(f.getFieldId(), (String)f.getFieldValue());
+				map.put(f.getFieldId(), f.getFieldValue());
 			});
 			
 			String date = DateConverter.encodeT(new Timestamp(System.currentTimeMillis()));
 			String textToHash = map.get("username") + date + map.get("password");
 			
 			UserActivationCode code = new UserActivationCode();
-			code.setUserId(map.get("username"));
+			code.setUserId((String)map.get("username"));
 			code.setCode(hash(textToHash));
-			code.setEmail(map.get("email"));
+			code.setEmail((String)map.get("email"));
 			
 			execution.setVariable("activation_code", code);
 		} catch (Exception e) {

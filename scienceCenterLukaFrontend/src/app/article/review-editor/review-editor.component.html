@@ -10,7 +10,6 @@
             <div class="col-lg-3 list-group">
                 <h3>Authors' comments</h3>
                 <a *ngFor="let opinion of reviewingEditorDto.authorsMessages" (click)="displayEditorReview = false; opinionToDisplay = opinion;"  class="list-group-item list-group-item-action" >{{opinion.personOpinionId}}' opinion, iteration {{opinion.iteration}}</a>
-                <a (click)="displayEditorReview = true; opinionToDisplay = undefined;"  class="list-group-item list-group-item-action" >Write your opinion</a>
             </div>
             <div class="col-lg-9">
                 <div class="row">

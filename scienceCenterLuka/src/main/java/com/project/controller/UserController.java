@@ -12,6 +12,7 @@ import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.form.FormField;
 import org.camunda.bpm.engine.form.TaskFormData;
+import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -70,6 +71,12 @@ public class UserController {
 	
 	@Autowired
 	private PasswordEncoder passwordEncoder;
+	
+	private final static String ADMIN_GROUP_ID = "camunda-admin";
+	private final static String GUEST_GROUP_ID = "guest";
+	private final static String REVIEWER_GROUP_ID = "reviewer";
+	private final static String EDITOR_GROUP_ID = "editor";
+	private final static String AUTHOR_GROUP_ID = "author";
 	
 	@GetMapping(path = "/register", produces = "application/json")
     public @ResponseBody FormFieldsDto get() {
@@ -163,11 +170,14 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 	
-	@PreAuthorize("hasAuthority('ADMIN')")
+	// @PreAuthorize("hasAuthority('ADMIN')")
 	@GetMapping(path = "/reviewerConfirmationStart/{taskId}", produces = "application/json")
-    public @ResponseBody ReviewerConfirmationDto reviewerConfirmation( @PathVariable("taskId") String taskId) {
-		//provera da li korisnik sa id-jem pera postoji
-		//List<User> users = identityService.createUserQuery().userId("pera").list();
+    public @ResponseBody ResponseEntity<?> reviewerConfirmation( @PathVariable("taskId") String taskId) {
+		
+		boolean authorized = authorize(ADMIN_GROUP_ID);
+		if(!authorized) {
+			return new ResponseEntity<>(new Response("Cannot find logged user", HttpStatus.UNAUTHORIZED), HttpStatus.UNAUTHORIZED);
+		}
 		
 		Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
 		String processInstanceId = task.getProcessInstanceId();
@@ -175,13 +185,18 @@ public class UserController {
 		// runtimeService.removeVariable(processInstanceId, "confirmationReviewerDto");
 		
 		
-        return response;
+        return new ResponseEntity<ReviewerConfirmationDto> (response, HttpStatus.OK);
     }
 	
+	// @PreAuthorize("hasAuthority('ADMIN')")
 	@GetMapping(path = "/reviewerConfirmationEnd/{taskId}", produces = "application/json")
     public @ResponseBody ResponseEntity<?> reviewerConfirmation( @PathVariable("taskId") String taskId, @RequestParam("confirm") boolean confirm) {
-		//provera da li korisnik sa id-jem pera postoji
-		//List<User> users = identityService.createUserQuery().userId("pera").list();
+		
+		boolean authorized = authorize(ADMIN_GROUP_ID);
+		if(!authorized) {
+			return new ResponseEntity<>(new Response("Cannot find logged user", HttpStatus.UNAUTHORIZED), HttpStatus.UNAUTHORIZED);
+		}
+		
 		Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
 	
 		Map<String, Object> properties = new HashMap<String, Object>();
@@ -206,6 +221,11 @@ public class UserController {
 	@PostMapping(path = "/newEditor", produces = "application/json")
     public @ResponseBody ResponseEntity<?> newEditor(@RequestBody NewEditorDto newEditor) {
 		
+		boolean authorized = authorize(ADMIN_GROUP_ID);
+		if(!authorized) {
+			return new ResponseEntity<>(new Response("Cannot find logged user", HttpStatus.UNAUTHORIZED), HttpStatus.UNAUTHORIZED);
+		}
+		
 		UserSignedUp editor = UserSignedUp.builder()
 				.firstName(newEditor.getFirstName())
 				.lastName(newEditor.getLastName())
@@ -221,36 +241,36 @@ public class UserController {
 		
 		unityOfWork.getUserSignedUpRepository().save(editor);
 		
+		User newUser =  identityService.newUser(newEditor.getUsername());
+		newUser.setEmail(newEditor.getEmail());
+		newUser.setFirstName(newEditor.getFirstName());
+		newUser.setLastName(newEditor.getLastName());
+		newUser.setPassword(newEditor.getPassword());
+		identityService.saveUser(newUser);
+		
+		identityService.createMembership(newEditor.getUsername(), "editor");
+		identityService.createMembership(newEditor.getUsername(), "reviewer");
+
+		
         return new ResponseEntity<>(HttpStatus.OK);
     }
 	
-//	@PostMapping(path = "/signIn", produces = "application/json")
-//    public @ResponseBody ResponseEntity<?> signIn(@RequestBody SignInDto signInDto) {
-//		User user = identityService.createUserQuery().userId(signInDto.getUsername()).singleResult();
-//		if(user == null) {
-//			return new ResponseEntity(HttpStatus.BAD_REQUEST);
-//		}
-//		
-//		boolean ok = identityService.checkPassword(user.getId(), signInDto.getPassword());
-//		if(!ok) {
-//			
-//		}
-//		
-//	
-//		identityService.setAuthenticatedUserId(user.getId());
-//		// identityService.setAuthentication("demo", Arrays.asList(new String[]{"camunda-admin"}));
-//		String s= identityService.getCurrentAuthentication().getUserId(); //ako nema puca exception
-//		
-//        return new ResponseEntity<>(HttpStatus.OK);
-//    }
-//	
-//	@GetMapping(path = "/signOut", produces = "application/json")
-//    public @ResponseBody ResponseEntity signOut() {
-//		
-//		identityService.clearAuthentication();
-//
-//        return new ResponseEntity<>(HttpStatus.OK);
-//    }
+	private boolean authorize(String requestedGroupId) {
+		String username = "";
+		try {
+		   username = identityService.getCurrentAuthentication().getUserId(); //ako nema puca exception
+		} catch (Exception e) {
+			return false;
+		}
+		
+		Group group = identityService.createGroupQuery().groupMember(username).groupId(requestedGroupId).singleResult();
+		
+		if(group != null) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 	
 	private HashMap<String, Object> mapListToDto(List<FormSubmissionDto> list)
 	{

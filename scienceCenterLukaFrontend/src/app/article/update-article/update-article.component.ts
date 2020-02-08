@@ -57,9 +57,9 @@ export class UpdateArticleComponent implements OnInit {
           this.scArea = this.magScArea.filter(sc => sc.scienceAreaId === +this.articleData.articleScienceArea)[0];
         
         
-          let t1 = EncodeDecode.b64DecodeUnicode(this.articleData.file.toString());
-          const blob1 = new Blob([t1], { type: 'application/octet-stream' });
-          this.fileUrl = this.sanitizer.bypassSecurityTrustResourceUrl(window.URL.createObjectURL(blob1));
+          // let t1 = EncodeDecode.b64DecodeUnicode(this.articleData.file.toString());
+          // const blob1 = new Blob([t1], { type: 'application/octet-stream' });
+          // this.fileUrl = this.sanitizer.bypassSecurityTrustResourceUrl(window.URL.createObjectURL(blob1));
         },
         err => {
           console.log("Error occured");
@@ -141,7 +141,7 @@ export class UpdateArticleComponent implements OnInit {
   }
 
   download() {
-    let articleId: number = this.update.articleIdk;
+    let articleId: number = this.update.articleId;
     this.articleService.downloadFile(articleId).subscribe( (data: Blob )=> {
 			//let blob:any = new Blob([response.blob()], { type: 'text/json; charset=utf-8' });
 			//const url= window.URL.createObjectURL(blob);

@@ -307,7 +307,7 @@
             <camunda:value id="REJECTED" name="REJECTED" />
             <camunda:value id="DO_MINOR_CHANGES" name="DO_MINOR_CHANGES" />
             <camunda:value id="DO_MAJOR_CHANGES" name="DO_MAJOR_CHANGES" />
-            <camunda:value id="ADD_ADDITIONAL_EDITOR" name="ADD_ADDITIONAL_EDITOR" />
+            <camunda:value id="ADD_ADDITIONAL_REVIEWER" name="ADD_ADDITIONAL_REVIEWER" />
           </camunda:formField>
           <camunda:formField id="article_editor_comment" label="Comment:" type="string">
             <camunda:properties>
@@ -676,7 +676,7 @@
     </bpmn:serviceTask>
     <bpmn:sequenceFlow id="SequenceFlow_163f9xj" sourceRef="proccess_editor_reviewing" targetRef="ExclusiveGateway_1bi5mtk" />
     <bpmn:sequenceFlow id="SequenceFlow_1bf54hx" name="aditional reviewing" sourceRef="ExclusiveGateway_1bi5mtk" targetRef="add_additional_reviewing">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${article_decision == "ADD_ADDITIONAL_EDITOR"}</bpmn:conditionExpression>
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${article_decision == "ADD_ADDITIONAL_REVIEWER"}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:exclusiveGateway id="ExclusiveGateway_1khco9i" name="Accept/reject?">
       <bpmn:incoming>SequenceFlow_1tos7hi</bpmn:incoming>

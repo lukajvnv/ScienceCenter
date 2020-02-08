@@ -9,7 +9,7 @@
                 <th>Task id</th>
                 <th>Assignee</th>
                 <th>Detail</th>
-                <th *ngIf="role === 'ADMIN'">Delete</th>
+                <th *ngIf="">Delete</th>
             </thead>
             <tbody>
                 <tr *ngFor="let task of tasks" > 
@@ -17,7 +17,7 @@
                     <td>{{task.taskDefinitionId}}</td>
                     <td>{{task.assignee}}</td>
                     <td><button (click)="view(task)">Complete</button></td>
-                    <td *ngIf="role === 'ADMIN'"><button (click)="removeTask(task)">Remove</button></td>
+                    <td *ngIf="admin"><button (click)="removeTask(task)">Remove</button></td>
                 </tr>
             </tbody>
         </table>

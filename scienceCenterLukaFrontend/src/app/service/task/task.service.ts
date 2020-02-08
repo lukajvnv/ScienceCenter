@@ -26,6 +26,6 @@ export class TaskService {
   }
 
   removeTask(taskId: string): Observable<any> {
-    return this.http.get(this.TASKAPI + 'removeTask/'.concat(taskId));
+    return this.http.get(this.TASKAPI + 'removeTask/'.concat(taskId), {headers: this.genHeader()});
   }
 }

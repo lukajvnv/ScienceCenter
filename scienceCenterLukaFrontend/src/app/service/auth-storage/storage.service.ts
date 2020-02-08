@@ -5,7 +5,15 @@ import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 const TOKEN_KEY = 'AuthToken';
 const USERNAME_KEY = 'AuthUsername';
 const AUTHORITIES_KEY = 'AuthAuthorities';
+const CAMUNDA_GROUPS = 'CamundaGroups';
 const USER_KEY = 'AuthUser;';
+
+const editor_id = 'editor';
+const admin_id = 'camunda-admin';
+const reviewer_id = 'reviewer';
+const guest_id = 'guest';
+const author_id = 'author';
+
 
 @Injectable({
   providedIn: 'root'
@@ -17,6 +25,8 @@ export class StorageService {
   isLoggedUser: Subject<boolean> = new Subject<boolean>();
   role: Subject<string> = new Subject<string>();
 
+  groups: Subject<string[]> = new Subject<string[]>();
+
 
   constructor() { }
 
@@ -24,6 +34,7 @@ export class StorageService {
     window.sessionStorage.clear();
     this.isLoggedUser.next(false);
     this.role.next(undefined);
+    this.groups.next([]);
   }
 
   public saveToken(token: string) {
@@ -49,32 +60,63 @@ export class StorageService {
     return sessionStorage.getItem(USERNAME_KEY);
   }
 
-  public saveAuthorities(authorities: string[]) {
-    window.sessionStorage.removeItem(AUTHORITIES_KEY);
-    window.sessionStorage.setItem(AUTHORITIES_KEY, JSON.stringify(authorities));
+  // public saveAuthorities(authorities: string[]) {
+  //   window.sessionStorage.removeItem(AUTHORITIES_KEY);
+  //   window.sessionStorage.setItem(AUTHORITIES_KEY, JSON.stringify(authorities));
 
-    this.role.next(this.getRole());
+  //   this.role.next(this.getRole());
+  // }
+
+  public saveGroups(groups: string[]) {
+    window.sessionStorage.removeItem(CAMUNDA_GROUPS);
+    window.sessionStorage.setItem(CAMUNDA_GROUPS, JSON.stringify(groups));
+
+    this.groups.next(this.getGroups());
   }
 
-  public getAuthorities(): string[] {
+  // public getAuthorities(): string[] {
+  //   this.roles = [];
+
+  //   if (sessionStorage.getItem(TOKEN_KEY)) {
+  //     JSON.parse(sessionStorage.getItem(AUTHORITIES_KEY)).forEach(authority => {
+  //       this.roles.push(authority.authority);
+  //     });
+  //   }
+
+  //   return this.roles;
+  // }
+
+  public getGroups(): string[] {
     this.roles = [];
 
     if (sessionStorage.getItem(TOKEN_KEY)) {
-      JSON.parse(sessionStorage.getItem(AUTHORITIES_KEY)).forEach(authority => {
-        this.roles.push(authority.authority);
+      JSON.parse(sessionStorage.getItem(CAMUNDA_GROUPS)).forEach(group => {
+        this.roles.push(group);
       });
     }
 
     return this.roles;
   }
 
-  public getRole(): string {
-    return this.getAuthorities()[0];
+  // public getRole(): string {
+  //   return this.getAuthorities()[0];
+  // }
+
+  public isAdmin(): boolean {
+    return this.getGroups().includes(admin_id);
   }
 
-  public hasRole(role: string): boolean{
-    return this.getAuthorities().filter(a => a === role) ? true : false; 
+  public isEditor(): boolean {
+    return this.getGroups().includes(editor_id);
   }
+
+  public isReviewer(): boolean {
+    return this.getGroups().includes(reviewer_id);
+  }
+
+  // public hasRole(role: string): boolean{
+  //   return this.getAuthorities().filter(a => a === role) ? true : false; 
+  // }
 
   public saveUser(user: number) {
     window.sessionStorage.removeItem(USER_KEY);

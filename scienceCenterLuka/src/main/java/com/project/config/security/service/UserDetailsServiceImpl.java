@@ -17,6 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.project.model.user.UserSignedUp;
 import com.project.repository.UserSignedUpRepository;
 
+// Ne koristi se OVO!!!!!!!!!!!!!!!
+
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
 
@@ -58,6 +60,17 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 			return null;
 		}
 		return userSignedUpRepository.findByUserUsername(username);
+    }
+    
+    public User getLoggedUserCamunda() {
+    	try {
+			String username = identityService.getCurrentAuthentication().getUserId(); //ako nema puca exception
+			System.out.println(username);
+			return identityService.createUserQuery().userId(username).singleResult();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			return null;
+		}
     }
     
 }

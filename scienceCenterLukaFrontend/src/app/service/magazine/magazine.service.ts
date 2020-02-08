@@ -51,8 +51,12 @@ export class MagazineService {
     return this.http.post(this.MAGAZINEAPI + "checkingMagazineData/".concat(taskId), response, {headers: this.genHeader()});
   }
 
+  // getAllMagazines(): Observable<any>{
+  //   return this.http.get('http://localhost:8085/article/magazines', {headers: this.genHeader()}); 
+  // }
+
   getAllMagazines(): Observable<any>{
-    return this.http.get('http://localhost:8085/article/magazines', {headers: this.genHeader()}); 
+    return this.http.get('http://localhost:8085/article/magazines'); 
   }
 
   getMagazine(magazineId: string): Observable<any>{

@@ -25,7 +25,6 @@ import { NewMagazineComponent } from './magazine/new-magazine/new-magazine.compo
 import { TaskService } from './service/task/task.service';
 import { ViewMagazinesComponent } from './magazine/view-magazines/view-magazines.component';
 import { ViewTasksComponent } from './task/view-tasks/view-tasks.component';
-import { ViewTaskComponent } from './task/view-task/view-task.component';
 import { UpdateMagazineComponent } from './magazine/update-magazine/update-magazine.component';
 import { ViewMagazineComponent } from './magazine/view-magazine/view-magazine.component';
 import { NewArticleComponent } from './article/new-article/new-article.component';
@@ -139,7 +138,6 @@ const routes = [
     NewMagazineComponent,
     ViewMagazinesComponent,
     ViewTasksComponent,
-    ViewTaskComponent,
     UpdateMagazineComponent,
     ViewMagazineComponent,
     NewArticleComponent,

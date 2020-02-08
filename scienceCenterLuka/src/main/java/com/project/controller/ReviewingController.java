@@ -15,6 +15,7 @@ import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.form.FormField;
 import org.camunda.bpm.engine.form.TaskFormData;
+import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.impl.form.type.EnumFormType;
 import org.camunda.bpm.engine.impl.form.validator.FormFieldValidatorException;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -56,6 +57,7 @@ import com.project.model.user.UserSignedUp;
 import com.project.repository.UnityOfWork;
 import com.project.service.ArticleService;
 import com.project.service.MagazineService;
+import com.project.util.Response;
 
 @RestController
 @RequestMapping("/review")
@@ -89,8 +91,19 @@ public class ReviewingController {
 	@Autowired
 	private ArticleService articleService;
 	
+	private final static String ADMIN_GROUP_ID = "camunda-admin";
+	private final static String GUEST_GROUP_ID = "guest";
+	private final static String REVIEWER_GROUP_ID = "reviewer";
+	private final static String EDITOR_GROUP_ID = "editor";
+	private final static String AUTHOR_GROUP_ID = "author";
+	
 	@GetMapping(path = "/addReviewer/{taskId}", produces = "application/json")
-    public @ResponseBody ResponseEntity<AddReviewersDto> addReviewer(@PathVariable String taskId) {
+    public @ResponseBody ResponseEntity<?> addReviewer(@PathVariable String taskId) {
+		
+		boolean authorized = authorize(EDITOR_GROUP_ID);
+		if(!authorized) {
+			return new ResponseEntity<>(new Response("Cannot find logged user", HttpStatus.UNAUTHORIZED), HttpStatus.UNAUTHORIZED);
+		}
 
 		Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
 		String proccessInstanceId = task.getProcessInstanceId();
@@ -107,7 +120,12 @@ public class ReviewingController {
 		
 	@PostMapping(path = "/addReviewer/{taskId}", produces = "application/json")
     public @ResponseBody ResponseEntity<?> addReviewer(@PathVariable String taskId, @RequestBody List<FormSubmissionDto> response) {
-
+		
+		boolean authorized = authorize(EDITOR_GROUP_ID);
+		if(!authorized) {
+			return new ResponseEntity<>(new Response("Cannot find logged user", HttpStatus.UNAUTHORIZED), HttpStatus.UNAUTHORIZED);
+		}
+		
 		Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
 		
 		String proccessInstanceId = task.getProcessInstanceId();
@@ -129,7 +147,12 @@ public class ReviewingController {
 	
 	@PostMapping(path = "/filterReviewer/{taskId}", produces = "application/json")
     public @ResponseBody ResponseEntity<?> filterReviewer(@PathVariable String taskId, @RequestBody ReviewerFilterDto searchRequest) {
-
+		
+		boolean authorized = authorize(EDITOR_GROUP_ID);
+		if(!authorized) {
+			return new ResponseEntity<>(new Response("Cannot find logged user", HttpStatus.UNAUTHORIZED), HttpStatus.UNAUTHORIZED);
+		}
+		
 		Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
 		
 		String proccessInstanceId = task.getProcessInstanceId();
@@ -203,7 +226,12 @@ public class ReviewingController {
     }
 	
 	@GetMapping(path = "/addReviewerWhenError/{taskId}", produces = "application/json")
-    public @ResponseBody ResponseEntity<AddReviewersDto> addReviewerWhenError(@PathVariable String taskId) {
+    public @ResponseBody ResponseEntity<?> addReviewerWhenError(@PathVariable String taskId) {
+		
+		boolean authorized = authorize(EDITOR_GROUP_ID);
+		if(!authorized) {
+			return new ResponseEntity<>(new Response("Cannot find logged user", HttpStatus.UNAUTHORIZED), HttpStatus.UNAUTHORIZED);
+		}
 
 		Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
 		String proccessInstanceId = task.getProcessInstanceId();
@@ -220,7 +248,12 @@ public class ReviewingController {
 	
 	@PostMapping(path = "/addReviewerWhenError/{taskId}", produces = "application/json")
     public @ResponseBody ResponseEntity<?> addReviewerWhenErrorPost(@PathVariable String taskId, @RequestBody AddReviewersDto response) {
-
+		
+		boolean authorized = authorize(EDITOR_GROUP_ID);
+		if(!authorized) {
+			return new ResponseEntity<>(new Response("Cannot find logged user", HttpStatus.UNAUTHORIZED), HttpStatus.UNAUTHORIZED);
+		}
+		
 		Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
 		
 		String proccessInstanceId = task.getProcessInstanceId();
@@ -264,21 +297,14 @@ public class ReviewingController {
         return new ResponseEntity<ArticleDto>(new ArticleDto(), HttpStatus.OK);
     }
 	
-//	@GetMapping(path = "/addAdditionalReviewer/{taskId}", produces = "application/json")
-//    public @ResponseBody ResponseEntity<AddReviewersDto> addAdditionalReviewer(@PathVariable String taskId) {
-//
-//		Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
-//		String proccessInstanceId = task.getProcessInstanceId();
-//		
-//		AddReviewersDto requestDto = (AddReviewersDto) runtimeService.getVariable(proccessInstanceId, "addReviewersDto");
-//		// runtimeService.removeVariable(proccessInstanceId, "addReviewersDto");
-//		
-//        return new ResponseEntity<AddReviewersDto>(requestDto, HttpStatus.OK);
-//    }
-	
 	@PostMapping(path = "/addAdditionalReviewer/{taskId}", produces = "application/json")
     public @ResponseBody ResponseEntity<?> addAdditionalReviewerPost(@PathVariable String taskId, @RequestBody AddReviewersDto response) {
-
+		
+		boolean authorized = authorize(EDITOR_GROUP_ID);
+		if(!authorized) {
+			return new ResponseEntity<>(new Response("Cannot find logged user", HttpStatus.UNAUTHORIZED), HttpStatus.UNAUTHORIZED);
+		}
+		
 		Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
 		String proccessInstanceId = task.getProcessInstanceId();
 		
@@ -298,7 +324,12 @@ public class ReviewingController {
     }
 	
 	@GetMapping(path = "/startReviewingAdditional/{taskId}", produces = "application/json")
-	public @ResponseBody ResponseEntity<ReviewingDto> reviewAdditional (@PathVariable String taskId){
+	public @ResponseBody ResponseEntity<?> reviewAdditional (@PathVariable String taskId){
+		
+		boolean authorized = authorize(REVIEWER_GROUP_ID);
+		if(!authorized) {
+			return new ResponseEntity<>(new Response("Cannot find logged user", HttpStatus.UNAUTHORIZED), HttpStatus.UNAUTHORIZED);
+		}
 		
 		Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
 		String proccessInstanceId = task.getProcessInstanceId();
@@ -315,6 +346,11 @@ public class ReviewingController {
 	
 	@PostMapping(path = "/startReviewingAdditional/{taskId}", produces = "application/json")
 	public @ResponseBody ResponseEntity<?> reviewAdditionalPost (@PathVariable String taskId, @RequestBody ReviewingDto requestBody){
+		
+		boolean authorized = authorize(REVIEWER_GROUP_ID);
+		if(!authorized) {
+			return new ResponseEntity<>(new Response("Cannot find logged user", HttpStatus.UNAUTHORIZED), HttpStatus.UNAUTHORIZED);
+		}
 		
 		Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
 		String proccessInstanceId = task.getProcessInstanceId();
@@ -336,7 +372,12 @@ public class ReviewingController {
 	}
 	
 	@GetMapping(path = "/editorReview/{taskId}", produces = "application/json")
-    public @ResponseBody ResponseEntity<ReviewingEditorDto> editorReview(@PathVariable String taskId) {
+    public @ResponseBody ResponseEntity<?> editorReview(@PathVariable String taskId) {
+		
+		boolean authorized = authorize(EDITOR_GROUP_ID);
+		if(!authorized) {
+			return new ResponseEntity<>(new Response("Cannot find logged user", HttpStatus.UNAUTHORIZED), HttpStatus.UNAUTHORIZED);
+		}
 
 		Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
 		String proccessInstanceId = task.getProcessInstanceId();
@@ -355,7 +396,12 @@ public class ReviewingController {
 	
 	@PostMapping(path = "/editorReview/{taskId}", produces = "application/json")
     public @ResponseBody ResponseEntity<?> editorReviewPost(@PathVariable String taskId, @RequestBody ReviewingEditorDto response) {
-
+		
+		boolean authorized = authorize(EDITOR_GROUP_ID);
+		if(!authorized) {
+			return new ResponseEntity<>(new Response("Cannot find logged user", HttpStatus.UNAUTHORIZED), HttpStatus.UNAUTHORIZED);
+		}
+		
 		Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
 		
 		String proccessInstanceId = task.getProcessInstanceId();
@@ -381,6 +427,11 @@ public class ReviewingController {
 	@GetMapping(path = "/defineTimeForReview/{taskId}", produces = "application/json")
     public @ResponseBody ResponseEntity<?> defineTimeForReviewStart(@PathVariable String taskId) {
 
+		boolean authorized = authorize(EDITOR_GROUP_ID);
+		if(!authorized) {
+			return new ResponseEntity<>(new Response("Cannot find logged user", HttpStatus.UNAUTHORIZED), HttpStatus.UNAUTHORIZED);
+		}
+		
 		Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
 		String proccessInstanceId = task.getProcessInstanceId();
 		
@@ -395,6 +446,11 @@ public class ReviewingController {
 	@PostMapping(path = "/defineTimeForReview/{taskId}", produces = "application/json")
     public @ResponseBody ResponseEntity<?> defineTimeForReviewPost(@PathVariable String taskId, @RequestBody List<FormSubmissionDto> fields) {
 
+		boolean authorized = authorize(EDITOR_GROUP_ID);
+		if(!authorized) {
+			return new ResponseEntity<>(new Response("Cannot find logged user", HttpStatus.UNAUTHORIZED), HttpStatus.UNAUTHORIZED);
+		}
+		
 		Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
 		String proccessInstanceId = task.getProcessInstanceId();
 		
@@ -411,7 +467,12 @@ public class ReviewingController {
     }
 	
 	@GetMapping(path = "/start/{taskId}", produces = "application/json")
-	public @ResponseBody ResponseEntity<ReviewingDto> review (@PathVariable String taskId){
+	public @ResponseBody ResponseEntity<?> review (@PathVariable String taskId){
+		
+		boolean authorized = authorize(REVIEWER_GROUP_ID);
+		if(!authorized) {
+			return new ResponseEntity<>(new Response("Cannot find logged user", HttpStatus.UNAUTHORIZED), HttpStatus.UNAUTHORIZED);
+		}
 		
 		ReviewingDto dto = createReviewingDto(taskId);
 		
@@ -426,6 +487,11 @@ public class ReviewingController {
 	
 	@PostMapping(path = "/reviewPost/{taskId}", produces = "application/json")
 	public @ResponseBody ResponseEntity<?> reviewPost (@PathVariable String taskId, @RequestBody ReviewingDto requestBody){
+		
+		boolean authorized = authorize(REVIEWER_GROUP_ID);
+		if(!authorized) {
+			return new ResponseEntity<>(new Response("Cannot find logged user", HttpStatus.UNAUTHORIZED), HttpStatus.UNAUTHORIZED);
+		}
 		
 		Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
 		String proccessInstanceId = task.getProcessInstanceId();
@@ -508,7 +574,7 @@ public class ReviewingController {
 			scienceAreasDto.add(new ScienceAreaDto(sc.getScienceAreaId(), sc.getScienceAreaName(), sc.getScienceAreaCode()));
 		});
 		
-		MagazineDto magazineDto = new MagazineDto(magazine.getMagazineId(), magazine.getISSN(), magazine.getName(), scienceAreasDto);
+		MagazineDto magazineDto = new MagazineDto(magazine.getMagazineId(), magazine.getISSN(), magazine.getName(),magazine.getWayOfPayment(), scienceAreasDto);
 		
 		VariableInstance user = runtimeService.createVariableInstanceQuery()
                 .processInstanceIdIn(proccessInstanceId)
@@ -560,6 +626,23 @@ public class ReviewingController {
 		}
 		
 		return map;
+	}
+	
+	private boolean authorize(String requestedGroupId) {
+		String username = "";
+		try {
+		   username = identityService.getCurrentAuthentication().getUserId(); //ako nema puca exception
+		} catch (Exception e) {
+			return false;
+		}
+		
+		Group group = identityService.createGroupQuery().groupMember(username).groupId(requestedGroupId).singleResult();
+		
+		if(group != null) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 	
 	public double getDistanceFromLatLonInKm(double lat1, double lon1, double lat2, double lon2) {

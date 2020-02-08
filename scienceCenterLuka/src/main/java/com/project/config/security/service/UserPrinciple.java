@@ -16,7 +16,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.project.model.user.UserSignedUp;
 
-
+// NE KORISTI!!!!!!!!
 public class UserPrinciple implements UserDetails {
 	private static final long serialVersionUID = 1L;
 
@@ -40,34 +40,6 @@ public class UserPrinciple implements UserDetails {
     	
     	List<GrantedAuthority> auth = new ArrayList<GrantedAuthority>();
     	   	
-//    	if(obj instanceof KrajnjiKorisnik) {
-//    		auth.add(new SimpleGrantedAuthority("USER"));
-//    		 return new UserPrinciple(
-//    	                ((KrajnjiKorisnik) obj).getId(),
-//    	                ((KrajnjiKorisnik) obj).getEmail(),
-//    	                ((KrajnjiKorisnik) obj).getSifra(),
-//    	                auth
-//    	        );
-//    	} else if(obj instanceof Agent) {
-//    		auth.add(new SimpleGrantedAuthority("AGENT"));
-//    		return new UserPrinciple(
-//	                ((Agent) obj).getId(),
-//	                ((Agent) obj).getEmail(),
-//	                ((Agent) obj).getSifra(),
-//	                auth
-//	        );
-//    	} else {
-//    		auth.add(new SimpleGrantedAuthority("ADMIN"));
-//    		return new UserPrinciple(
-//	                ((Administrator) obj).getId(),
-//	                ((Administrator) obj).getEmail(),
-//	                ((Administrator) obj).getSifra(),
-//	                auth
-//	        );
-//    	}
-    	
-    	
-    	
     	auth.add(new SimpleGrantedAuthority(dbUser.getRole().toString()));
     	
     	return new UserPrinciple(

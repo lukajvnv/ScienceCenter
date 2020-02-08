@@ -59,12 +59,12 @@ public class RegisterNewUser implements JavaDelegate {
 			List<ScienceArea> selectedScienceAreas = unityOfWork.getScienceAreaRepository().findAllById(scAreasId);
 			
 			List<FormSubmissionDto> fields = registrationDto.getFormFields();
-			Map<String, String> map = new HashMap<String, String>();
+			Map<String, Object> map = new HashMap<String, Object>();
 			fields.forEach(f -> {
-				map.put(f.getFieldId(), (String)f.getFieldValue());
+				map.put(f.getFieldId(), f.getFieldValue());
 			});
 			
-			List<User> usersWithSameId = identityService.createUserQuery().userId(map.get("username")).list();
+			List<User> usersWithSameId = identityService.createUserQuery().userId((String)map.get("username")).list();
 			if( usersWithSameId.size() > 0 ) {
 				execution.setVariable("verified", false);
 				com.project.util.Response response = new com.project.util.Response("User whit this name already exists", HttpStatus.UNAUTHORIZED);
@@ -74,40 +74,35 @@ public class RegisterNewUser implements JavaDelegate {
 			}
 			
 			UserSignedUp newSignUpUser = UserSignedUp.builder()
-					.userUsername(map.get("username"))
-					.password(passwordEncoder.encode(map.get("password")))
+					.userUsername((String)map.get("username"))
+					.password(passwordEncoder.encode((String)map.get("password")))
 					.role(Role.COMMON_USER)
-					.wantToReviewe(Boolean.parseBoolean(map.get("is_reviewer")))
+					.wantToReviewe((Boolean)map.get("is_reviewer"))
 					.userScienceAreas(new HashSet<ScienceArea>(selectedScienceAreas))
-					.vocation(map.get("title"))
-					.firstName(map.get("first_name"))
-					.lastName(map.get("last_name"))
-					.country(map.get("country"))
-					.city(map.get("city"))
-					.email(map.get("email"))
+					.vocation((String)map.get("title"))
+					.firstName((String)map.get("first_name"))
+					.lastName((String)map.get("last_name"))
+					.country((String)map.get("country"))
+					.city((String)map.get("city"))
+					.email((String)map.get("email"))
 					.build();
 			
 			unityOfWork.getUserSignedUpRepository().save(newSignUpUser);
 			
-			User newUser =  identityService.newUser(map.get("username"));
-			newUser.setEmail(map.get("email"));
-			newUser.setFirstName(map.get("first_name"));
-			newUser.setLastName(map.get("last_name"));
-			newUser.setPassword(map.get("password"));
+			User newUser =  identityService.newUser((String)map.get("username"));
+			newUser.setEmail((String)map.get("email"));
+			newUser.setFirstName((String)map.get("first_name"));
+			newUser.setLastName((String)map.get("last_name"));
+			newUser.setPassword((String)map.get("password"));
 			identityService.saveUser(newUser);
+			
+			identityService.createMembership((String)map.get("username"), "author");
 			
 			execution.setVariable("verified", true);
 			
 			execution.setVariable("user", newUser.getId());
 			
-			
-
-			
-//			identityService.setAuthentication("demo", Arrays.asList(new String[]{"camunda-admin"}));
-//			String s= identityService.getCurrentAuthentication().getUserId();
-//			boolean ok = identityService.checkPassword("", "");
-//			identityService.clearAuthentication();
-//			String s1= identityService.getCurrentAuthentication().getUserId();
+		
 		} catch (Exception e) {
 			 throw new BpmnError("UnexpectedError", "UnexpectedfddError");
 		}

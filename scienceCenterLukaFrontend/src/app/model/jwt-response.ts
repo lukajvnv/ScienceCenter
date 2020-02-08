@@ -4,4 +4,5 @@ export class JwtResponse {
     username: string;
     authorities: string[];
     user_id: number;
+    groups: string[];
 }

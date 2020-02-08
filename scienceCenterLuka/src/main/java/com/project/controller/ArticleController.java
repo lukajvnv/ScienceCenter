@@ -15,6 +15,7 @@ import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.form.FormField;
 import org.camunda.bpm.engine.form.TaskFormData;
+import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.impl.form.validator.FormFieldValidatorException;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
@@ -84,8 +85,20 @@ public class ArticleController {
 		@Autowired
 		MagazineService magazineService;
 		
+		private final static String ADMIN_GROUP_ID = "camunda-admin";
+		private final static String GUEST_GROUP_ID = "guest";
+		private final static String REVIEWER_GROUP_ID = "reviewer";
+		private final static String EDITOR_GROUP_ID = "editor";
+		private final static String AUTHOR_GROUP_ID = "author";
+		
 		@GetMapping(path = "/startArticleInit/{magazineId}", produces = "application/json")
 	    public @ResponseBody ResponseEntity<?> initArticleAdding(@PathVariable Long magazineId) {
+			
+			boolean authorized = authorize(AUTHOR_GROUP_ID);
+			if(!authorized) {
+				return new ResponseEntity<>(new Response("Cannot find logged user", HttpStatus.UNAUTHORIZED), HttpStatus.UNAUTHORIZED);
+			}
+			
 			ProcessInstance pi = runtimeService.startProcessInstanceByKey("new_article");
 			Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).list().get(0);
 			String proccessInstanceId = task.getProcessInstanceId();
@@ -129,7 +142,7 @@ public class ArticleController {
 	    }
 		
 		@GetMapping(path = "/start/{taskId}", produces = "application/json")
-	    public @ResponseBody ResponseEntity<NewArticleRequestDto> startAddingArticle(@PathVariable String taskId) {
+	    public @ResponseBody ResponseEntity<?> startAddingArticle(@PathVariable String taskId) {
 //			ProcessInstance pi = runtimeService.startProcessInstanceByKey("new_article");
 //			Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).list().get(0);
 //			String proccessInstanceId = task.getProcessInstanceId();
@@ -142,6 +155,11 @@ public class ArticleController {
 //			//da li treba platiti 
 //			
 //			//pukla greska itd...
+			
+			boolean authorized = authorize(AUTHOR_GROUP_ID);
+			if(!authorized) {
+				return new ResponseEntity<>(new Response("Cannot find logged user", HttpStatus.UNAUTHORIZED), HttpStatus.UNAUTHORIZED);
+			}
 			
 			
 			Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
@@ -163,8 +181,12 @@ public class ArticleController {
 	    }	
 		
 		@PostMapping(path = "/postArticle/{taskId}", produces = "application/json")
-	    public @ResponseBody ResponseEntity post(@RequestBody NewArticleResponseDto dto, @PathVariable String taskId) throws IOException {
+	    public @ResponseBody ResponseEntity<?> post(@RequestBody NewArticleResponseDto dto, @PathVariable String taskId) throws IOException {
 			
+			boolean authorized = authorize(AUTHOR_GROUP_ID);
+			if(!authorized) {
+				return new ResponseEntity<>(new Response("Cannot find logged user", HttpStatus.UNAUTHORIZED), HttpStatus.UNAUTHORIZED);
+			}
 			
 			Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
 			
@@ -195,7 +217,12 @@ public class ArticleController {
 	    }
 	
 		@GetMapping(path = "/analizeBasic/{taskId}", produces = "application/json")
-	    public @ResponseBody ResponseEntity<AnalizeDto> get(@PathVariable String taskId) {
+	    public @ResponseBody ResponseEntity<?> get(@PathVariable String taskId) {
+			
+			boolean authorized = authorize(EDITOR_GROUP_ID);
+			if(!authorized) {
+				return new ResponseEntity<>(new Response("Cannot find logged user", HttpStatus.UNAUTHORIZED), HttpStatus.UNAUTHORIZED);
+			}
 
 			Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
 			String proccessInstanceId = task.getProcessInstanceId();
@@ -215,8 +242,12 @@ public class ArticleController {
 	    }
 		
 		@GetMapping(path = "/analizeBasicResult/{taskId}", produces = "application/json")
-	    public @ResponseBody ResponseEntity<ArticleDto> get(@PathVariable String taskId, @RequestParam("topicOk") boolean topicOk) {
-
+	    public @ResponseBody ResponseEntity<?> get(@PathVariable String taskId, @RequestParam("topicOk") boolean topicOk) {
+			boolean authorized = authorize(EDITOR_GROUP_ID);
+			if(!authorized) {
+				return new ResponseEntity<>(new Response("Cannot find logged user", HttpStatus.UNAUTHORIZED), HttpStatus.UNAUTHORIZED);
+			}
+			
 			Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
 			
 			String proccessInstanceId = task.getProcessInstanceId();
@@ -259,6 +290,11 @@ public class ArticleController {
 		
 		@PostMapping(path = "/analizeBasicResult/{taskId}", produces = "application/json")
 	    public @ResponseBody ResponseEntity<?> postA(@PathVariable String taskId, @RequestBody AnalizeDto request) {
+			
+			boolean authorized = authorize(EDITOR_GROUP_ID);
+			if(!authorized) {
+				return new ResponseEntity<>(new Response("Cannot find logged user", HttpStatus.UNAUTHORIZED), HttpStatus.UNAUTHORIZED);
+			}
 
 			Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
 			
@@ -316,6 +352,11 @@ public class ArticleController {
 		
 		@PostMapping(path = "/analizeTextResult/{taskId}", produces = "application/json")
 	    public @ResponseBody ResponseEntity<?> analizeTextResult(@PathVariable String taskId, @RequestBody AnalizeDto req) {
+			
+			boolean authorized = authorize(EDITOR_GROUP_ID);
+			if(!authorized) {
+				return new ResponseEntity<>(new Response("Cannot find logged user", HttpStatus.UNAUTHORIZED), HttpStatus.UNAUTHORIZED);
+			}
 
 			Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
 			
@@ -336,7 +377,13 @@ public class ArticleController {
 	    }
 		
 		@GetMapping(path = "/updateArticleStart/{taskId}", produces = "application/json")
-	    public @ResponseBody ResponseEntity<UpdateArticleDto> updateArticleStart(@PathVariable String taskId) {
+	    public @ResponseBody ResponseEntity<?> updateArticleStart(@PathVariable String taskId) {
+			
+			boolean authorized = authorize(AUTHOR_GROUP_ID);
+			if(!authorized) {
+				return new ResponseEntity<>(new Response("Cannot find logged user", HttpStatus.UNAUTHORIZED), HttpStatus.UNAUTHORIZED);
+			}
+			
 			Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
 			String proccessInstanceId = task.getProcessInstanceId();
 			
@@ -349,6 +396,11 @@ public class ArticleController {
 		
 		@PutMapping(path = "/updateArticle/{taskId}", produces = "application/json")
 	    public @ResponseBody ResponseEntity updateArticle(@RequestBody NewArticleResponseDto dto, @PathVariable String taskId) throws IOException {
+			
+			boolean authorized = authorize(AUTHOR_GROUP_ID);
+			if(!authorized) {
+				return new ResponseEntity<>(new Response("Cannot find logged user", HttpStatus.UNAUTHORIZED), HttpStatus.UNAUTHORIZED);
+			}
 			
 			Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
 			
@@ -372,7 +424,13 @@ public class ArticleController {
 	    }
 		
 		@GetMapping(path = "/updateArticleChangesStart/{taskId}", produces = "application/json")
-	    public @ResponseBody ResponseEntity<UpdateArticleChangesDto> updateArticleChangesStart(@PathVariable String taskId) {
+	    public @ResponseBody ResponseEntity<?> updateArticleChangesStart(@PathVariable String taskId) {
+			
+			boolean authorized = authorize(AUTHOR_GROUP_ID);
+			if(!authorized) {
+				return new ResponseEntity<>(new Response("Cannot find logged user", HttpStatus.UNAUTHORIZED), HttpStatus.UNAUTHORIZED);
+			}
+			
 			Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
 			String proccessInstanceId = task.getProcessInstanceId();
 			
@@ -395,6 +453,10 @@ public class ArticleController {
 		@PutMapping(path = "/updateArticleChangesPut/{taskId}", produces = "application/json")
 	    public @ResponseBody ResponseEntity updateArticleChangesPut(@RequestBody UpdateArticleChangesDto dto, @PathVariable String taskId) throws IOException {
 			
+			boolean authorized = authorize(AUTHOR_GROUP_ID);
+			if(!authorized) {
+				return new ResponseEntity<>(new Response("Cannot find logged user", HttpStatus.UNAUTHORIZED), HttpStatus.UNAUTHORIZED);
+			}
 			
 			Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
 				
@@ -420,13 +482,6 @@ public class ArticleController {
 	        return new ResponseEntity<NewMagazineFormEditorsReviewersRequestDto>(HttpStatus.OK);
 	    }
 		
-//		@GetMapping(path = "/generateDoi", produces = "application/json")
-//	    public @ResponseBody ResponseEntity<?> generateDoi() throws IOException {
-//			articleService.generateDoi();
-//			return new ResponseEntity<>(HttpStatus.OK);
-//		}
-		
-		
 		// iz magazines controllera tamo nesto zeza...
 		@GetMapping(path = "/magazines", produces = "application/json")
 		private @ResponseBody List<MagazineDto> getAllMagazines(){
@@ -438,7 +493,7 @@ public class ArticleController {
 				Set<ScienceArea> areas = m.getScienceAreas();
 				List<ScienceAreaDto> areasDto = new ArrayList<ScienceAreaDto>();
 				areas.forEach(a -> areasDto.add(new ScienceAreaDto(a.getScienceAreaId(), a.getScienceAreaName(), a.getScienceAreaCode())));
-				magazinesDto.add(new MagazineDto(m.getMagazineId(), m.getISSN(), m.getName(), areasDto));	
+				magazinesDto.add(new MagazineDto(m.getMagazineId(), m.getISSN(), m.getName(), m.getWayOfPayment(), areasDto));	
 			});
 			
 			return magazinesDto;
@@ -454,7 +509,7 @@ public class ArticleController {
 			List<ScienceAreaDto> areasDto = new ArrayList<ScienceAreaDto>();
 			areas.forEach(a -> areasDto.add(new ScienceAreaDto(a.getScienceAreaId(), a.getScienceAreaName(), a.getScienceAreaCode())));
 			
-			return new MagazineDto(magazine.getMagazineId(), magazine.getISSN(), magazine.getName(), areasDto);		
+			return new MagazineDto(magazine.getMagazineId(), magazine.getISSN(), magazine.getName(), magazine.getWayOfPayment(), areasDto);		
 		}
 		
 		@PostMapping("/upload/{taskId}") // //new annotation since 4.3
@@ -472,40 +527,10 @@ public class ArticleController {
 	        return new ResponseEntity<>(HttpStatus.OK);
 	    }
 		
-//		@GetMapping(path="/download/{articleId}", produces = MediaType.APPLICATION_PDF_VALUE) // //new annotation since 4.3
-//	    public ResponseEntity<?> download(@PathVariable long articleId) {
-////	        Article a = null;
-////			if(articleService.findAll().size() > 0) {
-////				a = articleService.getArticle(1l);
-////			}
-//
-//			// Get the file and save it somewhere
-//			byte[] bytes = articleService.getFile(articleId);
-//			System.out.println(bytes);
-//			
-//			String fileName = "employees.pdf";
-////			HttpHeaders respHeaders = new HttpHeaders();
-////			respHeaders.setContentLength(bytes.length);
-////			respHeaders.setContentType(new MediaType("application", "pdf"));
-////			respHeaders.setCacheControl("must-revalidate, post-check=0, pre-check=0");
-////			respHeaders.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileName);
-//////			return new ResponseEntity<byte[]>(bytes, respHeaders, HttpStatus.OK);
-////			return new ResponseEntity<>(bytes, respHeaders, HttpStatus.OK);
-//			
-//			return ResponseEntity.ok()
-//					.contentType(MediaType.APPLICATION_PDF)
-//					.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
-//					.body(bytes);
-//
-//	    }
 		
 		@GetMapping(path="/download/{articleId}", produces = MediaType.APPLICATION_PDF_VALUE) // //new annotation since 4.3
 	    public ResponseEntity<?> download(@PathVariable long articleId) {
-	        Article a = null;
-			if(articleService.findAll().size() > 0) {
-				a = articleService.getArticle(1l);
-			}
-
+	     
 			// Get the file and save it somewhere
 			byte[] bytes = articleService.getFile(articleId);
 			System.out.println(bytes);
@@ -525,6 +550,23 @@ public class ArticleController {
 					.body(bytes);
 
 	    }
+		
+		private boolean authorize(String requestedGroupId) {
+			String username = "";
+			try {
+			   username = identityService.getCurrentAuthentication().getUserId(); //ako nema puca exception
+			} catch (Exception e) {
+				return false;
+			}
+			
+			Group group = identityService.createGroupQuery().groupMember(username).groupId(requestedGroupId).singleResult();
+			
+			if(group != null) {
+				return true;
+			} else {
+				return false;
+			}
+		}
 		
 		private HashMap<String, Object> mapListToDto(List<FormSubmissionDto> list, String processInstanceId)
 		{
