@@ -429,8 +429,8 @@ public class DataLoader implements ApplicationRunner {
 		// ************************ magazine2  *****************************************
 		UserSignedUp chiefEditor2 = unityOfWork.getUserSignedUpRepository().findByUserUsername("editorDemo5");
 		List<ScienceArea> scienceAreas2 = unityOfWork.getScienceAreaRepository().findAllById(Arrays.asList(new Long[] {4l, 7l}));
-		ScienceArea ITSystem = scienceAreas.get(0);
-		ScienceArea businessManagment = scienceAreas.get(1);
+		ScienceArea ITSystem = scienceAreas2.get(0);
+		ScienceArea businessManagment = scienceAreas2.get(1);
 		
 		UserSignedUp ITSystemEditor = unityOfWork.getUserSignedUpRepository().findByUserUsername("editorDemo3");
 		UserSignedUp businessManagmentEditor = unityOfWork.getUserSignedUpRepository().findByUserUsername("editorDemo4");
