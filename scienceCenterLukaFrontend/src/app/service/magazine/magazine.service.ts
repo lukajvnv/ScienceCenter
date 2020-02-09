@@ -8,7 +8,7 @@ import { StorageService } from '../auth-storage/storage.service';
 })
 export class MagazineService {
 
-  private MAGAZINEAPI = "http://localhost:8085/magazine/";
+  private MAGAZINEAPI = "https://localhost:8085/magazine/";
 
 
   constructor(private http: HttpClient, private tokenStorageService: StorageService) { }
@@ -56,10 +56,10 @@ export class MagazineService {
   // }
 
   getAllMagazines(): Observable<any>{
-    return this.http.get('http://localhost:8085/article/magazines'); 
+    return this.http.get('https://localhost:8085/article/magazines'); 
   }
 
   getMagazine(magazineId: string): Observable<any>{
-    return this.http.get('http://localhost:8085/article/magazine/'  + magazineId); 
+    return this.http.get('https://localhost:8085/article/magazine/'  + magazineId); 
   }
 }

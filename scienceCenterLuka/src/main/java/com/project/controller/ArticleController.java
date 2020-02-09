@@ -20,7 +20,9 @@ import org.camunda.bpm.engine.impl.form.validator.FormFieldValidatorException;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -34,6 +36,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.project.dto.AnalizeDto;
@@ -47,7 +51,7 @@ import com.project.dto.NewMagazineFormEditorsReviewersRequestDto;
 import com.project.dto.ScienceAreaDto;
 import com.project.dto.UpdateArticleChangesDto;
 import com.project.dto.UpdateArticleDto;
-import com.project.model.Article;
+import com.project.dto.integration.OrderIdDTO;
 import com.project.model.Magazine;
 import com.project.model.ScienceArea;
 import com.project.service.ArticleService;
@@ -586,6 +590,58 @@ public class ArticleController {
 			}
 			
 			return map;
+		}
+		
+		@GetMapping(path="/callKp", produces = MediaType.APPLICATION_PDF_VALUE) // //new annotation since 4.3
+	    public ResponseEntity<?> callKp() {
+	     
+			RestTemplate restTemplate = new RestTemplate();
+			
+//			String url = "https://localhost:8762/requestHandler/request/save";
+			String url = "https://localhost:8762/requestHandler/test";
+
+			ResponseEntity<Object> dto = null;
+			try {
+				dto = restTemplate.exchange(url, HttpMethod.GET, createHeader(null), Object.class);
+			} catch (RestClientException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			return new ResponseEntity<>(HttpStatus.OK);
+
+	    }
+		
+		@GetMapping(path="/executeAuthorPayment/{taskId}", produces = MediaType.APPLICATION_JSON_VALUE) // //new annotation since 4.3
+	    public ResponseEntity<?> callKp(@PathVariable String taskId) {
+	     
+			boolean authorized = authorize(AUTHOR_GROUP_ID);
+			if(!authorized) {
+				return new ResponseEntity<>(new Response("Cannot find logged user", HttpStatus.UNAUTHORIZED), HttpStatus.UNAUTHORIZED);
+			}
+			
+			Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
+				
+			String processInstanceId = task.getProcessInstanceId();
+			OrderIdDTO orderIdDto = (OrderIdDTO) runtimeService.getVariable(processInstanceId, "paymentInfo");
+			
+			return new ResponseEntity<>(orderIdDto, HttpStatus.OK);
+
+	    }
+		
+		private HttpEntity<?> createHeader (Object body){
+			HttpHeaders headers = new HttpHeaders();
+			headers.add("external", "true");
+			headers.add("hostsc", "localhost:" + 8085);
+			
+			HttpEntity<?> entity;
+			if(body != null) {
+				entity = new HttpEntity<>(body, headers);
+			} else {
+				entity = new HttpEntity<>(headers);
+			}
+			
+			return entity;
 		}
 }
 

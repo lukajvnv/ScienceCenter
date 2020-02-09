@@ -89,6 +89,7 @@ public class UserController {
 		TaskFormData tfd = formService.getTaskFormData(task.getId());
 		List<FormField> properties = tfd.getFormFields();
 		
+		
         return new FormFieldsDto(task.getId(), pi.getId(), properties);
     }
 	

@@ -15,8 +15,9 @@ const httpOptions = {
 })
 export class UserService {
 
-  private USERAPI = "http://localhost:8085/user/";
-  private USERAuthAPI = "http://localhost:8085/auth/";
+  private USERAPI = "https://localhost:8085/user/";
+  private USERAuthAPI = "https://localhost:8085/auth/";
+  // private USERAuthAPI = "http://localhost:8085/auth/";
 
 
 

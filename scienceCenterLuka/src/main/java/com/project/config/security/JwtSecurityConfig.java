@@ -74,14 +74,14 @@ public class JwtSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/article/**").permitAll()
                 .antMatchers("/magazine/**").permitAll()
                 .antMatchers("/review/**").permitAll()
+                .antMatchers("/pay/**").permitAll()
                 .antMatchers("/user/**").permitAll()
                  .antMatchers("/auth/**").permitAll()
                  .antMatchers("/task/**").permitAll()
                  .antMatchers("/rest/**").permitAll()
                 .anyRequest().authenticated()
-                .and()
-                .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+                .and().exceptionHandling().authenticationEntryPoint(unauthorizedHandler)
+                .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
     }

@@ -8,7 +8,7 @@ import { StorageService } from '../auth-storage/storage.service';
 })
 export class ReviewService {
 
-  private REVIEWAPI = "http://localhost:8085/review/";
+  private REVIEWAPI = "https://localhost:8085/review/";
 
 
   constructor(private http: HttpClient, private tokenStorageService: StorageService) { }

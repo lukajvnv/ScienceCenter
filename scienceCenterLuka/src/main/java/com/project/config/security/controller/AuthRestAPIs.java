@@ -24,7 +24,7 @@ import com.project.config.security.jwt.JwtProvider;
 import com.project.config.security.response.JwtResponse;
 import com.project.dto.SignInDto;
 import com.project.model.user.UserSignedUp;
-import com.project.repository.UserSignedUpRepository;
+import com.project.repository.user.UserSignedUpRepository;
 import com.project.util.Response;
 
 

@@ -37,11 +37,8 @@ public class UserTxItem {
 	@Column
 	private Float price;
 	
-	@Column
-	private Boolean sucess;
-	
 	@ManyToOne
-	@JoinColumn(name = "tx_id")
+	@JoinColumn(name = "userTx_id")
 	private UserTx userTx;
 	//private Magazine seller; //ili neki seller id
 	
@@ -49,16 +46,19 @@ public class UserTxItem {
 	@Enumerated(value = EnumType.STRING)
 	private BuyingType buyingType;
 	
-	@ManyToOne
-	@JoinColumn(name = "magazine_id")
-	private Magazine purhasedMagazine;
+//	@ManyToOne
+//	@JoinColumn(name = "magazine_id")
+//	private Magazine purhasedMagazine;
+//	
+//	@ManyToOne
+//	@JoinColumn(name = "article_id")
+//	private Article purchasedArticle;
+//	
+//	@ManyToOne
+//	@JoinColumn(name = "edition_id")
+//	private MagazineEdition purhasedMagazineEdition;
 	
-	@ManyToOne
-	@JoinColumn(name = "article_id")
-	private Article purchasedArticle;
-	
-	@ManyToOne
-	@JoinColumn(name = "edition_id")
-	private MagazineEdition purhasedMagazineEdition;
+	@Column
+	private Long itemId;
 
 }

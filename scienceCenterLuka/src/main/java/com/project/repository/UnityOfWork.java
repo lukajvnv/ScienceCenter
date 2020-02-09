@@ -3,6 +3,10 @@ package com.project.repository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.project.repository.user.UserSignedUpRepository;
+import com.project.repository.user.UserTxItemRepository;
+import com.project.repository.user.UserTxRepository;
+
 @Service
 public class UnityOfWork {
 
@@ -29,6 +33,12 @@ public class UnityOfWork {
 	
 	@Autowired
 	private MembershipRepository membershipRepository;
+	
+	@Autowired
+	private UserTxRepository userTxRepository;
+	
+	@Autowired
+	private UserTxItemRepository userTxItemRepository;
 	
 	
 //	@Autowired
@@ -64,6 +74,14 @@ public class UnityOfWork {
 
 	public MembershipRepository getMembershipRepository() {
 		return membershipRepository;
+	}
+
+	public UserTxRepository getUserTxRepository() {
+		return userTxRepository;
+	}
+
+	public UserTxItemRepository getUserTxItemRepository() {
+		return userTxItemRepository;
 	}
 	
 	

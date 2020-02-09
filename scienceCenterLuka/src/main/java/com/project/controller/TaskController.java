@@ -115,7 +115,8 @@ public class TaskController {
 		
 		RestTemplate restTemplate = new RestTemplate();
 		
-		String uriBasic = "http://localhost:8085/rest/process-instance/{id}";
+		String uriBasic = "https://localhost:8085/rest/process-instance/{id}";
+//		String uriBasic = "http://localhost:8085/rest/process-instance/{id}";
 		URI uri = new URI(uriBasic.replace("{id}", processInstanceId));
 		restTemplate.delete(uri);
 		

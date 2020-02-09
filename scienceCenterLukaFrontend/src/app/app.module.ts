@@ -1,5 +1,5 @@
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
+import { NgModule, InjectionToken } from '@angular/core';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -9,7 +9,7 @@ import { SignInComponent } from './view-general/sign-in/sign-in.component';
 import { SuccessComponent } from './view-general/success/success.component';
 import { FailedComponent } from './view-general/failed/failed.component';
 import { ErrorComponent } from './view-general/error/error.component';
-import { RouterModule } from '@angular/router';
+import { RouterModule, ActivatedRouteSnapshot } from '@angular/router';
 import { ToastrModule, ToastrService } from 'ngx-toastr';
 import { HttpClientModule } from '@angular/common/http';
 import {ReactiveFormsModule, FormsModule} from '@angular/forms';
@@ -46,6 +46,9 @@ import { AdminGuard } from './path-guards/admin.guard';
 import { EditorGuard } from './path-guards/editor.guard';
 import { Authorized } from './path-guards/authorized.guard';
 import { NewArticleInitComponent } from './article/new-article-init/new-article-init.component';
+import { AuthorPayComponent } from './shopping/author-pay/author-pay.component';
+
+const externalUrlProvider = new InjectionToken('externalUrlRedirectResolver');
 
 
 const routes = [
@@ -119,6 +122,20 @@ const routes = [
       path: 'check-magazine-data/:taskId', component: CheckNewMagazineDataComponent,
     },
     {
+      path: 'author-pay/:taskId', component: AuthorPayComponent,
+    },
+    {
+      path: 'success', component: SuccessComponent
+    },
+    {
+      path: 'externalRedirect',
+      resolve: {
+          url: externalUrlProvider,
+      },
+      // We need a component here because we cannot define the route otherwise
+      component: AuthorPayComponent,
+    },
+    {
       path: '**', component: NotFoundComponent
     }
 ];
@@ -154,7 +171,8 @@ const routes = [
     CheckNewMagazineDataComponent,
     ReviewerConfirmationComponent,
     NewEditorComponent,
-    NewArticleInitComponent
+    NewArticleInitComponent,
+    AuthorPayComponent
   ],
   imports: [
     BrowserModule,
@@ -171,7 +189,14 @@ const routes = [
     RouterModule.forRoot(routes, {enableTracing: true}) // <-- debugging purposes only
   ],
   providers: [ToastrService, TestService, UserService, MagazineService, StorageService, TaskService,
-    Notauthorized, AdminGuard, EditorGuard, Authorized],
+    Notauthorized, AdminGuard, EditorGuard, Authorized,
+    {
+      provide: externalUrlProvider,
+      useValue: (route: ActivatedRouteSnapshot) => {
+          const externalUrl = route.paramMap.get('externalUrl');
+          window.open(externalUrl, '_self');
+      }
+    }],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

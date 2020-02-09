@@ -1,4 +1,4 @@
-package com.project.repository;
+package com.project.repository.user;
 
 import java.util.List;
 

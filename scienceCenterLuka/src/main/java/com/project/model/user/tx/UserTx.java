@@ -6,6 +6,8 @@ import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -14,6 +16,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
+import com.project.model.enums.TxStatus;
 import com.project.model.user.UserSignedUp;
 
 import lombok.AllArgsConstructor;
@@ -40,19 +43,25 @@ public class UserTx {
 	private UserSignedUp user;
 	
 	@Column
-	private Date date;
+	private Date created;
 	
-	@OneToMany(mappedBy = "userTx")
+	@Column
+	@Enumerated(EnumType.STRING)
+	private TxStatus status;
+	
+	@OneToMany(mappedBy = "userTx", fetch = FetchType.EAGER)
 	private Set<UserTxItem> items;
 	
 	@Column
 	private Float totalAmount;
 	
 	@Column
-	private Boolean sucess;
+	private Long kPClientIdentifier;
 	
-	//???
 	@Column
-	private Long paymentId;
-
+	private Long orderId;
+	
+	@Column
+	private String procId;
+	
 }

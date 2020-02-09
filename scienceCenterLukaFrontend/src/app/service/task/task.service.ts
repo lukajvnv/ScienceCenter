@@ -8,7 +8,9 @@ import { StorageService } from '../auth-storage/storage.service';
 })
 export class TaskService {
 
-  private TASKAPI = "http://localhost:8085/task/";
+  private TASKAPI = "https://localhost:8085/task/";
+  // private TASKAPI = "http://localhost:8085/task/";
+
 
 
   constructor(private http: HttpClient, private tokenStorageService: StorageService) { }

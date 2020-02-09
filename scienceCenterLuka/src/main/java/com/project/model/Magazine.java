@@ -94,7 +94,10 @@ public class Magazine {
 	@Column
 	private Long membershipPrice;
 	
+//	@Column
+//	private Double price;
+	
 	//zbog KP
-//	private Long sellerIdentifier;
+	private Long sellerIdentifier;
 
 }

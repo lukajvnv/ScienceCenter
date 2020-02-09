@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.project.model.user.UserSignedUp;
-import com.project.repository.UserSignedUpRepository;
+import com.project.repository.user.UserSignedUpRepository;
 
 // Ne koristi se OVO!!!!!!!!!!!!!!!
 

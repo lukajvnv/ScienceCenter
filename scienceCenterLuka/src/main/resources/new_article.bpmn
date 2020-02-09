@@ -388,12 +388,11 @@
       </bpmn:startEvent>
       <bpmn:sequenceFlow id="SequenceFlow_0uf38e4" sourceRef="StartEvent_0tp2fgi" targetRef="Task_10pxn5a" />
       <bpmn:endEvent id="EndEvent_106gk58">
-        <bpmn:incoming>SequenceFlow_1e110t5</bpmn:incoming>
+        <bpmn:incoming>SequenceFlow_0w5d6nx</bpmn:incoming>
       </bpmn:endEvent>
-      <bpmn:sequenceFlow id="SequenceFlow_1e110t5" sourceRef="Task_10pxn5a" targetRef="EndEvent_106gk58" />
       <bpmn:serviceTask id="Task_10pxn5a" name="Init payment" camunda:class="com.project.service.camunda.service.PaymentHandler">
         <bpmn:incoming>SequenceFlow_0uf38e4</bpmn:incoming>
-        <bpmn:outgoing>SequenceFlow_1e110t5</bpmn:outgoing>
+        <bpmn:outgoing>SequenceFlow_02ncok0</bpmn:outgoing>
       </bpmn:serviceTask>
       <bpmn:sequenceFlow id="SequenceFlow_0twxzc2" sourceRef="IntermediateThrowEvent_11pvssb" targetRef="EndEvent_1ujoz4t" />
       <bpmn:boundaryEvent id="IntermediateThrowEvent_11pvssb" name="Init payment failed" attachedToRef="Task_10pxn5a">
@@ -404,6 +403,15 @@
         <bpmn:incoming>SequenceFlow_0twxzc2</bpmn:incoming>
         <bpmn:errorEventDefinition errorRef="Error_06g5eqn" />
       </bpmn:endEvent>
+      <bpmn:sequenceFlow id="SequenceFlow_02ncok0" sourceRef="Task_10pxn5a" targetRef="payment_kp_call" />
+      <bpmn:sequenceFlow id="SequenceFlow_0w5d6nx" sourceRef="payment_kp_call" targetRef="EndEvent_106gk58" />
+      <bpmn:userTask id="payment_kp_call" name="payment KP call" camunda:assignee="${user}">
+        <bpmn:extensionElements>
+          <camunda:taskListener class="com.project.service.camunda.task.KpPaymentInit" event="create" />
+        </bpmn:extensionElements>
+        <bpmn:incoming>SequenceFlow_02ncok0</bpmn:incoming>
+        <bpmn:outgoing>SequenceFlow_0w5d6nx</bpmn:outgoing>
+      </bpmn:userTask>
     </bpmn:subProcess>
     <bpmn:sequenceFlow id="SequenceFlow_0tresf6" sourceRef="select_magazine" targetRef="magazine_payment_type" />
     <bpmn:sequenceFlow id="SequenceFlow_0ru6yw0" sourceRef="message_to_send" targetRef="send_mail_to_author_editor" />
@@ -1104,10 +1112,10 @@ ROZA: RECEZENT</bpmn:text>
         <di:waypoint x="310" y="290" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="SubProcess_0ste521_di" bpmnElement="Task_18ru3xa" isExpanded="true">
-        <dc:Bounds x="640" y="80" width="330" height="160" />
+        <dc:Bounds x="450" y="80" width="520" height="160" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="StartEvent_0tp2fgi_di" bpmnElement="StartEvent_0tp2fgi">
-        <dc:Bounds x="660" y="122" width="36" height="36" />
+        <dc:Bounds x="502" y="122" width="36" height="36" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="SequenceFlow_0tresf6_di" bpmnElement="SequenceFlow_0tresf6">
         <di:waypoint x="330" y="430" />
@@ -1140,29 +1148,25 @@ ROZA: RECEZENT</bpmn:text>
         <dc:Bounds x="2840" y="620" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="SequenceFlow_0uf38e4_di" bpmnElement="SequenceFlow_0uf38e4">
-        <di:waypoint x="696" y="140" />
-        <di:waypoint x="770" y="140" />
+        <di:waypoint x="538" y="140" />
+        <di:waypoint x="590" y="140" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="EndEvent_106gk58_di" bpmnElement="EndEvent_106gk58">
         <dc:Bounds x="912" y="122" width="36" height="36" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="SequenceFlow_1e110t5_di" bpmnElement="SequenceFlow_1e110t5">
-        <di:waypoint x="870" y="140" />
-        <di:waypoint x="912" y="140" />
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="ServiceTask_1ox17l4_di" bpmnElement="Task_10pxn5a">
-        <dc:Bounds x="770" y="100" width="100" height="80" />
+        <dc:Bounds x="590" y="100" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="SequenceFlow_0twxzc2_di" bpmnElement="SequenceFlow_0twxzc2">
-        <di:waypoint x="888" y="180" />
-        <di:waypoint x="900" y="180" />
-        <di:waypoint x="900" y="200" />
+        <di:waypoint x="708" y="180" />
+        <di:waypoint x="810" y="180" />
+        <di:waypoint x="810" y="200" />
         <di:waypoint x="912" y="200" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="BoundaryEvent_1g1h1pv_di" bpmnElement="IntermediateThrowEvent_11pvssb">
-        <dc:Bounds x="852" y="162" width="36" height="36" />
+        <dc:Bounds x="672" y="162" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="826" y="205" width="90" height="14" />
+          <dc:Bounds x="646" y="205" width="90" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="EndEvent_1nam62v_di" bpmnElement="EndEvent_1ujoz4t">
@@ -1171,15 +1175,15 @@ ROZA: RECEZENT</bpmn:text>
       <bpmndi:BPMNEdge id="SequenceFlow_0dlzo4i_di" bpmnElement="SequenceFlow_0dlzo4i">
         <di:waypoint x="790" y="315" />
         <di:waypoint x="790" y="278" />
-        <di:waypoint x="805" y="278" />
-        <di:waypoint x="805" y="240" />
+        <di:waypoint x="710" y="278" />
+        <di:waypoint x="710" y="240" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="789" y="260" width="17" height="14" />
+          <dc:Bounds x="694" y="260" width="17" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_0cujuul_di" bpmnElement="SequenceFlow_0cujuul">
-        <di:waypoint x="820" y="240" />
-        <di:waypoint x="820" y="278" />
+        <di:waypoint x="734" y="240" />
+        <di:waypoint x="734" y="278" />
         <di:waypoint x="920" y="278" />
         <di:waypoint x="920" y="315" />
       </bpmndi:BPMNEdge>
@@ -1559,6 +1563,17 @@ ROZA: RECEZENT</bpmn:text>
         <di:waypoint x="278" y="990" />
         <di:waypoint x="340" y="990" />
       </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_02ncok0_di" bpmnElement="SequenceFlow_02ncok0">
+        <di:waypoint x="690" y="140" />
+        <di:waypoint x="750" y="140" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0w5d6nx_di" bpmnElement="SequenceFlow_0w5d6nx">
+        <di:waypoint x="850" y="140" />
+        <di:waypoint x="912" y="140" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="UserTask_194nj9g_di" bpmnElement="payment_kp_call">
+        <dc:Bounds x="750" y="100" width="100" height="80" />
+      </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
 </bpmn:definitions>

@@ -9,7 +9,7 @@ import { GenericResponse } from 'src/app/model/GenericResponse';
 })
 export class ArticleService {
 
-  private ARTICLEAPI = "http://localhost:8085/article/";
+  private ARTICLEAPI = "https://localhost:8085/article/";
 
 
   constructor(private http: HttpClient, private tokenStorageService: StorageService) { }
@@ -97,6 +97,10 @@ export class ArticleService {
   //   );
     
   // }
+
+  executeAuthorPayment(taskId): Observable<any> {
+    return this.http.get(this.ARTICLEAPI + "executeAuthorPayment/".concat(taskId), {headers: this.genHeader()});
+  }
 
  
 }

@@ -8,7 +8,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.camunda.bpm.engine.IdentityService;
+import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.identity.Group;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -37,6 +39,9 @@ public class DataLoader implements ApplicationRunner {
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 	
+	@Autowired
+	private RuntimeService runtimeService;
+	
 //	@Autowired
 //	private DoiGeneratorRepository doiGeneratorRepository;
 	
@@ -55,6 +60,11 @@ public class DataLoader implements ApplicationRunner {
 		initMemberships();
 		
 		initCamunda();
+		
+		List<ProcessInstance> active = runtimeService.createProcessInstanceQuery().active().list();
+		for(ProcessInstance p : active) {
+			runtimeService.deleteProcessInstance(p.getProcessInstanceId(), "");
+		}
 		
 	}
 	

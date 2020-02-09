@@ -1,5 +1,20 @@
 server:
   port: 8085
+  address: 127.0.0.1
+  ssl: 
+    enabled: true
+    protocol: TLS
+    key-alias: naucnacentrala
+    key-store: classpath:security/kps_naucna_centrala_keystore.jks
+    key-store-password: sepstore
+    key-store-type: JKS
+    trust-store: classpath:security/kps_naucna_centrala_truststore.jks
+    trust-store-password: sepstore
+    trust-store-type: JKS
+    client-auth: want 
+
+security:
+  require-ssl: true
 
 spring.datasource: # Please adjust username, password, hostname, port and database name
   type: org.postgresql.jdbc2.optional.SimpleDataSource
@@ -8,6 +23,8 @@ spring.datasource: # Please adjust username, password, hostname, port and databa
   url: jdbc:postgresql://localhost:5432/science_centerL?useSSL=false
   
 spring:
+  application:
+    name: scienceCenter
   jpa:
     hibernate:
       ddl-auto: create-drop
@@ -44,4 +61,22 @@ mail:
 camunda.bpm.admin-user: 
   id: demo
   password: demo
+    
+
+   
+eureka:
+  client:
+    registerWithEureka: false
+    fetchRegistry: false
+    serviceUrl.defaultZone: https://localhost:8761/eureka/
+  instance:
+    hostname: localhost
+    leaseRenewalIntervalInSeconds: 15
+    leaseExpirationDurationInSeconds: 2
+    securePort: ${server.port}
+    securePortEnabled: true
+    prefer-ip-address: true
+    ip-address: ${server.address}
+    instance-id: ${server.address}:${server.port}
+    nonSecurePortEnabled: false
   
