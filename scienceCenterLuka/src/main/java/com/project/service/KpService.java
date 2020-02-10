@@ -46,7 +46,7 @@ public class KpService {
 				.kPClientIdentifier(1l)
 				.user(user)
 				.status(TxStatus.UNKNOWN)
-				.totalAmount(0f)
+				.totalAmount(50f)
 				.procId(procId)
 				.build();
 		
@@ -54,7 +54,7 @@ public class KpService {
 	
 		UserTxItem txItem = UserTxItem.builder()
 				.buyingType(BuyingType.AUTHORS_PARTICIPATION)
-				.price(100f)
+				.price(50f)
 				.userTx(persistedNewTx)
 				.build();
 		

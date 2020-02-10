@@ -62,4 +62,8 @@ export class MagazineService {
   getMagazine(magazineId: string): Observable<any>{
     return this.http.get('https://localhost:8085/article/magazine/'  + magazineId); 
   }
+
+  getEditions(magazineId: string): Observable<any>{
+    return this.http.get('https://localhost:8085/article/getEditions/'  + magazineId); 
+  }
 }

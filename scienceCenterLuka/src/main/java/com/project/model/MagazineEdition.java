@@ -39,6 +39,7 @@ public class MagazineEdition {
 	@Column
 	private Float magazineEditionPrice;
 	
+	
 //	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 //	@ManyToOne(fetch = FetchType.EAGER,
 //    cascade = {
@@ -53,5 +54,6 @@ public class MagazineEdition {
 	@OneToMany(mappedBy = "magazineEdition", fetch= FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<Article> articles;
 
-	
+	@Column
+	private String title;
 }

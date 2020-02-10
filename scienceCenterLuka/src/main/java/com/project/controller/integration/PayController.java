@@ -87,7 +87,9 @@ public class PayController {
 		
 		OrderIdDTO orderIdDto = (OrderIdDTO) runtimeService.getVariable(userTx.getProcId(), "paymentInfo");
 
-				
+		runtimeService.setVariable(userTx.getProcId(), "txStatus", userTx.getStatus().toString());		
+//		runtimeService.setVariable(userTx.getProcId(), "txStatus", "ERROR");		
+
 		formService.submitTaskForm(orderIdDto.getTaskId(), new HashMap<String, Object>());
 
 		

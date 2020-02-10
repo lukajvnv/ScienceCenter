@@ -1,5 +1,6 @@
 package com.project.service.camunda.service;
 
+import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +23,6 @@ public class PaymentHandler implements JavaDelegate {
 		
 		// TODO: KP PROCES PRETPLATE
 		// Thread.sleep(10000);
-		System.out.println("10s passed");
 //		try {
 //			// izazivanje greske
 //			NewMagazineFormResponseDto newMagazineDto = null;
@@ -33,11 +33,16 @@ public class PaymentHandler implements JavaDelegate {
 //
 //		}
 		
-		System.out.println(execution.getProcessInstanceId());
-	
-		OrderIdDTO orderDto = kpService.pay(execution.getProcessInstanceId());
-		
-		execution.setVariable("paymentInfo", orderDto);
+		try {
+			System.out.println(execution.getProcessInstanceId());
+
+			OrderIdDTO orderDto = kpService.pay(execution.getProcessInstanceId());
+			
+			execution.setVariable("paymentInfo", orderDto);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			 throw new BpmnError("PAYMENT_ERROR", "PAYMENT_ERROR");
+		}
 	
 	}
 

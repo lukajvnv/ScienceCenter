@@ -14,6 +14,9 @@ export class ViewMagazineComponent implements OnInit {
   private magazine: Magazine;
   private isLogged: boolean;
 
+  private magazineId: string;
+
+  private editions: any[];
 
   constructor(private activatedRoute: ActivatedRoute, private magazineService: MagazineService, private router: Router,
     private tokenStorageService: StorageService) { }
@@ -21,6 +24,7 @@ export class ViewMagazineComponent implements OnInit {
   ngOnInit() {
     this.activatedRoute.paramMap.subscribe(data => {
       const magazineId = data.get("magazineId");
+      this.magazineId = magazineId;
       
       let x = this.magazineService.getMagazine(magazineId);
       this.isLogged = this.tokenStorageService.isLogged();
@@ -44,10 +48,18 @@ export class ViewMagazineComponent implements OnInit {
   }
 
   viewEditions(){
+    let x = this.magazineService.getEditions(this.magazineId);
 
+    x.subscribe(data => {
+      this.editions = data;
+    });
   }
 
   subscribe(){
+
+  }
+
+  displayEdition(id: string){
 
   }
 

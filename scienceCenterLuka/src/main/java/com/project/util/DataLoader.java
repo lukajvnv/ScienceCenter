@@ -385,12 +385,14 @@ public class DataLoader implements ApplicationRunner {
 													.magazineEditionPrice(100f)
 													.publishingDate(new Date())
 													.magazine(persistedMagazine1)
+													.title("Edition 1")
 													.build();
 		
 		MagazineEdition magazineEdition2 = MagazineEdition.builder()
 				.magazineEditionPrice(200f)
 				.publishingDate(new Date(119, 11, 30))  //2019 godina
 				.magazine(persistedMagazine1)
+				.title("Edition 2")
 				.build();
 		
 		unityOfWork.getMagazineEditionRepository().save(magazineEdition1);
@@ -470,12 +472,14 @@ public class DataLoader implements ApplicationRunner {
 													.magazineEditionPrice(100f)
 													.publishingDate(new Date())
 													.magazine(persistedMagazine2)
+													.title("Edition 1")
 													.build();
 		
 		MagazineEdition magazineEdition22 = MagazineEdition.builder()
 				.magazineEditionPrice(200f)
 				.publishingDate(new Date(119, 11, 30))  //2019 godina
 				.magazine(persistedMagazine2)
+				.title("Edition 2")
 				.build();
 		
 		unityOfWork.getMagazineEditionRepository().save(magazineEdition21);

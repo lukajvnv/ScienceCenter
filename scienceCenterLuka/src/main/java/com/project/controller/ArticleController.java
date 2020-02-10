@@ -33,6 +33,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -45,6 +46,7 @@ import com.project.dto.ArticleDto;
 import com.project.dto.ArticleProcessDto;
 import com.project.dto.FormSubmissionDto;
 import com.project.dto.MagazineDto;
+import com.project.dto.MagazineEditionDto;
 import com.project.dto.NewArticleRequestDto;
 import com.project.dto.NewArticleResponseDto;
 import com.project.dto.NewMagazineFormEditorsReviewersRequestDto;
@@ -53,6 +55,7 @@ import com.project.dto.UpdateArticleChangesDto;
 import com.project.dto.UpdateArticleDto;
 import com.project.dto.integration.OrderIdDTO;
 import com.project.model.Magazine;
+import com.project.model.MagazineEdition;
 import com.project.model.ScienceArea;
 import com.project.service.ArticleService;
 import com.project.service.MagazineService;
@@ -515,6 +518,36 @@ public class ArticleController {
 			
 			return new MagazineDto(magazine.getMagazineId(), magazine.getISSN(), magazine.getName(), magazine.getWayOfPayment(), areasDto);		
 		}
+		
+		@RequestMapping(path = "/getEditions/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+		public ResponseEntity<List<MagazineEditionDto>> getEditions(@PathVariable Long id) {
+			
+			Magazine magazine = magazineService.getMagazine(id);
+
+			Set<MagazineEdition> editions = magazine.getMagazineEditions();
+			List<MagazineEditionDto> editionsDto = new ArrayList<MagazineEditionDto>();
+			
+			for(MagazineEdition mE: editions) {
+				editionsDto.add(new MagazineEditionDto(mE.getMagazineEditionId(), mE.getPublishingDate(), mE.getMagazineEditionPrice(), mE.getTitle()));
+			}
+			
+			return new ResponseEntity<List<MagazineEditionDto>>(editionsDto, HttpStatus.OK);
+		}
+		
+//		@RequestMapping(path = "/getArticles/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+//		public ResponseEntity<List<MagazineEditionArticleDto>> getArticles(@PathVariable Long id) {
+//			
+//			Magazine mag = magRepo.getOne(id);
+//			MagazineEdition edition = magEditionRepo.getOne(id);
+//			Set<Article> articles = edition.getArticles();
+//			List<MagazineEditionArticleDto> articlesDto = new ArrayList<MagazineEditionArticleDto>();
+//			
+//			for(Article a : articles) {
+//				articlesDto.add(new MagazineEditionArticleDto(a.getArticleId(), a.getArticleTitle(), a.getArticleAbstract(), a.getPublishingDate(), a.getDoi(), a.getArticlePrice(), ""));
+//			}
+//			
+//			return new ResponseEntity<List<MagazineEditionArticleDto>>(articlesDto, HttpStatus.OK);
+//		}
 		
 		@PostMapping("/upload/{taskId}") // //new annotation since 4.3
 	    public ResponseEntity<?> singleFileUpload(@RequestParam("file") MultipartFile file, @PathVariable String taskId) {

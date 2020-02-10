@@ -2,13 +2,10 @@
     <div class="row">
         <div class="col-lg-4 themed-grid-col  mt-3" style="border:2px solid red;  ">
             <div class="container">
-                <div class="list-group">
-                    <!-- <a (click)="filterByAirline(undefined);" [class.active]="selectedAirline === undefined" class="list-group-item list-group-item-action" >Post text</a> -->
-                   
+                <div class="list-group">                   
                     <a (click)="viewEditions()"  class="list-group-item list-group-item-action" >View editions</a>
                     <a (click)="subscribe()"  class="list-group-item list-group-item-info" *ngIf="isLogged">Subscribe</a>
                     <a (click)="newText()"  class="list-group-item list-group-item-info" *ngIf="isLogged">Post text</a>
-
                   </div>
             </div>
       </div>
@@ -48,5 +45,57 @@
             </tbody>
           </table>  
       </div>
+
     </div>
+
+
+    <div class="row">
+      <div  *ngIf="editions">
+        <h2 class="text-center">View editions</h2>
+        <div *ngFor="let edition of editions">
+          <div class="row oneFlight">
+            <div class="col-lg-10">
+              <div class="row">
+                <div class="col-lg-2">
+                  <p><b>Edition id</b></p>       
+                </div>
+                <div class="col-lg-4">
+                  <p><b>Edition title</b></p>
+                </div>
+                <div class="col-lg-2">
+                  <p><b>Edition publishing date</b></p>
+                </div>
+                <div class="col-lg-4">
+                  <p><b>Edition  price:</b></p>
+                </div>
+              </div>
+              <div class="row">
+                  <div class="col-lg-2">
+                      <p><b>{{edition.magazineEditionId}}</b></p>
+                    </div>
+                <div class="col-lg-4">
+                  <p><b>{{edition.title}}</b></p>
+                </div>
+                <div class="col-lg-2">
+                  <p><b>{{edition.publishingDate | date}}</b></p>
+                </div>
+                <div class="col-lg-4"  style="font-size: 17px">
+                  <p><b>{{edition.magazineEditionPrice}}</b></p>
+                </div>
+    
+              </div>
+            </div>
+            <div class="col-lg-2 priceDiv">
+              <div style="text-align: center">
+                <button type="submit" class="btn btn-primary btn-block detail" (click)="displayEdition(magazine.magazineId)">
+                  Detail
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    
 </div>
