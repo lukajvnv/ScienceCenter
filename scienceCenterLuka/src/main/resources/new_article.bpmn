@@ -1101,11 +1101,11 @@ ROZA: RECEZENT</bpmn:text>
         <di:waypoint x="2105" y="900" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="TextAnnotation_1unquxa_di" bpmnElement="TextAnnotation_1unquxa">
-        <dc:Bounds x="220" y="230" width="220" height="170" />
+        <dc:Bounds x="160" y="210" width="220" height="170" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Association_0mtgpfg_di" bpmnElement="Association_0mtgpfg">
-        <di:waypoint x="289" y="500" />
-        <di:waypoint x="310" y="400" />
+        <di:waypoint x="279" y="500" />
+        <di:waypoint x="273" y="380" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="SubProcess_0ste521_di" bpmnElement="Task_18ru3xa" isExpanded="true">
         <dc:Bounds x="400" y="80" width="730" height="270" />

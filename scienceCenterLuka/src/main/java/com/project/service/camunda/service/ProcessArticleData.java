@@ -26,6 +26,7 @@ import com.project.model.Term;
 import com.project.model.enums.ArticleStatus;
 import com.project.model.enums.Role;
 import com.project.model.user.UserSignedUp;
+import com.project.model.user.tx.UserTxItem;
 import com.project.repository.UnityOfWork;
 import com.project.util.Base64Utility;
 
@@ -156,7 +157,6 @@ public class ProcessArticleData implements JavaDelegate {
 								.articleAbstract(article_abstract)
 								.articlePrice(article_price)
 								//.file(newArticleDto.getFile())   //value to long String(255)
-								.fileFormat("application/pdf")
 								.file(article_file)
 								.magazineEdition(latestEdition)
 								.author(author)
@@ -170,7 +170,8 @@ public class ProcessArticleData implements JavaDelegate {
 		ArticleProcessDto articleProcessIfUpdate = (ArticleProcessDto) execution.getVariable("articleProcessDto");
 		if(articleProcessIfUpdate != null) {
 			article.setArticleId(articleProcessIfUpdate.getArticleId());
-			unityOfWork.getArticleRepository().save(article);
+			Article persisted = unityOfWork.getArticleRepository().save(article);
+			
 		} else {
 			Article persistedArticle = unityOfWork.getArticleRepository().save(article);
 			
@@ -179,6 +180,13 @@ public class ProcessArticleData implements JavaDelegate {
 					new ArrayList<String>(), new ArrayList<OpinionAboutArticle>(), new ArrayList<OpinionAboutArticle>() , new ArrayList<OpinionAboutArticle>(), 1);
 			
 			execution.setVariable("articleProcessDto", articleProcessDto);
+			
+			long itemTxId = (long) execution.getVariable("itemTxId");
+			
+			UserTxItem item = unityOfWork.getUserTxItemRepository().getOne(itemTxId);
+			item.setItemId(persistedArticle.getArticleId());
+			
+			unityOfWork.getUserTxItemRepository().save(item);
 		}
 		
 		

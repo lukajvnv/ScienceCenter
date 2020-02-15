@@ -72,13 +72,7 @@ public class Article {
 	
 	@Column
 	private byte[] file;
-	
-	@Column
-	private String fileFormat;
-	
-//	@Column
-//	private String file;
-	
+		
 	@Column
 	@Enumerated(value = EnumType.STRING)
 	private ArticleStatus status;
@@ -86,7 +80,7 @@ public class Article {
 	@Column
 	private String doi;
 	
-	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@ManyToOne
 	@JoinColumn(name = "magazine_edition_id")
 	private MagazineEdition magazineEdition;
 	

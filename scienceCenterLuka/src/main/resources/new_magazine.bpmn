@@ -65,12 +65,9 @@
     <bpmn:sequenceFlow id="SequenceFlow_1rmuq4d" sourceRef="add_editor_and_reviewer" targetRef="process_edit_rev_adding" />
     <bpmn:exclusiveGateway id="is_valid" name="Is valid?">
       <bpmn:incoming>SequenceFlow_1bqiryk</bpmn:incoming>
-      <bpmn:outgoing>valid</bpmn:outgoing>
       <bpmn:outgoing>invalid</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_11ghlyu</bpmn:outgoing>
     </bpmn:exclusiveGateway>
-    <bpmn:sequenceFlow id="valid" name="Valid" sourceRef="is_valid" targetRef="activate_magazine">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${view_is_valid == true}</bpmn:conditionExpression>
-    </bpmn:sequenceFlow>
     <bpmn:endEvent id="EndEvent_18fnd0y">
       <bpmn:incoming>SequenceFlow_0h8jgsx</bpmn:incoming>
     </bpmn:endEvent>
@@ -113,7 +110,7 @@
     <bpmn:sequenceFlow id="SequenceFlow_0qukm1q" sourceRef="new_magazine_form" targetRef="process_form_data" />
     <bpmn:sequenceFlow id="SequenceFlow_1ws5y00" sourceRef="process_form_data" targetRef="add_editor_and_reviewer" />
     <bpmn:serviceTask id="activate_magazine" name="Activate_magazine" camunda:class="com.project.service.camunda.service.ActivateMagazine">
-      <bpmn:incoming>valid</bpmn:incoming>
+      <bpmn:incoming>SequenceFlow_0voul1o</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_0h8jgsx</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:subProcess id="SubProcess_0p3ti8i" triggeredByEvent="true">
@@ -131,6 +128,17 @@
       <bpmn:sequenceFlow id="SequenceFlow_15cfirk" sourceRef="StartEvent_02ap3uh" targetRef="ServiceTask_13tenrn" />
       <bpmn:sequenceFlow id="SequenceFlow_0cuf6y4" sourceRef="ServiceTask_13tenrn" targetRef="EndEvent_1vo67d7" />
     </bpmn:subProcess>
+    <bpmn:sequenceFlow id="SequenceFlow_11ghlyu" name="Valiid" sourceRef="is_valid" targetRef="add_magazine_to_kp">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${view_is_valid == true}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SequenceFlow_0voul1o" sourceRef="add_magazine_to_kp" targetRef="activate_magazine" />
+    <bpmn:userTask id="add_magazine_to_kp" name="Add to Kp" camunda:assignee="${user}">
+      <bpmn:extensionElements>
+        <camunda:taskListener class="com.project.service.camunda.task.AddToKpInit" event="create" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_11ghlyu</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0voul1o</bpmn:outgoing>
+    </bpmn:userTask>
     <bpmn:textAnnotation id="TextAnnotation_1ubrt6m">
       <bpmn:text>If bpm error occurs or be thrown from tasks</bpmn:text>
     </bpmn:textAnnotation>
@@ -162,19 +170,12 @@
           <dc:Bounds x="1469" y="78" width="41" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="SequenceFlow_041mo2u_di" bpmnElement="valid">
-        <di:waypoint x="1515" y="127" />
-        <di:waypoint x="1570" y="127" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="1531" y="109" width="23" height="14" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="EndEvent_18fnd0y_di" bpmnElement="EndEvent_18fnd0y">
-        <dc:Bounds x="1832" y="109" width="36" height="36" />
+        <dc:Bounds x="1972" y="109" width="36" height="36" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="SequenceFlow_0h8jgsx_di" bpmnElement="SequenceFlow_0h8jgsx">
-        <di:waypoint x="1670" y="127" />
-        <di:waypoint x="1832" y="127" />
+        <di:waypoint x="1870" y="127" />
+        <di:waypoint x="1972" y="127" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="ExclusiveGateway_17893bf_di" bpmnElement="ExclusiveGateway_17893bf" isMarkerVisible="true">
         <dc:Bounds x="195" y="102" width="50" height="50" />
@@ -229,7 +230,7 @@
         <di:waypoint x="800" y="127" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="ServiceTask_1agunds_di" bpmnElement="activate_magazine">
-        <dc:Bounds x="1570" y="87" width="100" height="80" />
+        <dc:Bounds x="1770" y="87" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="SubProcess_0p3ti8i_di" bpmnElement="SubProcess_0p3ti8i" isExpanded="true">
         <dc:Bounds x="260" y="410" width="350" height="200" />
@@ -258,6 +259,20 @@
         <di:waypoint x="610" y="439" />
         <di:waypoint x="670" y="414" />
       </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_11ghlyu_di" bpmnElement="SequenceFlow_11ghlyu">
+        <di:waypoint x="1515" y="127" />
+        <di:waypoint x="1620" y="127" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1540" y="133" width="26" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0voul1o_di" bpmnElement="SequenceFlow_0voul1o">
+        <di:waypoint x="1720" y="127" />
+        <di:waypoint x="1770" y="127" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="UserTask_17yhkmt_di" bpmnElement="add_magazine_to_kp">
+        <dc:Bounds x="1620" y="87" width="100" height="80" />
+      </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
 </bpmn:definitions>

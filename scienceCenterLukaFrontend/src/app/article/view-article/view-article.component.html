@@ -1,0 +1,65 @@
+
+
+<div class="container">
+    <h1 class="text-center"> View article</h1>
+    <div class="row" *ngIf="displayArticle">
+        <div class="col-lg-8">
+            <h3>Basic</h3>
+            <table class="table table-bordered">
+                <tr>
+                    <th>Title</th>
+                    <td>{{displayArticle.articleTitle}}</td>
+                </tr>
+                <tr>
+                    <th>Abstract</th>
+                    <textarea class="form-control" name="" id=""  rows="5">{{displayArticle.articleAbstract}}</textarea>
+                </tr>
+                <tr>
+                    <th>Science area</th>
+                    <td>Code {{displayArticle.scienceArea.scienceAreaCode}} , Name: {{displayArticle.scienceArea.scienceAreaName}}</td>
+                </tr>
+                <tr>
+                    <th>Author</th>
+                    <td>{{displayArticle.author.firstName}} {{displayArticle.author.lastName}}</td>
+                </tr>
+                <tr>
+                    <th>Key terms</th>
+                    <td><span *ngFor="let term of displayArticle.keyTerms" class="badge badge-primary ml-3">{{term.termName}}</span></td>
+                </tr>
+                <tr *ngIf="isLogged">
+                    <th>
+                        File preview
+                    </th>
+                    <td>
+                        <input type="button" (click)="download(displayArticle.articleId)" value="Download File"/>
+    
+                    </td>
+                </tr>
+                <tr *ngIf="isLogged">
+                    <th>
+                        Add to cart
+                    </th>
+                    <td>
+                        <input type="button" (click)="addToCart(displayArticle)" value="Add to cart"/>
+    
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="col">
+            <h3>Co authors</h3>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>First name</th>
+                        <th>Last name</th>
+                    </tr>
+                </thead>
+                <tr *ngFor="let coathor of displayArticle.coAuthors">
+                    <td>{{coathor.firstName}}</td>
+                    <td>{{coathor.lastName}}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>

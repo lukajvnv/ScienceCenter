@@ -6,7 +6,6 @@ import { AppComponent } from './app.component';
 import { HomeComponent } from './view-general/home/home.component';
 import { RegisterComponent } from './view-general/register/register.component';
 import { SignInComponent } from './view-general/sign-in/sign-in.component';
-import { SuccessComponent } from './view-general/success/success.component';
 import { FailedComponent } from './view-general/failed/failed.component';
 import { ErrorComponent } from './view-general/error/error.component';
 import { RouterModule, ActivatedRouteSnapshot } from '@angular/router';
@@ -47,6 +46,14 @@ import { EditorGuard } from './path-guards/editor.guard';
 import { Authorized } from './path-guards/authorized.guard';
 import { NewArticleInitComponent } from './article/new-article-init/new-article-init.component';
 import { AuthorPayComponent } from './shopping/author-pay/author-pay.component';
+import { ViewMagazineEditionsComponent } from './magazine/view-magazine-editions/view-magazine-editions.component';
+import { ViewArticleComponent } from './article/view-article/view-article.component';
+import { CartComponent } from './shopping/cart/cart.component';
+import { UserTxComponent } from './shopping/user-tx/user-tx.component';
+import { SuccessComponent } from './shopping/success/success.component';
+import { NewEditionComponent } from './magazine/new-edition/new-edition.component';
+import { ProfileComponent } from './view-general/profile/profile.component';
+import { AddToKpComponent } from './magazine/add-to-kp/add-to-kp.component';
 
 const externalUrlProvider = new InjectionToken('externalUrlRedirectResolver');
 
@@ -80,6 +87,9 @@ const routes = [
       path: 'update-magazine/:taskId', component: UpdateMagazineComponent,
     },
     {
+      path: 'add-magazine-to-kp/:taskId', component: AddToKpComponent,
+    },
+    {
       path: 'new-article/:taskId', component: NewArticleComponent,
     },
     {
@@ -93,6 +103,9 @@ const routes = [
     },
     {
       path: 'analize-article/:taskId', component: AnalizeArticleComponent,
+    },
+    {
+      path: 'view-article/:articleId', component: ViewArticleComponent,
     },
     {
       path: 'add-review/:taskId', component: AddReviewerComponent,
@@ -125,6 +138,23 @@ const routes = [
       path: 'author-pay/:taskId', component: AuthorPayComponent,
     },
     {
+      path: 'view-edition/:editionId', component: ViewMagazineEditionsComponent,
+    },
+    {
+      path: 'new-edition/:magazineId', component: NewEditionComponent,
+    },
+    {
+      path: 'cart', component: CartComponent
+  
+    },
+    {
+      path: 'profile', component: ProfileComponent
+    },
+    {
+      path: 'user-tx', component: UserTxComponent
+  
+    },
+    {
       path: 'success', component: SuccessComponent
     },
     {
@@ -147,7 +177,6 @@ const routes = [
     // FontAwesomeModule,
     RegisterComponent,
     SignInComponent,
-    SuccessComponent,
     FailedComponent,
     ErrorComponent,
     NotFoundComponent,
@@ -172,7 +201,15 @@ const routes = [
     ReviewerConfirmationComponent,
     NewEditorComponent,
     NewArticleInitComponent,
-    AuthorPayComponent
+    AuthorPayComponent,
+    ViewMagazineEditionsComponent,
+    ViewArticleComponent,
+    CartComponent,
+    UserTxComponent,
+    SuccessComponent,
+    NewEditionComponent,
+    ProfileComponent,
+    AddToKpComponent
   ],
   imports: [
     BrowserModule,

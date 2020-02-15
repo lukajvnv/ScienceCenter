@@ -1,0 +1,83 @@
+<div class="container">
+      <div  *ngIf="edition">
+        <h2 class="text-center">View edition</h2>
+          <div class="row oneFlight">
+            <div class="col-lg-10">
+              <div class="row">
+                <div class="col-lg-2">
+                  <p><b>Edition id</b></p>       
+                </div>
+                <div class="col-lg-4">
+                  <p><b>Edition title</b></p>
+                </div>
+                <div class="col-lg-2">
+                  <p><b>Edition publishing date</b></p>
+                </div>
+                <div class="col-lg-4">
+                  <p><b>Edition  price:</b></p>
+                </div>
+              </div>
+              <div class="row">
+                  <div class="col-lg-2">
+                      <p><b>{{edition.magazineEditionId}}</b></p>
+                    </div>
+                <div class="col-lg-4">
+                  <p><b>{{edition.title}}</b></p>
+                </div>
+                <div class="col-lg-2">
+                  <p><b>{{edition.publishingDate | date}}</b></p>
+                </div>
+                <div class="col-lg-4"  style="font-size: 17px">
+                  <p><b>{{edition.magazineEditionPrice}} €</b></p>
+                </div>
+    
+              </div>
+            </div>
+            <div class="col-lg-2 priceDiv">
+              <div style="text-align: center">
+                <button type="submit" class="btn btn-primary btn-block detail" (click)="buyEdition()">
+                  Buy edition
+                </button>
+              </div>
+            </div>
+          </div>
+      </div>
+
+      <div  *ngIf="articles" class="mt-3">
+        <h2 class="text-center">View articles</h2>     
+        <div *ngFor="let article of articles" class="mt-2">
+            <table class="table table-bordered">
+                <tr>
+                    <th>Article id</th>
+                    <th>Article title</th>
+                    <th>Science area</th>
+                    <th>Publishing date</th>
+                </tr>
+                <tr>
+                    <td>{{article.articleId}}</td>
+                    <td>{{article.articleTitle}}</td>
+                    <td>{{article.scienceArea.scienceAreaName}} {{article.scienceArea.scienceAreaCode}}</td>
+                    <td>{{article.publishingDate | date}}</td>
+                </tr>
+                <tr>
+                    <th>Author</th>
+                    <th>Price</th>
+                    <th>Doi</th>
+                    <th>Detail</th>
+                </tr>
+                <tr>
+                    <td>{{article.author.firstName}} {{article.author.lastName}}</td>
+                    <td>{{article.price}}</td>
+                    <td>{{article.doi}}</td>
+                    <td>
+                        <button type="submit" class="btn btn-primary" (click)="displayArticle(article.articleId)">
+                            Detail
+                        </button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+      </div>
+
+    
+</div>

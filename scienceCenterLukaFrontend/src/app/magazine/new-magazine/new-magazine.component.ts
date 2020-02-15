@@ -72,15 +72,7 @@ export class NewMagazineComponent implements OnInit {
 
   onSubmit(fieldValues, form){
     console.log(this.formData);
-    // let controls = form.controls;
-    // for (var field in controls){
-    //   let t = controls[field];
-    //   if ( t.status == 'INVALID'){
-    //     this.toastrService.error(field + ' is required!');
-    //     return;
-    //   }
-    // }
-
+  
     let valid = this.validate(fieldValues, form);
     if(!valid){
       return;

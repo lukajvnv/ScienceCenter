@@ -1,0 +1,81 @@
+<p *ngIf="userTxs.length === 0">No txs</p>
+<table class="table table-bordered" *ngIf="userTxs.length > 0">
+    <thead>
+      <th>Id</th>
+      <th>Created</th>
+      <th>Status</th>
+      <th>Total amount</th>
+      <th>Display</th>
+      <th>Check tx</th>
+    </thead>
+    <tr *ngFor="let tx of userTxs">
+      <td>{{tx.userTxId}}</td>
+      <td>{{tx.created | date}}</td>
+      <td>{{tx.status}}</td>
+      <td>{{tx.totalAmount}}</td>
+      <td><button (click)="click(tx)">Details</button></td>
+      <td ><button (click)="checkTx(tx)" *ngIf="tx.status === 'UNKNOWN'">Check status</button></td>
+
+    </tr>
+  </table>
+  <div *ngIf="selectedTx">
+    <div *ngFor="let item of selectedTx.items; let i = index ">
+      <section class="container content-section">
+        <h2 class="section-header">Item {{i}}</h2>
+        <div class="shop-items">
+            <div class="shop-item">
+                <span class="shop-item-title">Id: {{item.userTxItemId}} </span>
+                <br>
+                <span class="shop-item-title">Price : {{item.price}}</span>
+                <br>
+                <span class="shop-item-title"> Buying type: {{item.buyingType}}</span>
+                <br>
+                <section class="container content-section">
+                  <h2 class="section-header">Item details</h2>
+                  <div class="shop-items" [ngSwitch]="item.buyingType">
+
+                      <div class="shop-item" *ngSwitchCase="'ARTICLE'">
+                          <span class="shop-item-title">Id: {{item.content.articleId}} </span>
+                          <br>
+                          <span class="shop-item-title">Title : {{item.content.articleTitle}}</span>
+                          <br>
+                          <span class="shop-item-title"> Abstract: {{item.content.articleAbstract}}</span>
+                          <br>
+                          <span class="shop-item-title"> Publishing date: {{item.content.publishingDate | date}} </span>
+                          <br>
+                          <span class="shop-item-title">Doi: {{item.content.doi}} </span>
+                          <br>
+                          <span class="shop-item-title">price : {{item.content.price}}€</span>
+                      </div>
+                      <div class="shop-item" *ngSwitchCase="'AUTHORS_PARTICIPATION'">
+                        <span class="shop-item-title">Id: {{item.content.articleId}} </span>
+                        <br>
+                        <span class="shop-item-title">Title : {{item.content.articleTitle}}</span>
+                        <br>
+                        <span class="shop-item-title"> Abstract: {{item.content.articleAbstract}}</span>
+                        <br>
+                        <span class="shop-item-title"> Publishing date: {{item.content.publishingDate | date}} </span>
+                        <br>
+                        <span class="shop-item-title">Doi: {{item.content.doi}} </span>
+                        <br>
+                        <span class="shop-item-title">price : {{item.content.price}}€</span>
+                    </div>
+                      <div class="shop-item" *ngSwitchCase="'MAGAZINE_EDITION'">
+                        <span class="shop-item-title">Id: {{item.content.magazineEditionId}} </span>
+                        <br>
+                        <span class="shop-item-title">Title : {{item.content.title}}</span>
+                        <br>
+                        <span class="shop-item-title"> Price: {{item.content.magazineEditionPrice}}</span>
+                        <br>
+                        <span class="shop-item-title"> Publishing date: {{item.content.publishingDate | date}} </span>
+                        <br>
+                    </div>
+                  </div>
+                </section>
+            </div>
+        </div>
+      </section>
+    </div>
+  </div>
+  
+  

@@ -98,9 +98,7 @@ export class AnalizeArticleComponent implements OnInit {
 
       
       this.article = res.displayArticle;
-      console.log(this.article.file.toString());
       this.taskIdText = res.displayArticle.taskId;
-      const data = 'some text';
       // const blob = new Blob([this.article.file.toString()], { type: 'application/octet-stream' });
       
       // let t1 = EncodeDecode.b64DecodeUnicode(this.article.file.toString());
@@ -108,7 +106,6 @@ export class AnalizeArticleComponent implements OnInit {
       // this.fileUrl = this.sanitizer.bypassSecurityTrustResourceUrl(window.URL.createObjectURL(blob1));
 
       // let t2 = EncodeDecode.b64Decode(this.article.file);
-      let t2 = this.article.file;
       // let t2 = atob(this.article.file.toString());
       // let t2 = EncodeDecode.b64DecodeUnicode(this.article.file);
       // const blob2 = new Blob([t2], { type: 'application/pdf' });

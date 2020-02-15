@@ -38,7 +38,7 @@ public class UserTx {
 	@Column
 	private Long userTxId;
 	
-	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@ManyToOne
 	@JoinColumn(name = "user_id")
 	private UserSignedUp user;
 	

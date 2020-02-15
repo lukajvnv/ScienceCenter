@@ -7,6 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.project.dto.integration.OrderIdDTO;
+import com.project.model.Magazine;
+import com.project.model.MagazineEdition;
+import com.project.repository.UnityOfWork;
 import com.project.service.KpService;
 
 @Service
@@ -14,6 +17,9 @@ public class PaymentHandler implements JavaDelegate {
 	
 	@Autowired
 	private KpService kpService;
+	
+	@Autowired
+	private UnityOfWork unityOfWork;
 
 	@Override
 	public void execute(DelegateExecution execution) throws Exception {
@@ -34,9 +40,14 @@ public class PaymentHandler implements JavaDelegate {
 //		}
 		
 		try {
+			Long magazineId = (Long) execution.getVariable("select_magazine_id");
+			Magazine magazine = unityOfWork.getMagazineRepository().getOne(magazineId);
+			
+			MagazineEdition edition = unityOfWork.getMagazineEditionRepository().findByMagazineOrderByPublishingDateDesc(magazine).get(0);
+			
 			System.out.println(execution.getProcessInstanceId());
 
-			OrderIdDTO orderDto = kpService.pay(execution.getProcessInstanceId());
+			OrderIdDTO orderDto = kpService.pay(execution.getProcessInstanceId(), edition);
 			
 			execution.setVariable("paymentInfo", orderDto);
 		} catch (Exception e) {

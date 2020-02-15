@@ -4,15 +4,15 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
-import com.project.model.Term;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@SuperBuilder(toBuilder = true)
 public class ArticleDto implements Serializable {
 	
 	/**
@@ -36,7 +36,7 @@ public class ArticleDto implements Serializable {
 	
 	private Long price;
 	
-	private String file;
-	//file, doi, edition, status
+	private String doi;
+	//file edition, status
 
 }

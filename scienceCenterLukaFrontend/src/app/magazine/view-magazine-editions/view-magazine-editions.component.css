@@ -1,0 +1,22 @@
+a {cursor: pointer;}
+
+.oneFlight {
+    border: 2px solid red;
+    margin-top:5px;
+    /*background-color: beige;*/
+  } 
+
+  
+  .oneFlight > .priceDiv {
+    border-left: 3px solid green;
+    background-color: aqua;
+  }
+  
+  button.detail{
+    margin: 25px 0px 0px 0px;
+  }
+  
+  .stopsTable{
+    overflow-y:scroll;
+    display:block;
+  }

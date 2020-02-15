@@ -2,10 +2,12 @@ package com.project.controller;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.camunda.bpm.engine.FormService;
 import org.camunda.bpm.engine.HistoryService;
@@ -51,12 +53,23 @@ import com.project.dto.NewArticleRequestDto;
 import com.project.dto.NewArticleResponseDto;
 import com.project.dto.NewMagazineFormEditorsReviewersRequestDto;
 import com.project.dto.ScienceAreaDto;
+import com.project.dto.TermDto;
 import com.project.dto.UpdateArticleChangesDto;
 import com.project.dto.UpdateArticleDto;
+import com.project.dto.UserDto;
 import com.project.dto.integration.OrderIdDTO;
+import com.project.dto.integration.UserTxDto;
+import com.project.model.Article;
 import com.project.model.Magazine;
 import com.project.model.MagazineEdition;
 import com.project.model.ScienceArea;
+import com.project.model.Term;
+import com.project.model.enums.BuyingType;
+import com.project.model.enums.TxStatus;
+import com.project.model.user.UserSignedUp;
+import com.project.model.user.tx.UserTx;
+import com.project.model.user.tx.UserTxItem;
+import com.project.repository.UnityOfWork;
 import com.project.service.ArticleService;
 import com.project.service.MagazineService;
 import com.project.util.Response;
@@ -91,6 +104,9 @@ public class ArticleController {
 		
 		@Autowired
 		MagazineService magazineService;
+		
+		@Autowired
+		private UnityOfWork unityOfWork;
 		
 		private final static String ADMIN_GROUP_ID = "camunda-admin";
 		private final static String GUEST_GROUP_ID = "guest";
@@ -290,7 +306,6 @@ public class ArticleController {
 			ArticleDto articleDto = new ArticleDto();
 			articleDto.setTaskId(taskAnalizeText.getId());
 			articleDto.setProcessInstanceId(proccessInstanceId);
-			articleDto.setFile(document);
 			
 	        return new ResponseEntity<ArticleDto>(articleDto, HttpStatus.OK);
 	    }
@@ -345,7 +360,6 @@ public class ArticleController {
 			ArticleDto articleDto = new ArticleDto();
 			articleDto.setTaskId(taskAnalizeText.getId());
 			articleDto.setProcessInstanceId(proccessInstanceId);
-			articleDto.setFile(document);
 			
 			TaskFormData tfd = formService.getTaskFormData(taskAnalizeText.getId());
 			List<FormField> properties = tfd.getFormFields();
@@ -534,21 +548,124 @@ public class ArticleController {
 			return new ResponseEntity<List<MagazineEditionDto>>(editionsDto, HttpStatus.OK);
 		}
 		
-//		@RequestMapping(path = "/getArticles/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-//		public ResponseEntity<List<MagazineEditionArticleDto>> getArticles(@PathVariable Long id) {
-//			
-//			Magazine mag = magRepo.getOne(id);
-//			MagazineEdition edition = magEditionRepo.getOne(id);
-//			Set<Article> articles = edition.getArticles();
-//			List<MagazineEditionArticleDto> articlesDto = new ArrayList<MagazineEditionArticleDto>();
-//			
-//			for(Article a : articles) {
-//				articlesDto.add(new MagazineEditionArticleDto(a.getArticleId(), a.getArticleTitle(), a.getArticleAbstract(), a.getPublishingDate(), a.getDoi(), a.getArticlePrice(), ""));
-//			}
-//			
-//			return new ResponseEntity<List<MagazineEditionArticleDto>>(articlesDto, HttpStatus.OK);
-//		}
+		@RequestMapping(path = "/getEdition/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+		public ResponseEntity<MagazineEditionDto> getEdition(@PathVariable Long id) {
+			
+			MagazineEdition mE = magazineService.getMagazineEdition(id);
+
+			MagazineEditionDto editionsDto = new MagazineEditionDto(mE.getMagazineEditionId(), mE.getPublishingDate(), mE.getMagazineEditionPrice(), mE.getTitle());
+			
+			return new ResponseEntity<MagazineEditionDto>(editionsDto, HttpStatus.OK);
+		}
 		
+		@RequestMapping(path = "/newEdition/{magazineId}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+		public ResponseEntity<MagazineEditionDto> newEdition(@PathVariable Long magazineId, @RequestBody MagazineEditionDto dto) {
+			
+			Magazine mag = magazineService.getMagazine(magazineId);
+			
+			MagazineEdition newEdition = MagazineEdition.builder()
+											.title(dto.getTitle())
+											.magazineEditionPrice(dto.getMagazineEditionPrice())
+											.publishingDate(new Date())
+											.magazine(mag)
+											.build();
+			
+			MagazineEdition persistedEdition = magazineService.newMagazineEdition(newEdition);
+						
+			return new ResponseEntity<MagazineEditionDto>(HttpStatus.CREATED);
+		}
+		
+		@RequestMapping(path = "/getArticles/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+		public ResponseEntity<List<ArticleDto>> getArticles(@PathVariable Long id) {
+			
+			MagazineEdition mE = magazineService.getMagazineEdition(id);
+			Set<Article> articles = mE.getArticles();
+
+			MagazineEditionDto editionsDto = new MagazineEditionDto(mE.getMagazineEditionId(), mE.getPublishingDate(), mE.getMagazineEditionPrice(), mE.getTitle());
+			
+			List<ArticleDto> articlesDto = new ArrayList<ArticleDto>();
+			
+			articles.forEach(a -> {
+				ScienceArea sc = a.getScienceArea();
+				ScienceAreaDto scDto = new ScienceAreaDto(sc.getScienceAreaId(), sc.getScienceAreaName(), sc.getScienceAreaCode());
+				
+				UserSignedUp author = a.getAuthor();
+				UserDto authorDto = new UserDto(author.getUserId(), author.getFirstName(), author.getLastName(), author.getEmail(), author.getCity(), author.getCountry(), author.getUserUsername(), author.getVocation());
+				
+				Set<UserSignedUp> coAuthors = a.getCoAuthors();
+				List<UserDto> coAuthorsDto = new ArrayList<UserDto>();
+				coAuthors.forEach(c -> {
+					UserDto coAuthorDto = new UserDto(c.getUserId(), c.getFirstName(), c.getLastName(), c.getEmail(), c.getCity(), c.getCountry(), c.getUserUsername(), c.getVocation());
+					coAuthorsDto.add(coAuthorDto);
+				});
+				
+				Set<Term> keyTerms = a.getKeyTerms();
+				List<TermDto> keyTermsDto = new ArrayList<TermDto>();
+				keyTerms.forEach(k -> {
+					keyTermsDto.add(new TermDto(k.getTermId(), k.getTermName()));
+				});
+				
+				ArticleDto dto = new ArticleDto(
+						"", 
+						"", 
+						a.getArticleId(), 
+						a.getArticleTitle(), 
+						a.getArticleAbstract(), 
+						scDto, 
+						a.getPublishingDate(), 
+						authorDto, 
+						coAuthorsDto, 
+						keyTermsDto, 
+						a.getArticlePrice(), 
+						a.getDoi());
+				
+				articlesDto.add(dto);
+			});
+			
+			return new ResponseEntity<List<ArticleDto>>(articlesDto, HttpStatus.OK);
+		}
+		
+		@RequestMapping(path = "/viewArticle/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+		public ResponseEntity<ArticleDto> viewArticle(@PathVariable Long id) {
+			
+			Article a = articleService.getArticle(id);
+			
+			ScienceArea sc = a.getScienceArea();
+			ScienceAreaDto scDto = new ScienceAreaDto(sc.getScienceAreaId(), sc.getScienceAreaName(), sc.getScienceAreaCode());
+			
+			UserSignedUp author = a.getAuthor();
+			UserDto authorDto = new UserDto(author.getUserId(), author.getFirstName(), author.getLastName(), author.getEmail(), author.getCity(), author.getCountry(), author.getUserUsername(), author.getVocation());
+			
+			Set<UserSignedUp> coAuthors = a.getCoAuthors();
+			List<UserDto> coAuthorsDto = new ArrayList<UserDto>();
+			coAuthors.forEach(c -> {
+				UserDto coAuthorDto = new UserDto(c.getUserId(), c.getFirstName(), c.getLastName(), c.getEmail(), c.getCity(), c.getCountry(), c.getUserUsername(), c.getVocation());
+				coAuthorsDto.add(coAuthorDto);
+			});
+			
+			Set<Term> keyTerms = a.getKeyTerms();
+			List<TermDto> keyTermsDto = new ArrayList<TermDto>();
+			keyTerms.forEach(k -> {
+				keyTermsDto.add(new TermDto(k.getTermId(), k.getTermName()));
+			});
+			
+			ArticleDto articleDto = new ArticleDto(
+					"", 
+					"", 
+					a.getArticleId(), 
+					a.getArticleTitle(), 
+					a.getArticleAbstract(), 
+					scDto, 
+					a.getPublishingDate(), 
+					authorDto, 
+					coAuthorsDto, 
+					keyTermsDto, 
+					a.getArticlePrice(), 
+					a.getDoi());
+						
+			return new ResponseEntity<ArticleDto>(articleDto, HttpStatus.OK);
+		}
+				
 		@PostMapping("/upload/{taskId}") // //new annotation since 4.3
 	    public ResponseEntity<?> singleFileUpload(@RequestParam("file") MultipartFile file, @PathVariable String taskId) {
 	        try {
@@ -586,6 +703,51 @@ public class ArticleController {
 					.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
 					.body(bytes);
 
+	    }
+		
+		@GetMapping(path="/downloadFile/{articleId}", produces = MediaType.APPLICATION_PDF_VALUE) // //new annotation since 4.3
+	    public ResponseEntity<?> downloadFileByUser(@PathVariable long articleId) {
+			
+			String username = "";
+			try {
+				   username = identityService.getCurrentAuthentication().getUserId(); //ako nema puca exception
+				} catch (Exception e) {
+					return new ResponseEntity<List<UserTxDto>>(HttpStatus.CONFLICT);
+				}
+			
+			//privremeno 
+			UserSignedUp loggedUser = unityOfWork.getUserSignedUpRepository().findByUserUsername(username);
+			if(loggedUser == null) {
+				return new ResponseEntity<List<UserTxDto>>(HttpStatus.CONFLICT);
+			}
+			
+			List<UserTx> userTxs = loggedUser.getUserTxs().stream().filter(tx -> tx.getStatus() == TxStatus.SUCCESS).collect(Collectors.toList());
+			
+			List<UserTxItem> filteredItemsArticles = userTxs.stream()
+					.flatMap(u -> u.getItems().stream().filter(item -> item.getBuyingType().equals(BuyingType.ARTICLE) && item.getItemId().equals(articleId))).collect(Collectors.toList());
+	     
+			Article article = articleService.getArticle(articleId);
+			MagazineEdition edition = article.getMagazineEdition();
+			
+			List<UserTxItem> filteredItemsEdition = userTxs.stream()
+					.flatMap(u -> u.getItems().stream().filter(item -> item.getBuyingType().equals(BuyingType.MAGAZINE_EDITION) && item.getItemId().equals(edition.getMagazineEditionId()))).collect(Collectors.toList());
+			
+			//TODO: PRETPLATE...
+			
+			if(filteredItemsArticles.size() == 0 && filteredItemsEdition.size() == 0) {
+				return new ResponseEntity<List<UserTxDto>>(HttpStatus.CONFLICT);
+			}
+			
+			// Get the file and save it somewhere
+			byte[] bytes = articleService.getFile(articleId);
+			System.out.println(bytes);
+			
+			String fileName = "employees.pdf";
+			
+			return ResponseEntity.ok()
+					.contentType(MediaType.APPLICATION_PDF)
+					.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
+					.body(bytes);
 	    }
 		
 		private boolean authorize(String requestedGroupId) {

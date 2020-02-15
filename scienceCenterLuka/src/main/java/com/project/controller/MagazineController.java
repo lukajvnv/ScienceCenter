@@ -21,6 +21,10 @@ import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEn
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -33,6 +37,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
 
 import com.project.dto.CheckingMagazineDataDto;
 import com.project.dto.FormFieldsDto;
@@ -43,6 +49,7 @@ import com.project.dto.NewMagazineFormEditorsReviewersResponseDto;
 import com.project.dto.NewMagazineFormRequestDto;
 import com.project.dto.NewMagazineFormResponseDto;
 import com.project.dto.ScienceAreaDto;
+import com.project.dto.integration.NewClientResponse;
 import com.project.model.Magazine;
 import com.project.model.ScienceArea;
 import com.project.repository.ArticleRepository;
@@ -77,12 +84,55 @@ public class MagazineController {
 	@Autowired
 	MagazineService magazineService;
 	
+	@Value("${server.port}")
+	private String webShopClientport;
+	
 	private final static String ADMIN_GROUP_ID = "camunda-admin";
 	private final static String GUEST_GROUP_ID = "guest";
 	private final static String REVIEWER_GROUP_ID = "reviewer";
 	private final static String EDITOR_GROUP_ID = "editor";
 	private final static String AUTHOR_GROUP_ID = "author";
 	
+	private HttpEntity<?> createHeader (Object body){
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("external", "true");
+		headers.add("hostsc", "localhost:" + webShopClientport);
+		
+		HttpEntity<?> entity;
+		if(body != null) {
+			entity = new HttpEntity<>(body, headers);
+		} else {
+			entity = new HttpEntity<>(headers);
+		}
+		
+		return entity;
+	}
+	
+	@GetMapping(path = "/addMagazineToKp/{taskId}", produces = "application/json")
+    public  ResponseEntity<?> retrieveEditorsReviewers( @PathVariable String taskId) {
+		
+		Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
+		String processInstanceId = task.getProcessInstanceId();
+		
+		NewMagazineFormResponseDto newMagazineDto = (NewMagazineFormResponseDto) runtimeService.getVariable(processInstanceId, "newMagazineBasicInfo");
+		long magId = newMagazineDto.getMagazineDbId();
+		
+		String newClientRequestUrl = "https://localhost:8762/requestHandler/client/newClient/";
+		
+		RestTemplate restTemplate = new RestTemplate();
+		
+		ResponseEntity<String> response = null;
+		try {
+			response = restTemplate.exchange(newClientRequestUrl + magId, HttpMethod.GET, createHeader(null), String.class);
+		} catch (RestClientException e) {
+			// TODO Auto-generated catch block
+			//e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.CONFLICT);
+		}
+
+		
+		return new ResponseEntity<>(new NewClientResponse(response.getBody()), HttpStatus.OK);
+    }
 	
 	@GetMapping(path = "/start", produces = "application/json")
     public @ResponseBody NewMagazineFormRequestDto get() {

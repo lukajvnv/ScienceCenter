@@ -3,6 +3,7 @@ package com.project.service;
 import java.util.Date;
 
 import org.camunda.bpm.engine.IdentityService;
+import org.camunda.bpm.engine.RuntimeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -14,6 +15,7 @@ import org.springframework.web.client.RestTemplate;
 
 import com.project.dto.integration.OrderIdDTO;
 import com.project.dto.integration.ShoppingCartRequestKpDto;
+import com.project.model.MagazineEdition;
 import com.project.model.enums.BuyingType;
 import com.project.model.enums.TxStatus;
 import com.project.model.user.UserSignedUp;
@@ -30,7 +32,10 @@ public class KpService {
 	@Autowired
 	private IdentityService identityService;
 	
-	public OrderIdDTO pay(String procId) throws Exception {
+	@Autowired
+	private RuntimeService runtimeService;
+	
+	public OrderIdDTO pay(String procId, MagazineEdition ed) throws Exception {
 		
 		String username = "";
 		try {
@@ -46,7 +51,7 @@ public class KpService {
 				.kPClientIdentifier(1l)
 				.user(user)
 				.status(TxStatus.UNKNOWN)
-				.totalAmount(50f)
+				.totalAmount(ed.getMagazineEditionPrice())
 				.procId(procId)
 				.build();
 		
@@ -54,15 +59,16 @@ public class KpService {
 	
 		UserTxItem txItem = UserTxItem.builder()
 				.buyingType(BuyingType.AUTHORS_PARTICIPATION)
-				.price(50f)
+				.price(ed.getMagazineEditionPrice())
 				.userTx(persistedNewTx)
 				.build();
 		
 		UserTxItem persistedItem = unityOfWork.getUserTxItemRepository().save(txItem);
 		
+		runtimeService.setVariable(procId, "itemTxId", persistedItem.getUserTxItemId());
+		
 		String url = "https://localhost:8762/requestHandler/request/save";
 
-		
 		ShoppingCartRequestKpDto kpRequest = new ShoppingCartRequestKpDto(persistedNewTx.getKPClientIdentifier(), persistedNewTx.getTotalAmount());
 		
 		RestTemplate restTemplate = new RestTemplate();

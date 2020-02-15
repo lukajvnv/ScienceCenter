@@ -67,22 +67,25 @@ public class ArticleService {
 	private void initArticles() {
 		ScienceArea scienceArea = unityOfWork.getScienceAreaRepository().getOne(1l);
 		Set<Term> keyTerms = unityOfWork.getTermRepository().findAllById(Arrays.asList(new Long[] {1l, 2l})).stream().collect(Collectors.toSet());
-		UserSignedUp author = unityOfWork.getUserSignedUpRepository().findByUserUsername("lukaAuthor");
+		
+		UserSignedUp lukaAuthor = unityOfWork.getUserSignedUpRepository().findByUserUsername("lukaAuthor");
+		UserSignedUp nikolaAuthor = unityOfWork.getUserSignedUpRepository().findByUserUsername("nikolaAuthor");
+
+		
 		MagazineEdition e = unityOfWork.getMagazineEditionRepository().getOne(1l);
 		
 		Article article = Article.builder()
 								.articleTitle("WWW3 memes")
 								.articleAbstract("Abstract")
-								.articlePrice(500l)
+								.articlePrice(40l)
 								.status(ArticleStatus.ACCEPTED)
 								.publishingDate(new Date())
 								.scienceArea(scienceArea)
 								.keyTerms(keyTerms)
-								.author(author)
+								.author(lukaAuthor)
 								.coAuthors(new HashSet<UserSignedUp>())
 								.magazineEdition(e)
 								.file(null)
-								.fileFormat("")
 								.build();
 		
 		Article a = unityOfWork.getArticleRepository().save(article);
@@ -91,7 +94,7 @@ public class ArticleService {
 		DoiGenerator dSaved = doiGeneratorRepository.save(d);
 		
 		String doi = generateDoi(dSaved);
-
+		System.out.println(doi);
 	}
 	
 	private String generateDoi(DoiGenerator d) {

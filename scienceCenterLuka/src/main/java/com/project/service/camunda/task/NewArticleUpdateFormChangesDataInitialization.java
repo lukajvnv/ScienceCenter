@@ -84,7 +84,7 @@ public class NewArticleUpdateFormChangesDataInitialization implements TaskListen
 				oldSavedArticle.getArticleTitle(), oldSavedArticle.getArticleAbstract(), 
 				Long.toString(oldSavedArticle.getScienceArea().getScienceAreaId()), oldSavedArticle.getArticlePrice(), 
 				termsArticleDto, coAuthorsArticleDto, 
-				oldSavedArticle.getFileFormat(), decodedFile, null);
+				"", decodedFile, null);
 		
 		String authorId = (String) execution.getVariable("user");
 		

@@ -4,6 +4,7 @@
             <div class="container">
                 <div class="list-group">                   
                     <a (click)="viewEditions()"  class="list-group-item list-group-item-action" >View editions</a>
+                    <a (click)="newEdition()"  class="list-group-item list-group-item-action" *ngIf="editor">New edition</a>
                     <a (click)="subscribe()"  class="list-group-item list-group-item-info" *ngIf="isLogged">Subscribe</a>
                     <a (click)="newText()"  class="list-group-item list-group-item-info" *ngIf="isLogged">Post text</a>
                   </div>
@@ -49,7 +50,6 @@
     </div>
 
 
-    <div class="row">
       <div  *ngIf="editions">
         <h2 class="text-center">View editions</h2>
         <div *ngFor="let edition of editions">
@@ -80,14 +80,14 @@
                   <p><b>{{edition.publishingDate | date}}</b></p>
                 </div>
                 <div class="col-lg-4"  style="font-size: 17px">
-                  <p><b>{{edition.magazineEditionPrice}}</b></p>
+                  <p><b>{{edition.magazineEditionPrice}} €</b></p>
                 </div>
     
               </div>
             </div>
             <div class="col-lg-2 priceDiv">
               <div style="text-align: center">
-                <button type="submit" class="btn btn-primary btn-block detail" (click)="displayEdition(magazine.magazineId)">
+                <button type="submit" class="btn btn-primary btn-block detail" (click)="displayEdition(edition.magazineEditionId)">
                   Detail
                 </button>
               </div>
@@ -95,7 +95,6 @@
           </div>
         </div>
       </div>
-    </div>
 
     
 </div>

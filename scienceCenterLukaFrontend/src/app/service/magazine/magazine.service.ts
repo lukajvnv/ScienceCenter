@@ -23,6 +23,10 @@ export class MagazineService {
     return this.http.get(this.MAGAZINEAPI + 'start', {headers: this.genHeader()}); 
   }
 
+  addMagazineToKp(taskId) : Observable<any>{
+    return this.http.get(this.MAGAZINEAPI + "addMagazineToKp/".concat(taskId), {headers: this.genHeader()});
+  }
+
   correctNewMagazine(taskId: string){
     return this.http.get(this.MAGAZINEAPI + 'correct/'.concat(taskId));
   }
@@ -65,5 +69,13 @@ export class MagazineService {
 
   getEditions(magazineId: string): Observable<any>{
     return this.http.get('https://localhost:8085/article/getEditions/'  + magazineId); 
+  }
+
+  getEdition(magazineId: string): Observable<any>{
+    return this.http.get('https://localhost:8085/article/getEdition/'  + magazineId); 
+  }
+
+  addEdition(magazineId: string, body): Observable<any>{
+    return this.http.post('https://localhost:8085/article/newEdition/'  + magazineId, body); 
   }
 }

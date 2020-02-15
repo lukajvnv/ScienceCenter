@@ -54,5 +54,9 @@ export class UserService {
   signOut(user, taskId) : Observable<any>{
     return this.http.post(this.USERAPI + "register/".concat(taskId), user);
   }
+
+  getUser(): Observable<any> {
+    return this.http.get(this.USERAPI + "view", {headers: this.genHeader()});
+  }
   
 }

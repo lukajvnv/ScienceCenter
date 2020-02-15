@@ -79,7 +79,7 @@ public class NewArticleUpdateFormDataInitialization implements TaskListener {
 				oldSavedArticle.getArticleTitle(), oldSavedArticle.getArticleAbstract(), 
 				Long.toString(oldSavedArticle.getScienceArea().getScienceAreaId()), oldSavedArticle.getArticlePrice(), 
 				termsArticleDto, coAuthorsArticleDto, 
-				oldSavedArticle.getFileFormat(), decodedFile, null);
+				"", decodedFile, null);
 		
 		String comment = (String) execution.getVariable("analize_article_comment");
 		

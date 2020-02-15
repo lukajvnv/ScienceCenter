@@ -38,6 +38,8 @@ import com.project.dto.NewEditorDto;
 import com.project.dto.NewUserResponseDto;
 import com.project.dto.ReviewerConfirmationDto;
 import com.project.dto.SignInDto;
+import com.project.dto.UserDto;
+import com.project.dto.integration.UserTxDto;
 import com.project.model.enums.Role;
 import com.project.model.user.UserSignedUp;
 import com.project.repository.UnityOfWork;
@@ -254,6 +256,26 @@ public class UserController {
 
 		
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+	
+	@GetMapping(path = "/view", produces = "application/json")
+    public @ResponseBody ResponseEntity<?> view() {
+		
+		String username = "";
+		try {
+			   username = identityService.getCurrentAuthentication().getUserId(); //ako nema puca exception
+			} catch (Exception e) {
+				return new ResponseEntity<List<UserTxDto>>(HttpStatus.CONFLICT);
+			}
+		
+		UserSignedUp loggedUser = unityOfWork.getUserSignedUpRepository().findByUserUsername(username);
+		if(loggedUser == null) {
+			return new ResponseEntity<List<UserTxDto>>(HttpStatus.CONFLICT);
+		}
+		
+		UserDto dto = new UserDto(loggedUser.getUserId(), loggedUser.getFirstName(), loggedUser.getLastName(), loggedUser.getEmail(), loggedUser.getCity(), loggedUser.getCountry(), loggedUser.getUserUsername(), loggedUser.getVocation());
+		
+        return new ResponseEntity<>(dto, HttpStatus.OK);
     }
 	
 	private boolean authorize(String requestedGroupId) {

@@ -84,6 +84,22 @@ export class ArticleService {
 		return this.http.get<Blob>(this.ARTICLEAPI + 'download/'.concat(articleId), {headers: headers, responseType: 'blob' as 'json'});
   }
 
+  downloadFileByUser(articleId): Observable<Blob>{
+    // const headers = new HttpHeaders({ responseType : 'blob'});
+
+    let header = this.genHeader().set('responseType', 'blog');
+
+		return this.http.get<Blob>(this.ARTICLEAPI + 'downloadFile/'.concat(articleId), {headers: header, responseType: 'blob' as 'json'});
+  }
+
+  viewArticle(articleId: string): Observable<any>{
+    return this.http.get(this.ARTICLEAPI + 'viewArticle/'.concat(articleId), {headers: this.genHeader()}); 
+  }
+
+  viewArticles(articleId: string): Observable<any>{
+    return this.http.get(this.ARTICLEAPI + 'getArticles/'.concat(articleId), {headers: this.genHeader()}); 
+  }
+
   // downloadFiles(): Observable<HttpResponse<Blob>>{
   //   const headers = new HttpHeaders({ responseType : 'blob'});
 

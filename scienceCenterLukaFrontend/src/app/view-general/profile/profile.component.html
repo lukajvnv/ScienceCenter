@@ -1,0 +1,82 @@
+<ul class="nav nav-pills nav-fill">
+    <li class="nav-item"  [class.active]="activeTab === 'profile'">
+      <a class="nav-link" (click)="activeTab = 'profile'">Profile</a>
+    </li>
+    <li class="nav-item" [class.active]="activeTab === 'success-txs'">
+      <a class="nav-link" (click)="activeTab = 'success-txs'">Successful txs</a>
+    </li>
+    <li class="nav-item" [class.active]="activeTab === 'other-txs'">
+        <a class="nav-link" (click)="activeTab = 'other-txs'">Other txs</a>
+      </li>
+</ul>
+
+<div [ngSwitch]="activeTab">
+    <div *ngSwitchCase="'profile'">
+        <!-- FORMA ZA DODAVANJE UPDATE-->
+        <div class="jumbotron">   
+            <div class="container">  
+              <h1 class="text-center">Profile data</h1>
+              <table class="table table-bordered">
+                  <tr>
+                      <th>First name</th>
+                      <td>{{user.firstName}}</td>
+                  </tr>
+                  <tr>
+                    <th>Last name</th>
+                    <td>{{user.lastName}}</td>
+                </tr>
+                <tr>
+                    <th>Vocation</th>
+                    <td>{{user.vocation}}</td>
+                </tr>
+                <tr>
+                    <th>Email</th>
+                    <td>{{user.email}}</td>
+                </tr>
+                <tr>
+                    <th>Username</th>
+                    <td>{{user.userUsername}}</td>
+                </tr>
+                <tr>
+                    <th>City</th>
+                    <td>{{user.city}}</td>
+                </tr>
+                <tr>
+                    <th>Country</th>
+                    <td>{{user.country}}</td>
+                </tr>
+              </table>
+                            
+
+            
+
+            
+            </div>
+        </div>
+    </div>
+
+    <div *ngSwitchCase="'success-txs'">
+        <div class="jumbotron">   
+            <div class="container">  
+              <app-user-tx [tx-type]="activeTab"></app-user-tx>
+            </div>
+        </div>
+    </div>
+
+
+    <div *ngSwitchCase="'other-txs'">
+        <div class="jumbotron">   
+            <div class="container">  
+                <app-user-tx [tx-type]="activeTab"></app-user-tx>
+
+                            
+
+            
+
+            
+            </div>
+        </div>
+    </div>
+
+
+</div>

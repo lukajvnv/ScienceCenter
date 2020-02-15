@@ -1,5 +1,9 @@
 package com.project.util;
 
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
@@ -9,7 +13,6 @@ import java.util.stream.Collectors;
 
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.RuntimeService;
-import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
@@ -24,10 +27,15 @@ import com.project.model.MagazineEdition;
 import com.project.model.ScienceArea;
 import com.project.model.Term;
 import com.project.model.enums.ArticleStatus;
+import com.project.model.enums.BuyingType;
 import com.project.model.enums.Role;
+import com.project.model.enums.TxStatus;
 import com.project.model.enums.WayOfPayment;
 import com.project.model.user.UserSignedUp;
 import com.project.model.user.tx.Membership;
+import com.project.model.user.tx.UserTx;
+import com.project.model.user.tx.UserTxItem;
+import com.project.repository.ArticleRepository;
 import com.project.repository.UnityOfWork;
 
 @Component
@@ -41,12 +49,12 @@ public class DataLoader implements ApplicationRunner {
 	
 	@Autowired
 	private RuntimeService runtimeService;
-	
-//	@Autowired
-//	private DoiGeneratorRepository doiGeneratorRepository;
-	
+		
 	@Autowired
 	private IdentityService identityService;
+	
+	private static final String FILEPATH = "src/main/resources/files/E2_ispiti.pdf";
+
 	
 	@Override
 	public void run(ApplicationArguments args) throws Exception {
@@ -60,6 +68,10 @@ public class DataLoader implements ApplicationRunner {
 		initMemberships();
 		
 		initCamunda();
+		
+		initArticles();
+		
+		initTxs();
 		
 		List<ProcessInstance> active = runtimeService.createProcessInstanceQuery().active().list();
 		for(ProcessInstance p : active) {
@@ -140,6 +152,32 @@ public class DataLoader implements ApplicationRunner {
 				.role(Role.COMMON_USER)
 				.password(passwordEncoder.encode("nikolaAuthor"))
 				.userUsername("nikolaAuthor").build();
+		
+		UserSignedUp user02 = UserSignedUp.builder()
+				.firstName("Luka")
+				.lastName("Guestovic")
+				.activatedAccount(true)
+				.city("Novi Sad")
+				.country("Serbia")
+				.email("lukajvnv@gmail.com")
+				.vocation("dipling")
+				.role(Role.COMMON_USER)
+				.password(passwordEncoder.encode("lukaGuest"))
+				.latitude(44.79d)		//bg
+				.longitude(20.45d)
+				.userUsername("lukaGuest").build();
+		
+		UserSignedUp user03 = UserSignedUp.builder()
+				.firstName("Nikola")
+				.lastName("Guestovic")
+				.activatedAccount(true)
+				.city("Beograd")
+				.country("Serbia")
+				.email("lukajvnv@gmail.com")
+				.vocation("dipling")
+				.role(Role.COMMON_USER)
+				.password(passwordEncoder.encode("nikolaGuest"))
+				.userUsername("nikolaGuest").build();
 		
 		// editori
 		
@@ -339,6 +377,9 @@ public class DataLoader implements ApplicationRunner {
 		
 		unityOfWork.getUserSignedUpRepository().save(user0);
 		unityOfWork.getUserSignedUpRepository().save(user01);
+		unityOfWork.getUserSignedUpRepository().save(user02);
+		unityOfWork.getUserSignedUpRepository().save(user03);
+		
 		unityOfWork.getUserSignedUpRepository().save(user1);
 		unityOfWork.getUserSignedUpRepository().save(user2);
 		unityOfWork.getUserSignedUpRepository().save(user3);
@@ -377,6 +418,7 @@ public class DataLoader implements ApplicationRunner {
 									.wayOfPayment(WayOfPayment.PAID_ACCESS)
 									.chiefEditor(chiefEditor)
 									.scienceAreas(new HashSet<ScienceArea>(scienceAreas))
+									.sellerIdentifier(1l)
 									.build();
 		
 		Magazine persistedMagazine1 = unityOfWork.getMagazineRepository().save(magazine1);
@@ -459,24 +501,25 @@ public class DataLoader implements ApplicationRunner {
 		Magazine magazine2 = Magazine.builder()
 									.active(true)
 									.ISSN("4563-4425")
-									.membershipPrice(1250l)
+									.membershipPrice(750l)
 									.name("Business Managment")
 									.wayOfPayment(WayOfPayment.OPEN_ACCESS)
 									.chiefEditor(chiefEditor2)
 									.scienceAreas(new HashSet<ScienceArea>(scienceAreas2))
+									.sellerIdentifier(2l)
 									.build();
 		
 		Magazine persistedMagazine2 = unityOfWork.getMagazineRepository().save(magazine2);
 		
 		MagazineEdition magazineEdition21 = MagazineEdition.builder()
-													.magazineEditionPrice(100f)
+													.magazineEditionPrice(122f)
 													.publishingDate(new Date())
 													.magazine(persistedMagazine2)
 													.title("Edition 1")
 													.build();
 		
 		MagazineEdition magazineEdition22 = MagazineEdition.builder()
-				.magazineEditionPrice(200f)
+				.magazineEditionPrice(175f)
 				.publishingDate(new Date(119, 11, 30))  //2019 godina
 				.magazine(persistedMagazine2)
 				.title("Edition 2")
@@ -527,6 +570,79 @@ public class DataLoader implements ApplicationRunner {
 		unityOfWork.getEditorReviewerByScienceAreaRepository().save(reviewer22);
 		unityOfWork.getEditorReviewerByScienceAreaRepository().save(reviewer23);
 		
+		// ******************************************************* magazine3 ************************************************
+				Magazine magazine3 = Magazine.builder()
+											.active(true)
+											.ISSN("4563-1232")
+											.membershipPrice(450l)
+											.name("Data inteligence")
+											.wayOfPayment(WayOfPayment.PAID_ACCESS)
+											.chiefEditor(chiefEditor)
+											.scienceAreas(new HashSet<ScienceArea>(scienceAreas))
+											.sellerIdentifier(3l)
+											.build();
+				
+				Magazine persistedMagazine3 = unityOfWork.getMagazineRepository().save(magazine3);
+				
+				MagazineEdition magazineEdition31 = MagazineEdition.builder()
+															.magazineEditionPrice(66f)
+															.publishingDate(new Date())
+															.magazine(persistedMagazine3)
+															.title("Edition 1")
+															.build();
+				
+				MagazineEdition magazineEdition32 = MagazineEdition.builder()
+													.magazineEditionPrice(166f)
+													.publishingDate(new Date(119, 11, 30))  //2019 godina
+													.magazine(persistedMagazine3)
+													.title("Edition 2")
+													.build();
+				
+				unityOfWork.getMagazineEditionRepository().save(magazineEdition31);
+				unityOfWork.getMagazineEditionRepository().save(magazineEdition32);
+				
+				
+				EditorReviewerByScienceArea editor31 = EditorReviewerByScienceArea.builder()
+																				.editor(true)
+																				.magazine(persistedMagazine3)
+																				.scienceArea(computerScience)
+																				.editorReviewer(computerScienceEditor)
+																				.build();
+				
+				EditorReviewerByScienceArea editor32 = EditorReviewerByScienceArea.builder()
+																				.editor(true)
+																				.magazine(persistedMagazine3)
+																				.scienceArea(artificialIntelligence)
+																				.editorReviewer(artificialInteligenceEditor)
+																				.build();
+				
+				EditorReviewerByScienceArea reviewer31 = EditorReviewerByScienceArea.builder()
+																				.editor(false)
+																				.magazine(persistedMagazine3)
+																				.scienceArea(computerScience)
+																				.editorReviewer(computerScienceReviewer1)
+																				.build();
+				
+				EditorReviewerByScienceArea reviewer32 = EditorReviewerByScienceArea.builder()
+																				.editor(false)
+																				.magazine(persistedMagazine3)
+																				.scienceArea(computerScience)
+																				.editorReviewer(computerScienceReviewer2)
+																				.build();
+				
+				EditorReviewerByScienceArea reviewer33 = EditorReviewerByScienceArea.builder()
+																				.editor(false)
+																				.magazine(persistedMagazine3)
+																				.scienceArea(artificialIntelligence)
+																				.editorReviewer(artificialIntelligence1)
+																				.build();
+				
+				unityOfWork.getEditorReviewerByScienceAreaRepository().save(editor31);
+				unityOfWork.getEditorReviewerByScienceAreaRepository().save(editor32);
+				unityOfWork.getEditorReviewerByScienceAreaRepository().save(reviewer31);
+				unityOfWork.getEditorReviewerByScienceAreaRepository().save(reviewer32);
+				unityOfWork.getEditorReviewerByScienceAreaRepository().save(reviewer33);
+		
 		
 	}
 	
@@ -554,34 +670,133 @@ public class DataLoader implements ApplicationRunner {
 		unityOfWork.getMembershipRepository().save(mShip1);
 	}
 	
+	@Autowired
+	private ArticleRepository articleRepo;
+	
 	private void initArticles() {
 		ScienceArea scienceArea = unityOfWork.getScienceAreaRepository().getOne(1l);
 		Set<Term> keyTerms = unityOfWork.getTermRepository().findAllById(Arrays.asList(new Long[] {1l, 2l})).stream().collect(Collectors.toSet());
-		UserSignedUp author = unityOfWork.getUserSignedUpRepository().findByUserUsername("lukaAuthor");
-		MagazineEdition e = unityOfWork.getMagazineEditionRepository().getOne(1l);
+		
+		UserSignedUp lukaAuthor = unityOfWork.getUserSignedUpRepository().findByUserUsername("lukaAuthor");
+		UserSignedUp nikolaAuthor = unityOfWork.getUserSignedUpRepository().findByUserUsername("nikolaAuthor");		
+		
+		MagazineEdition me1 = unityOfWork.getMagazineEditionRepository().getOne(1l);
+		MagazineEdition me2 = unityOfWork.getMagazineEditionRepository().getOne(2l);
+		MagazineEdition me3 = unityOfWork.getMagazineEditionRepository().getOne(3l);
+		MagazineEdition me4 = unityOfWork.getMagazineEditionRepository().getOne(4l);
+		MagazineEdition me5 = unityOfWork.getMagazineEditionRepository().getOne(5l);
+		MagazineEdition me6 = unityOfWork.getMagazineEditionRepository().getOne(6l);
+
+		byte[] theBytes = null;
+		
+		try {
+	        DataInputStream dis = new DataInputStream(new FileInputStream(FILEPATH));
+	         theBytes = new byte[dis.available()];
+	        dis.read(theBytes, 0, dis.available());
+	        dis.close();
+	    } catch (IOException ex) {
+	    	
+	    }
 		
 		Article article = Article.builder()
 								.articleTitle("WWW3 memes")
 								.articleAbstract("Abstract")
-								.articlePrice(500l)
+								.articlePrice(50l)
 								.status(ArticleStatus.ACCEPTED)
 								.publishingDate(new Date())
 								.scienceArea(scienceArea)
 								.keyTerms(keyTerms)
-								.author(author)
+								.author(lukaAuthor)
 								.coAuthors(new HashSet<UserSignedUp>())
-								.magazineEdition(e)
-								.file(null)
-								.fileFormat("")
+								.magazineEdition(me1)
+								.file(theBytes)
+								.doi("10.1123/153")
 								.build();
 		
-		Article a = unityOfWork.getArticleRepository().save(article);
-//		DoiGenerator d = new DoiGenerator();
-//		d.setArticle(a);
-//		DoiGenerator dSaved = doiGeneratorRepository.save(d);
+		articleRepo.save(article);
+
 	}
 	
 
+	private void initTxs() {
+		UserSignedUp lukaAuthor = unityOfWork.getUserSignedUpRepository().findByUserUsername("lukaAuthor");
+
+		//tx1
+		UserTx newTx = UserTx.builder()
+				.user(lukaAuthor)
+				.created(new Date())
+				.status(TxStatus.SUCCESS)
+				.totalAmount(20f)
+				.orderId(1l)
+				.build();
+		
+		UserTx persistedNewTx = unityOfWork.getUserTxRepository().save(newTx);
+		
+		UserTxItem newUserTxItem1 = UserTxItem.builder()
+				.buyingType(BuyingType.ARTICLE)
+				.itemId(1l)
+				.price(20f)
+				.userTx(persistedNewTx)
+				.build();
+
+		
+		unityOfWork.getUserTxItemRepository().save(newUserTxItem1);
+		
+		
+		UserTxItem newUserTxItem2 = UserTxItem.builder()
+				.buyingType(BuyingType.MAGAZINE_EDITION)
+				.itemId(1l)
+				.price(20f)
+				.userTx(persistedNewTx)
+				.build();
+
+		
+		unityOfWork.getUserTxItemRepository().save(newUserTxItem2);
+		
+		//tx2
+		UserTx newTx1 = UserTx.builder()
+				.user(lukaAuthor)
+				.created(new Date())
+				.status(TxStatus.UNKNOWN)
+				.totalAmount(20f)
+				.orderId(1l)
+				.build();
+		
+		UserTx persistedNewTx1 = unityOfWork.getUserTxRepository().save(newTx1);
+		
+		UserTxItem newUserTxItem11 = UserTxItem.builder()
+				.buyingType(BuyingType.ARTICLE)
+				.itemId(1l)
+				.price(20f)
+				.userTx(persistedNewTx1)
+				.build();
+
+		
+		unityOfWork.getUserTxItemRepository().save(newUserTxItem11);
+		
+		//tx3
+				UserTx newTx2 = UserTx.builder()
+						.user(lukaAuthor)
+						.created(new Date())
+						.orderId(1l)
+						.status(TxStatus.ERROR)
+						.totalAmount(20f)
+						.build();
+				
+				UserTx persistedNewTx2 = unityOfWork.getUserTxRepository().save(newTx2);
+				
+				UserTxItem newUserTxItem21 = UserTxItem.builder()
+						.buyingType(BuyingType.ARTICLE)
+						.itemId(1l)
+						.price(20f)
+						.userTx(persistedNewTx2)
+						.build();
+
+				
+				unityOfWork.getUserTxItemRepository().save(newUserTxItem21);
+		
+		
+	}
 	
 	private void initCamunda() {
 //		Group authorGroup = identityService.newGroup("author");
@@ -609,6 +824,24 @@ public class DataLoader implements ApplicationRunner {
 //		identityService.createMembership("reviewerDemo5", "reviewer");
 
 
-		
+//		User lukaGuest = identityService.newUser("lukaGuest");
+//		lukaGuest.setEmail("lukajvnv@gmail.com");
+//		lukaGuest.setFirstName("Luka");
+//		lukaGuest.setLastName("Guestovic");
+//		lukaGuest.setPassword("lukaGuest");
+//		
+//		User nikolaGuest = identityService.newUser("nikolaGuest");
+//		nikolaGuest.setEmail("lukajvnv@gmail.com");
+//		nikolaGuest.setFirstName("Nikola");
+//		nikolaGuest.setLastName("Guestovic");
+//		nikolaGuest.setPassword("nikolaGuest");
+//		
+//		identityService.saveUser(lukaGuest);
+//		identityService.saveUser(nikolaGuest);
+//		
+//		identityService.createMembership("lukaGuest", "author");
+//		identityService.createMembership("nikolaGuest", "author");
+
+
 	}
 }
